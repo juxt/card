@@ -58,3 +58,33 @@ jdt:
 "Just had a great chat with [[Jeremy Taylor]] & [[Alice Jones]]"
 
 "https://home.juxt.site/_site/users/jdt"
+
+
+;; A 'atom' is:
+
+;; Section:: Title? (Paragraph+ | List | Figure)
+;; Figures:: Example | Table | CodeBlock
+
+;;
+
+
+{:crux.db/id :a
+ :title "My family and other animals"
+ :sections
+ [:b :c :d]}
+
+{:crux.db/id :b
+ :title "Introduction"
+ :sections [:b2 :b3]}
+
+{:crux.db/id :b2
+ :paragraphs [:b21 :b22]}
+
+{:crux.db/id :b21
+ :content [[:text "This is where we should focus editor efforts - and allow "]
+           [:bold "bold"]
+           [:text " and italic and embedded links to other Crux entities, e.g. "]
+           "http://home.juxt.site/_site/users/jdt"]}
+
+{:crux.db/id :b3
+ :quotation "foobar"}
