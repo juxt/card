@@ -1,0 +1,68 @@
+{:openapi "3.0.2"
+ :info
+ {:version "1.0.0"
+  :title "Self"
+  :description
+  "Individual contact, professional and personal details, with consent options."
+  :contact
+  {:name "Malcolm Sparks"
+   :email "mal@juxt.pro"
+   :url "https://juxt.pro"}}
+
+ :servers [{:url "/self"}]
+
+ :paths
+ {"/{username}/contact-details"
+  {:parameters
+   [{:name "username"
+     :in "path"
+     :required true
+     :description "Username"
+     :schema {:type "string"}}]
+
+   :get
+   {:operationId "getContactDetails"
+    :responses
+    {200
+     {:juxt.site.alpha/query
+      #juxt.site.alpha/as-str
+      {:find [(pull user [*]) (pull mobile [*])]
+       :strs [user mobile]
+       :where [[mobile :juxt.site.alpha/type "SelfMobile"]
+               [mobile :juxt.pass.alpha/user user]
+               [user :juxt.pass.alpha/username {:name "username" :in "path"}]]}
+
+      :content
+      {"application/json"
+       {:schema {"type" "array"
+                 "items" {"type" "object"}}}}}}}}}
+
+ :components
+ {:schemas
+  {"Typed"
+   {:type "object"
+    :required ["type"]
+    :juxt.jinx.alpha/keyword-mappings {"type" "juxt.site.alpha/type"}
+    :properties
+    {"type" {:type "string" :minLength 1 :pattern "Self.*"}}}
+
+   "SelfEmail"
+   {:allOf
+    [{"$ref" "#/components/schemas/Typed"}
+     {:type "object"
+      :juxt.site.alpha/purpose ""
+      :required ["email"]
+      :properties
+      {"type" {:const "SelfEmail"}
+       "email" {:description "Personal (non-JUXT) email"
+                :type "email"}}}]}
+
+   "SelfMobile"
+   {:allOf
+    [{"$ref" "#/components/schemas/Typed"}
+     {:type "object"
+      :required ["mobile"]
+      :properties
+      {"type" {:const "SelfMobile"}
+       "email" {:description "Mobile phone"
+                :type "mobile"}}}]}}}}

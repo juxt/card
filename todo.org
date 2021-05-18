@@ -1,0 +1,49 @@
+* Card data format
+
+See file:design/data.edn
+
+* Spaced repetition
+
+Memory jogging
+
+* Use-cases
+
+Why do we want this thing?
+
+** @mal: Capturing thoughts and ideas that I don't want to forget
+
+** @mal: Sharing bookmarks (deli.cio.us style)
+
+Other colleagues might bookmark the same articles in a similar time-frame
+
+Anyone I can discuss this link with?
+
+
+** @jdt: Dumping/Sharing without interrupting
+
+Foster gardening and curation of knowledge
+
+** Tag cloud
+
+** Folksonomy
+https://en.wikipedia.org/wiki/Folksonomy
+
+** @jdt: A single place where I can view the priorities - subsume all the other systems
+
+"stop using my emacs buffer"
+
+have a TODO list that I can very easily share (and be prioritised)
+
+** Tasks
+
+
+A Task is a Card (that might have a due-date, has a completed 'status' todo/done)
+
+A Card can be a Reminder
+
+** Memex
+
+https://en.wikipedia.org/wiki/Memex
+
+
+** You know you've nailed it when everybody sets it as their home page

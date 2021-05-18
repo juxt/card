@@ -1,0 +1,31 @@
+{:deps {:aliases [:dev]}
+
+ :dev-http {8000 {:roots ["public" "target/dev/app"]}}
+
+ :builds
+ {:app
+  {:target :browser
+   :modules {:main {:entries [juxt.home.card.main]}}
+
+   :devtools
+   {:preloads [day8.re-frame-10x.preload]}
+
+   :dev
+   {:compiler-options {}
+    :output-dir "target/dev/app/js"
+    :closure-defines
+    {goog.DEBUG true
+     juxt.home.self.config/dev? true
+     juxt.home.self.config/site-api-origin "http://localhost:2021"
+     re-frame.trace/trace-enabled? true}}
+
+   :release
+   {:compiler-options {:optimizations :advanced}
+    :output-dir "target/release/app/js"
+    :closure-defines
+    {juxt.home.self.config/dev? true
+     juxt.home.self.config/site-api-origin ""
+     re-frame.trace/trace-enabled? true}
+    :build-options
+    {:ns-aliases
+     {day8.re-frame.tracing day8.re-frame.tracing-stubs}}}}}}

@@ -1,1 +1,13 @@
 = Card
+
+== Development
+
+----
+$ npm run shadow-dev
+----
+
+== Release
+
+----
+$ npm run shadow-release
+----
