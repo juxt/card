@@ -1,0 +1,12 @@
+{;;:crux.db/id "https://home.juxt.site/cards/641fc054-0f9f-4c46-b5f2-aa37dfbdb080"
+ :juxt.site.alpha/type ["Task" "Card"]
+ :author "{{base-uri}}/_site/users/jdt"
+ :classification "INTERNAL"
+ :assignee ["{{base-uri}}/_site/users/jon"
+            "{{base-uri}}/_site/users/sdh"]
+ :priority 3
+ :deadline "2020-12-10"
+ :status "TODO"
+ :content [[:text "Organise cake for "]
+           "{{base-uri}}/_site/users/mal"
+           [:text "'s 50th birthday."]]}
