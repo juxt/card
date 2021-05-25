@@ -1,68 +1,51 @@
 {:openapi "3.0.2"
  :info
  {:version "1.0.0"
-  :title "Self"
+  :title "Card"
   :description
-  "Individual contact, professional and personal details, with consent options."
+  "Zettelkasten, Kanban"
   :contact
   {:name "Malcolm Sparks"
    :email "mal@juxt.pro"
    :url "https://juxt.pro"}}
 
- :servers [{:url "/self"}]
+ :servers [{:url "/card"}]
 
  :paths
- {"/{username}/contact-details"
+ {"/cards/"
+  {:post
+   {:operationId "postCard"
+    :juxt.site.alpha/post-fn juxt.apex.alpha.helpers/post-request-body
+    :requestBody
+    {:required true
+     :content {"application/json" {:schema {"$ref" "#/components/schemas/Card"}}}}
+    :responses
+    {201 {}}}}
+
+  "/cards/{id}"
   {:parameters
-   [{:name "username"
+   [{:name "id"
      :in "path"
      :required true
-     :description "Username"
-     :schema {:type "string"}}]
+     :description "Card identifier"
+     :schema {:type "string" :format "uuid"}}]
 
-   :get
-   {:operationId "getContactDetails"
-    :responses
-    {200
-     {:juxt.site.alpha/query
-      #juxt.site.alpha/as-str
-      {:find [(pull user [*]) (pull mobile [*])]
-       :strs [user mobile]
-       :where [[mobile :juxt.site.alpha/type "SelfMobile"]
-               [mobile :juxt.pass.alpha/user user]
-               [user :juxt.pass.alpha/username {:name "username" :in "path"}]]}
-
-      :content
-      {"application/json"
-       {:schema {"type" "array"
-                 "items" {"type" "object"}}}}}}}}}
+   :get {:operationId "getCard"}
+   :put {:operationId "putCard"
+         :requestBody
+         {:required true
+          :content {"application/json" {:schema {"$ref" "#/components/schemas/Card"}}}}
+         :responses
+         {201 {}
+          204 {}}}}}
 
  :components
  {:schemas
-  {"Typed"
+  {"Card"
    {:type "object"
-    :required ["type"]
     :juxt.jinx.alpha/keyword-mappings {"type" "juxt.site.alpha/type"}
     :properties
-    {"type" {:type "string" :minLength 1 :pattern "Self.*"}}}
-
-   "SelfEmail"
-   {:allOf
-    [{"$ref" "#/components/schemas/Typed"}
-     {:type "object"
-      :juxt.site.alpha/purpose ""
-      :required ["email"]
-      :properties
-      {"type" {:const "SelfEmail"}
-       "email" {:description "Personal (non-JUXT) email"
-                :type "email"}}}]}
-
-   "SelfMobile"
-   {:allOf
-    [{"$ref" "#/components/schemas/Typed"}
-     {:type "object"
-      :required ["mobile"]
-      :properties
-      {"type" {:const "SelfMobile"}
-       "email" {:description "Mobile phone"
-                :type "mobile"}}}]}}}}
+    {"type" {:const "Card"}
+     "priority" {:type "number"}
+     "deadline" {:type "string"
+                 :juxt.jinx.alpha/as "inst"}}}}}}
