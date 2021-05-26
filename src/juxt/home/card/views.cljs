@@ -129,31 +129,38 @@
 (defn text [data]
   data)
 
+(declare card-content)
+
 (defmulti render-component :juxt.site.alpha/type)
 
 (defmethod render-component :default [component]
-  [:span.text-red-700.font-bold "error"])
+  [:span.text-red-700.font-bold (str "error on type " (:juxt.site.alpha/type component))])
 
 (defmethod render-component "User" [user]
   [:a.text-indigo-700.font-bold
    {:href (:crux.db/id user)}
    (str "@" (:juxt.pass.alpha/username user))])
 
-(declare card)
+(defmethod render-component "DocumentSection" [section]
+  [:div
+   [:h1 (tw ["text-xl" "font-medium"]) (:title section)]
+   [:h2 (:subtitle section)]
+   (card-content section)])
 
 (defmethod render-component "Task" [task]
   [:div
    [:input (tw ["mx-2"] {:type "checkbox" :checked (= (:status task) "DONE")})]
    [:span (tw ["px-4"]) [:a (tw ["text-indigo-700"]
                                 {:href (:crux.db/id task)}) (:title task)]]
-   [:span.text-sm "pri:" (:priority task) ", deadline: " (:deadline task)]])
+   [:span.text-sm "(pri:" (:priority task) ", deadline: " (:deadline task) ")"]
+   #_(card-content task)])
 
 (defmethod render-component "Checklist" [task]
-  (card task))
+  [:div (tw "border-2")
+   (card-content task)])
 
-
-(defn card [card]
-  [:div (tw ["p-2" "border-2"])
+(defn card-content [card]
+  [:div (tw ["py-2"])
    #_[:p (tw ["pb-4" "text-sm" "text-gray-400"])
     (:juxt.site.alpha/type card)]
 
@@ -167,7 +174,9 @@
        (vector? segment)
        (let [[typ data] segment]
          (case typ
-           "text" [text data]))
+           "text" [text data]
+           "em" [:span.italic [text data]]
+           [text data]))
        (map? segment)
        (render-component segment)
 
@@ -182,4 +191,5 @@
                                               #_"/card/cards/task-1")])]
     [:div (tw ["bg-gray-100" "p-6" "appearance-none"])
      (let [root @signal]
-       [card root])]))
+       (render-component root)
+       )]))
