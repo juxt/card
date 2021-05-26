@@ -28,7 +28,7 @@
      :in "path"
      :required true
      :description "Card identifier"
-     :schema {:type "string" :format "uuid"}}]
+     :schema {:type "string"}}]
 
    :get {:operationId "getCard"}
    :put {:operationId "putCard"
