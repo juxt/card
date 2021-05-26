@@ -11,7 +11,7 @@
 (rf/reg-event-fx
  :initialize
  (fn [_ _]
-   {:fx [[:dispatch [:get-card "task-1"]]]}))
+   {:fx [[:dispatch [:get-card "section-containing-checklist-1" #_"task-1"]]]}))
 
 (rf/reg-event-fx
  :get-card

@@ -139,16 +139,28 @@
    {:href (:crux.db/id user)}
    (str "@" (:juxt.pass.alpha/username user))])
 
+(declare card)
+
+(defmethod render-component "Task" [task]
+  [:div
+   [:input (tw ["mx-2"] {:type "checkbox" :checked (= (:status task) "DONE")})]
+   [:span (tw ["px-4"]) [:a (tw ["text-indigo-700"]
+                                {:href (:crux.db/id task)}) (:title task)]]
+   [:span.text-sm "pri:" (:priority task) ", deadline: " (:deadline task)]])
+
+(defmethod render-component "Checklist" [task]
+  (card task))
+
 
 (defn card [card]
   [:div (tw ["p-2" "border-2"])
-   [:p (tw ["pb-4" "text-sm" "text-gray-400"])
+   #_[:p (tw ["pb-4" "text-sm" "text-gray-400"])
     (:juxt.site.alpha/type card)]
 
-   [:p (tw ["text-sm" "text-gray-400"]) "Priority: " (:priority card)]
-   [:p (tw ["text-sm" "text-gray-400"]) "Status: " (:status card)]
-   [:p (tw ["text-sm" "text-gray-400"]) "Classification: " (:classification card)]
-   [:hr (tw ["pb-4"])]
+   #_[:p (tw ["text-sm" "text-gray-400"]) "Priority: " (:priority card)]
+   #_[:p (tw ["text-sm" "text-gray-400"]) "Status: " (:status card)]
+   #_[:p (tw ["text-sm" "text-gray-400"]) "Classification: " (:classification card)]
+   #_[:hr (tw ["pb-4"])]
 
    (for [segment (:content card)]
      (cond
@@ -158,10 +170,16 @@
            "text" [text data]))
        (map? segment)
        (render-component segment)
+
+       (string? segment)
+       [:span segment]
+
        :else [:span.text-red-700 "(unsupported segment type)"]))])
 
 (defn ui []
-  (let [signal (rf/subscribe [::sub/card (str config/site-api-origin "/card/cards/task-1")])]
+  (let [signal (rf/subscribe [::sub/card (str config/site-api-origin
+                                              "/card/cards/section-containing-checklist-1"
+                                              #_"/card/cards/task-1")])]
     [:div (tw ["bg-gray-100" "p-6" "appearance-none"])
      (let [root @signal]
        [card root])]))
