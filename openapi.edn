@@ -30,6 +30,15 @@
      :description "Card identifier"
      :schema {:type "string"}}]
 
+   :get {:operationId "getCard"
+
+         :responses
+         {200 {:content
+               {"application/json"
+                {:schema {"$ref" "#/components/schemas/Card"}}
+                "text/html;charset=utf-8" {}}}
+          }}
+
    :put {:operationId "putCard"
          :requestBody
          {:required true
@@ -46,8 +55,6 @@
      :required true
      :description "Card identifier"
      :schema {:type "string"}}]
-
-
 
    :get {:operationId "getCardComponents"
          :description "From the card corresponding to the id parameter, return
