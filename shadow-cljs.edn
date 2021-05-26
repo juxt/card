@@ -15,18 +15,18 @@
     :output-dir "target/dev/app/js"
     :closure-defines
     {goog.DEBUG true
-     juxt.home.self.config/dev? true
-     juxt.home.self.config/site-api-origin "https://home.juxt.site"
-     juxt.home.self.config/application-context "/"
+     juxt.home.card.config/dev? true
+     juxt.home.card.config/site-api-origin #_"https://home.juxt.site" "http://localhost:2021"
+     juxt.home.card.config/application-context "/"
      re-frame.trace/trace-enabled? true}}
 
    :release
    {:compiler-options {:optimizations :advanced}
     :output-dir "target/release/app/js"
     :closure-defines
-    {juxt.home.self.config/dev? true
-     juxt.home.self.config/site-api-origin ""
-     juxt.home.self.config/application-context "/card/"
+    {juxt.home.card.config/dev? true
+     juxt.home.card.config/site-api-origin ""
+     juxt.home.card.config/application-context "/card/"
      re-frame.trace/trace-enabled? true}
     :build-options
     {:ns-aliases
