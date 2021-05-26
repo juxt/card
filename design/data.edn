@@ -1,21 +1,21 @@
-{:crux.db/id "faed4cd6-789a-4c8f-9a94-e0608f481fe6"
+#_{:crux.db/id "faed4cd6-789a-4c8f-9a94-e0608f481fe6"
  :title "Diary entry for 4th May"
  :type "quotation"
  :paras ["To be or not to be"]
  :author "William Shakespeare"}
 
-{:crux.db/id "https://home.juxt.site/_site/users/jdt"
+#_{:crux.db/id "https://home.juxt.site/_site/users/jdt"
  :name "Jeremy Taylor"
  :type "User"}
 
 
-{:crux.db/id "jdt-suggestion"
+#_{:crux.db/id "jdt-suggestion"
  :type "section"
  :author "https://home.juxt.site/_site/users/jdt"
  :paras ["We should always start with modelling the data!"
          "I think that makes sense"]}
 
-{
+#_{
  :crux.db/id "eaed4cd6-789a-4c8f-9a94-e0608f481fe6"
  :title "Diary entry for 4th May"
  :type "section"
@@ -36,29 +36,13 @@
  :tags ["rant" "design" "clojure"]}
 
 
-What travels to the text editor:
-
-"Had a _great_ session with [[https://home.juxt.site/_site/users/jdt]] working out the design of Card"
-
-What the user types:
-
-"Had a _great_ session with [[Jeremy Taylor]] working out the design of Card"
-
-
-jdt:
-
-{:username "jdt",
+#_{:username "jdt",
  :email "jdt@juxt.pro",
  :name "Jeremy Taylor",
  :roam/label "Jeremy Taylor"
  :juxt.site.alpha/type "User",
  :juxt.pass.alpha/username "jdt",
  :crux.db/id "https://home.juxt.site/_site/users/jdt"}
-
-"Just had a great chat with [[Jeremy Taylor]] & [[Alice Jones]]"
-
-"https://home.juxt.site/_site/users/jdt"
-
 
 ;; A 'atom' is:
 
@@ -68,23 +52,76 @@ jdt:
 ;;
 
 
-{:crux.db/id :a
+#_{:crux.db/id :a
  :title "My family and other animals"
  :sections
  [:b :c :d]}
 
-{:crux.db/id :b
+#_{:crux.db/id :b
  :title "Introduction"
  :sections [:b2 :b3]}
 
-{:crux.db/id :b2
+#_{:crux.db/id :b2
  :paragraphs [:b21 :b22]}
 
-{:crux.db/id :b21
- :content [[:text "This is where we should focus editor efforts - and allow "]
-           [:bold "bold"]
+#_{:crux.db/id :b21
+ :author "Malcolm"
+ :classification "CLIENT CONFIDENTIAL"
+ :assignee ["https://home.juxt.site/_site/users/jon"
+            "https://home.juxt.site/_site/users/sdh"]
+ :client ""
+ :content [[:para "This is where we should focus editor efforts - and allow "]
+           [:em "bold"]
            [:text " and italic and embedded links to other Crux entities, e.g. "]
-           "http://home.juxt.site/_site/users/jdt"]}
+           "https://home.juxt.site/_site/users/jdt"]}
 
-{:crux.db/id :b3
+#_{:crux.db/id :b3
  :quotation "foobar"}
+
+
+#_{:crux.db/id :tasks1
+ :author "https://home.juxt.site/_site/users/jdt"
+ :classification "INTERNAL"
+ :assignee ["https://home.juxt.site/_site/users/jon"
+            "https://home.juxt.site/_site/users/sdh"]
+ :priority 3
+ :juxt.site.alpha/type ["Task" "Card"]
+ :content [[:text "Please ask"]
+           "https://home.juxt.site/_site/users/rem"
+           [:text "about his "]
+           "https://home.juxt.site/wiki/Crux"
+           [:text "contact. Also, ensure that he knows where to find Crux materials."]
+           :checklists1]}
+
+#_{:crux.db/id :checklists1
+ :author "https://home.juxt.site/_site/users/jdt"
+ :classification "INTERNAL"
+ :assignee ["https://home.juxt.site/_site/users/jon"
+            "https://home.juxt.site/_site/users/sdh"]
+ :juxt.site.alpha/type ["Checklist"]
+ :items [:checklist-items/1 :checklist-items/2]}
+
+#_{:crux.db/id :checklist-items/1
+ :status :todo
+ :assignee "https://home.juxt.site/_site/users/jon"
+ :content [[:text "Lookup "]
+           "https://home.juxt.site/wiki/Crux"
+           [:text "materials"]]}
+
+#_{:crux.db/id :checklist-items/2
+ :status :todo
+ :assignee "https://home.juxt.site/_site/users/kat"
+ :content [[:text "Book party!"]]
+ :links :events/1}
+
+#_{:crux.db/id :events/1
+ :juxt.site.alpha/type "Event"
+ :content [[:text "JUXT Party!"]]
+ :tick/beginning #inst "2021-09-14T18:30"
+ :tick/end #inst "2021-09-14T23:00"}
+
+
+;; Get these resources into a database and be able to render them
+
+;; @mal create a 'recursive API' (try to use a recursive pull) to pull all the
+;; attributes of cards and their children.
