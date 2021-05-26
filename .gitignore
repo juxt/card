@@ -1,2 +1,4 @@
 .cpcache/
 target/
+node_modules/
+.shadow-cljs/
