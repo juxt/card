@@ -1,6 +1,6 @@
 {:openapi "3.0.2"
  :info
- {:version "1.0.0"
+ {:version "1.0.1"
   :title "Card"
   :description
   "Zettelkasten, Kanban"
@@ -30,14 +30,60 @@
      :description "Card identifier"
      :schema {:type "string"}}]
 
-   :get {:operationId "getCard"}
    :put {:operationId "putCard"
          :requestBody
          {:required true
           :content {"application/json" {:schema {"$ref" "#/components/schemas/Card"}}}}
          :responses
          {201 {}
-          204 {}}}}}
+          204 {}}}
+   }
+
+  "/components/{id}"
+  {:parameters
+   [{:name "id"
+     :in "path"
+     :required true
+     :description "Card identifier"
+     :schema {:type "string"}}]
+
+
+
+   :get {:operationId "getCardComponents"
+         :description "From the card corresponding to the id parameter, return
+         all the content component entities of the card, including the card
+         itself."
+         :responses
+         {200
+          {:juxt.site.alpha/query
+           #juxt.site.alpha/as-str
+           {:find [(pull component [*])]
+            :where [[root :crux.db/id root-uri]
+
+                    ;; We construct the card uri from the id
+                    [(str
+                      {:juxt.site.alpha/ref [:juxt.site.alpha/base-uri]}
+                      "/card/cards/"
+                      {:in "path" :name "id"}) root-uri]
+
+                    [component :crux.db/id]
+
+                    (is-ancestor-of? root component)]
+            :rules [
+                    [(is-ancestor-of? ?parent ?child)
+                     [?parent :content ?child]]
+                    [(is-ancestor-of? ?ancestor ?child)
+                     [?parent :content ?child]
+                     (is-ancestor-of? ?ancestor ?parent)]
+                    [(is-ancestor-of? ?ancestor ?child)
+                     [(= ?ancestor ?child)]]]}
+           :juxt.site.alpha/extract-first-projection? true
+
+           :content
+           {"application/json"
+            {:schema {"$ref" "#/components/schemas/Card"}}}}}}
+
+   }}
 
  :components
  {:schemas
