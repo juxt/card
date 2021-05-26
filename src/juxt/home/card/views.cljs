@@ -92,19 +92,19 @@
 
 (defn button [label]
   [:div
-   (tw [:px-4 :py-3 :text-right "sm:px-6"])
+   (tw ["px-4" "py-3" "text-right" "sm:px-6"])
    [:button
     (tw
-     [:inline-flex
-      :justify-center
-      :py-2
-      :px-4
-      :border
-      :border-transparent
-      :text-sm
-      :font-medium
-      :text-white
-      :bg-yellow-600
+     ["inline-flex"
+      "justify-center"
+      "py-2"
+      "px-4"
+      "border"
+      "border-transparent"
+      "text-sm"
+      "font-medium"
+      "text-white"
+      "bg-yellow-600"
       "hover:bg-yellow-700"
       "focus:outline-none"
       "focus:ring-2"
@@ -114,22 +114,54 @@
 
 (defn input [{:keys [label type] :or {type "input"}} ]
   [:div
-   [:label (tw [:block :text-sm :font-medium :text-gray-700]) label]
+   [:label (tw ["block" "text-sm" "font-medium" "text-gray-700"]) label]
    [:input
     (tw
-     [:mt-1
-      :px-1
+     ["mt-1"
+      "px-1"
       "focus:ring-yellow-500"
       "focus:border-yellow-500"
-      :block
-      :w-full
-      :border-2]
+      "block"
+      "w-full"
+      "border-2"]
      {:type type})]])
 
+(defn text [data]
+  data)
+
+(defmulti render-component :juxt.site.alpha/type)
+
+(defmethod render-component :default [component]
+  [:span.text-red-700.font-bold "error"])
+
+(defmethod render-component "User" [user]
+  [:a.text-indigo-700.font-bold
+   {:href (:crux.db/id user)}
+   (str "@" (:juxt.pass.alpha/username user))])
+
+
+(defn card [card]
+  [:div (tw ["p-2" "border-2"])
+   [:p (tw ["pb-4" "text-sm" "text-gray-400"])
+    (:juxt.site.alpha/type card)]
+
+   [:p (tw ["text-sm" "text-gray-400"]) "Priority: " (:priority card)]
+   [:p (tw ["text-sm" "text-gray-400"]) "Status: " (:status card)]
+   [:p (tw ["text-sm" "text-gray-400"]) "Classification: " (:classification card)]
+   [:hr (tw ["pb-4"])]
+
+   (for [segment (:content card)]
+     (cond
+       (vector? segment)
+       (let [[typ data] segment]
+         (case typ
+           "text" [text data]))
+       (map? segment)
+       (render-component segment)
+       :else [:span.text-red-700 "(unsupported segment type)"]))])
+
 (defn ui []
-  [:div.bg-gray-100.p-6.appearance-none
-   [:div.p-8
-
-    [:p "TODO: Display card"]
-
-    ]])
+  (let [signal (rf/subscribe [::sub/card (str config/site-api-origin "/card/cards/task-1")])]
+    [:div (tw ["bg-gray-100" "p-6" "appearance-none"])
+     (let [root @signal]
+       [card root])]))

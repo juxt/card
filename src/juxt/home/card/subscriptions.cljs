@@ -16,7 +16,22 @@
  (fn [current-route _]
    (get-in current-route [:data :name])))
 
+(defn resolve-references [node index]
+  (update
+   node
+   :content
+   (fn [content]
+     (mapv (fn [segment]
+            (cond
+              (string? segment)
+              (if-let [subnode (get index segment)]
+                (resolve-references subnode index)
+                segment)
+              :else segment))
+          content))))
+
 (rf/reg-sub
- ::user-details
- (fn [db _]
-   (get-in db [:user])))
+ ::card
+ (fn [db [_ id]]
+   (let [card (get-in db [:card-components id])]
+     (resolve-references card (:card-components db)))))

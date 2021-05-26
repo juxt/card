@@ -10,24 +10,28 @@
 
 (rf/reg-event-fx
  :initialize
- (fn-traced [_ _]
-   {:fx [[:dispatch [:get-user]]]}))
+ (fn [_ _]
+   {:fx [[:dispatch [:get-card "task-1"]]]}))
 
 (rf/reg-event-fx
- :get-user
- (fn-traced [db [kw]]
+ :get-card
+ (fn [db [_ id]]
    (->
-    (js/fetch (str config/site-api-origin "/_site/user")
+    (js/fetch (str config/site-api-origin "/card/components/" id)
               #js {"credentials" "include"
                    "headers" #js {"accept" "application/json"}})
     (.then (fn [response] (.json response)))
-    (.then (fn [json] (rf/dispatch [:received-user json])
+    (.then (fn [json] (rf/dispatch [:received-card-components json])
 )))
    ;; Remember to return at least a map
    {}))
 
 (rf/reg-event-db
- :received-user
+ :received-card-components
  (fn [db [kw json]]
-   (println "Received user")
-   (assoc db :user (js->clj json :keywordize-keys true))))
+   (println "Received card")
+   (let [components
+         (->> (js->clj json :keywordize-keys true)
+              (map (juxt :crux.db/id identity))
+              (into {}))]
+     (update db :card-components (fnil merge {}) components))))
