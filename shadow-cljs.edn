@@ -16,7 +16,8 @@
     :closure-defines
     {goog.DEBUG true
      juxt.home.self.config/dev? true
-     juxt.home.self.config/site-api-origin "http://localhost:2021"
+     juxt.home.self.config/site-api-origin "https://home.juxt.site"
+     juxt.home.self.config/application-context "/"
      re-frame.trace/trace-enabled? true}}
 
    :release
@@ -25,6 +26,7 @@
     :closure-defines
     {juxt.home.self.config/dev? true
      juxt.home.self.config/site-api-origin ""
+     juxt.home.self.config/application-context "/card/"
      re-frame.trace/trace-enabled? true}
     :build-options
     {:ns-aliases

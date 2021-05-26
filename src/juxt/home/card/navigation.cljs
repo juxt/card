@@ -2,6 +2,7 @@
 
 (ns juxt.home.card.navigation
   (:require
+   [juxt.home.card.config :as config]
    [re-frame.core :as rf]
    [reitit.frontend :as reitit]
    [reitit.coercion.spec :as rss]
@@ -31,10 +32,8 @@
 
 (def router
   (reitit/router
-   ["/card/"
-    ["index.html" {:name ::index}]
-    ]
-
+   [config/application-context
+    ["index.html" {:name ::index}]]
    {:data {:coercion rss/coercion}}))
 
 (defn init-routes! []
