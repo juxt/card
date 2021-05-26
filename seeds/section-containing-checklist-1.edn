@@ -1,0 +1,9 @@
+{:juxt.site.alpha/type "DocumentSection"
+ :author "{{base-uri}}/_site/users/jdt"
+ :classification "INTERNAL"
+ :title "Introduction"
+ :subtitle "The evolution of cards"
+ :content [[:text "Here's a section of a document that has a built-in check-list: "]
+           "{{base-uri}}/card/cards/checklist-1"
+           [:text ". "]
+           [:text "Some more text here."]]}

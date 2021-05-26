@@ -1,0 +1,7 @@
+{;;:crux.db/id "https://home.juxt.site/cards/641fc054-0f9f-4c46-b5f2-aa37dfbdb080"
+ :juxt.site.alpha/type "Checklist"
+ :author "{{base-uri}}/_site/users/jdt"
+ :classification "INTERNAL"
+ :deadline "2020-12-10"
+ :content ["{{base-uri}}/card/cards/task-1a"
+           "{{base-uri}}/card/cards/task-1b"]}

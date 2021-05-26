@@ -6,7 +6,8 @@
             "{{base-uri}}/_site/users/sdh"]
  :priority 3
  :deadline "2020-12-10"
- :status "TODO"
+ :status "DONE"
+ :title "Get cake"
  :content [[:text "Organise cake for "]
            "{{base-uri}}/_site/users/mal"
            [:text "'s 50th birthday."]]}
