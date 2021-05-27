@@ -185,11 +185,27 @@
 
        :else [:span.text-red-700 "(unsupported segment type)"]))])
 
+(defn menu []
+  [:div
+   [:ul [:li.text-sm [:a {:href "index.html"} "Index"]]]
+   [:ul [:li.text-sm [:a {:href "kanban.html"} "Kanban"]]]
+   ])
+
+(defn index []
+  (let [root (rf/subscribe [::sub/card (str config/site-api-origin
+                                            "/card/cards/section-containing-checklist-1"
+                                            #_"/card/cards/task-1")])]
+
+    [:div
+     [:div (tw ["bg-gray-100" "p-6" "appearance-none"])
+      (render-component @root)]
+     [menu]
+     ]))
+
 (defn ui []
-  (let [signal (rf/subscribe [::sub/card (str config/site-api-origin
-                                              "/card/cards/section-containing-checklist-1"
-                                              #_"/card/cards/task-1")])]
-    [:div (tw ["bg-gray-100" "p-6" "appearance-none"])
-     (let [root @signal]
-       (render-component root)
-       )]))
+  (let [page @(rf/subscribe [::sub/page])]
+    [:div
+     (case page
+       ::nav/index [index]
+       ::nav/kanban [:div [:h1.text-lg "Kanban"] [menu]]
+       [:div [:h1 "Page not ready"]])]))
