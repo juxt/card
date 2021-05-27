@@ -134,10 +134,13 @@
 (defmulti render-component :juxt.site.alpha/type)
 
 (defmethod render-component :default [component]
-  [:span.text-red-700.font-bold (str "error on type " (:juxt.site.alpha/type component))])
+  [:span.text-red-700.font-bold (str "error on type '" (:juxt.site.alpha/type component) "' on " [:pre (pr-str component)])])
+
+(defmethod render-component nil [_]
+  [:span.text-red-700.font-bold (str "some nil component...")])
 
 (defmethod render-component "User" [user]
-  [:a.text-indigo-700.font-bold
+  [:a.text-yellow-700.font-bold
    {:href (:crux.db/id user)}
    (str "@" (:juxt.pass.alpha/username user))])
 
@@ -192,9 +195,11 @@
    ])
 
 (defn index []
-  (let [root (rf/subscribe [::sub/card (str config/site-api-origin
-                                            "/card/cards/section-containing-checklist-1"
-                                            #_"/card/cards/task-1")])]
+  (let [root (rf/subscribe
+              [::sub/card
+               (str config/site-api-origin
+                    "/card/cards/section-containing-checklist-1"
+                    #_"/card/cards/task-1")])]
 
     [:div
      [:div (tw ["bg-gray-100" "p-6" "appearance-none"])
