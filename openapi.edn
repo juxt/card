@@ -36,8 +36,7 @@
          {200 {:content
                {"application/json"
                 {:schema {"$ref" "#/components/schemas/Card"}}
-                "text/html;charset=utf-8" {}}}
-          }}
+                "text/html;charset=utf-8" {}}}}}
 
    :put {:operationId "putCard"
          :requestBody
@@ -45,8 +44,7 @@
           :content {"application/json" {:schema {"$ref" "#/components/schemas/Card"}}}}
          :responses
          {201 {}
-          204 {}}}
-   }
+          204 {}}}}
 
   "/components/{id}"
   {:parameters
