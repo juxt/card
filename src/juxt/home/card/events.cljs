@@ -5,7 +5,6 @@
    [juxt.home.card.config :as config]
    [reagent.dom]
    [re-frame.core :as rf]
-   [tick.alpha.api :as t]
    [day8.re-frame.tracing :refer [fn-traced]]))
 
 (rf/reg-event-fx

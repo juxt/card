@@ -5,13 +5,13 @@
  :builds
  {:app
   {:target :browser
-   :modules {:main {:entries [juxt.home.card.main]}}
+   :modules {:main {:entries [#_juxt.home.card.main juxt.home.card.slate]}}
 
    :devtools
    {:preloads [day8.re-frame-10x.preload]}
 
    :dev
-   {:compiler-options {}
+   {:compiler-options {}#_{:output-feature-set :es5}
     :output-dir "target/dev/app/js"
     :closure-defines
     {goog.DEBUG true

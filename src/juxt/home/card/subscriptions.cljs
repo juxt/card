@@ -2,8 +2,7 @@
 
 (ns juxt.home.card.subscriptions
   (:require
-   [re-frame.core :as rf]
-   [tick.alpha.api :as t]))
+   [re-frame.core :as rf]))
 
 (rf/reg-sub
  ::current-route

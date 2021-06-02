@@ -5,6 +5,7 @@
    [juxt.home.card.navigation :as nav]
    [juxt.home.card.config :as config]
    [juxt.home.card.subscriptions :as sub]
+   [juxt.home.card.slate :as slate]
    [re-frame.core :as rf]
    [tailwind-hiccup.core :refer [tw]]))
 
@@ -192,6 +193,7 @@
   [:div
    [:ul [:li.text-sm [:a {:href "index.html"} "Index"]]]
    [:ul [:li.text-sm [:a {:href "kanban.html"} "Kanban"]]]
+   [:ul [:li.text-sm [:a {:href "slate.html"} "Slate"]]]
    ])
 
 (defn index []
@@ -213,4 +215,5 @@
      (case page
        ::nav/index [index]
        ::nav/kanban [:div [:h1.text-lg "Kanban"] [menu]]
+       ::nav/slate [:div [:h1.text-lg "Slate"] [slate/app]]
        [:div [:h1 "Page not ready"]])]))
