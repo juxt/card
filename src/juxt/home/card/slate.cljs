@@ -36,7 +36,6 @@
                    :children
                    #js [#js {:text "A line of text in a paragraph."}]}])]
 
-    #_(createElement "div" #js {} "foobar")
     (createElement Slate
                    #js {:editor editor
                         :value value

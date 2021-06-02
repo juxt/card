@@ -5,13 +5,16 @@
  :builds
  {:app
   {:target :browser
+   ;; This entry-keys option were found to be needed prior to the upgrade to
+   ;;   shadow-cljs 2.14.2. Left in in-case the fix regresses.  :js-options
+   ;;   {:entry-keys ["umd" "browser" "main" "module"]}
    :modules {:main {:entries [#_juxt.home.card.main juxt.home.card.slate]}}
 
    :devtools
    {:preloads [day8.re-frame-10x.preload]}
 
    :dev
-   {:compiler-options {}#_{:output-feature-set :es5}
+   {:compiler-options #_{:output-feature-set :es8} {}
     :output-dir "target/dev/app/js"
     :closure-defines
     {goog.DEBUG true
