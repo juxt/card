@@ -5,6 +5,7 @@
    [goog.object :as gobj]
    [reagent.core :as reagent]
    ["react" :as react :refer [createElement useEffect useMemo useState]]
+   ["react-dom" :refer [render]]
    ["slate" :as slate :refer [createEditor]]
    ["slate-react" :refer [Slate Editable withReact]]
    [tailwind-hiccup.core :refer [tw]]))
@@ -27,19 +28,20 @@
 
 (defn App
   []
-  (let [editor (useMemo #(withReact (createEditor))
-                        #js [])
-                                        ; Add the initial value when setting up our state.
-        #_[value setValue]
-        #_(useState
-           #js [#js {:type "paragraph"
-                     :children
-                     #js [#js {:text "A line of text in a paragraph."}]}])]
-    #_(createElement Slate
-                     #js {:editor editor
-                          :value value
-                          :onChange #(setValue %)}
-                     (createElement Editable #js{}))))
+  (let [editor (useMemo #(withReact (createEditor)) #js [])
+        ;; Add the initial value when setting up our state.
+        [value setValue]
+        (useState
+         #js [#js {:type "paragraph"
+                   :children
+                   #js [#js {:text "A line of text in a paragraph."}]}])]
+
+    #_(createElement "div" #js {} "foobar")
+    (createElement Slate
+                   #js {:editor editor
+                        :value value
+                        :onChange #(setValue %)}
+                   (createElement Editable #js{}))))
 
 #_(defn app []
   [:<>
@@ -47,6 +49,6 @@
    #_[editor (tw ["bg-yellow-200"] {:name "malcolm"})]])
 
 
-(reagent.dom/render
-   [App]
-   (js/document.getElementById "app"))
+(render
+ (createElement App #js {})
+ (js/document.getElementById "app"))
