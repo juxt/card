@@ -2,10 +2,7 @@
 
 (ns juxt.home.card.slate
   (:require
-   [goog.object :as gobj]
-   [reagent.core :as reagent]
    ["react" :as react :refer [createElement useEffect useMemo useState]]
-   ["react-dom" :refer [render]]
    ["slate" :as slate :refer [createEditor]]
    ["slate-react" :refer [Slate Editable withReact]]
    [tailwind-hiccup.core :refer [tw]]))
@@ -36,18 +33,21 @@
                    :children
                    #js [#js {:text "A line of text in a paragraph."}]}])]
 
-    (createElement Slate
-                   #js {:editor editor
-                        :value value
-                        :onChange #(setValue %)}
-                   (createElement Editable #js{}))))
+    (createElement
+     Slate
+     #js {:editor editor
+          :value value
+          :onChange #(setValue %)}
+     (createElement
+      Editable
+      #js {:className (clj->js (:class (tw ["bg-yellow-200"])))}))))
 
-#_(defn app []
+(defn app []
   [:<>
-   [:div (tw ["bg-red-200"]) "Hello World!"]
-   #_[editor (tw ["bg-yellow-200"] {:name "malcolm"})]])
+   [:div (tw ["bg-red-200" "m-4"]) "Hello World!"]
+   [:> App]])
 
 
-(render
- (createElement App #js {})
- (js/document.getElementById "app"))
+#_(render
+   (createElement App #js {})
+   (js/document.getElementById "app"))
