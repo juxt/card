@@ -2,26 +2,25 @@
 
 (ns juxt.home.card.slate
   (:require
-   ["react" :as react :refer [createElement useEffect useMemo useState]]
-   ["slate" :as slate :refer [createEditor]]
-   ["slate-react" :refer [Slate Editable withReact]]
+   ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
+   ["slate" :as slate :refer [createEditor Editor Transforms]]
+   ["slate-react" :refer [Editable Slate withReact]]
    [tailwind-hiccup.core :refer [tw]]))
 
-#_(defn editor []
-  (let [val (reagent/atom
-             [#js {"type" "paragraph"
-                   "children" #js [#js {"text" "A line of text in a paragraph."}]}])
-        editor (withReact (createEditor))
-        on-change-fn (fn [change-or-editor]
-                       (let [new-value (.-value change-or-editor)]
-                         (println "new-value:" new-value)
-                         ;;(some-> @this-atom reagent/force-update)
-                         change-or-editor
-                         nil))]
-    [:> Slate {:value @val
-               :editor editor
-               :on-change on-change-fn}
-     [:> Editable]]))
+(defn CodeElement
+  [props]
+  (aset (.-attributes props) "class" "bg-yellow-100 p-2")
+  (createElement "pre" (.-attributes props)
+    (createElement "code" #js{}
+                   (.-children props))))
+
+(defn DefaultElement
+  [props]
+  (aset (.-attributes props) "class" "bg-gray-100 p-2")
+  (createElement "p" (.-attributes props)
+                 (.-children props)))
+
+
 
 (defn App
   []
@@ -31,7 +30,14 @@
         (useState
          #js [#js {:type "paragraph"
                    :children
-                   #js [#js {:text ""}]}])]
+                   #js [#js {:text ""}]}])
+
+        renderElement
+        (useCallback
+         (fn [props]
+           (case (.-type (.-element props))
+             "code" (createElement CodeElement props)
+             (createElement DefaultElement props))))]
 
     (createElement
      Slate
@@ -41,12 +47,25 @@
 
      (createElement
       Editable
-      #js {:className (clj->js (:class (tw ["bg-yellow-100"])))
+      #js {;;:className (clj->js (:class (tw ["bg-yellow-100"])))
+           :renderElement renderElement
            :onKeyDown
            (fn [ev]
-             (case (.-key ev)
-               "Enter" (.preventDefault ev)
-               nil ; do nothing
+             (cond
+               (= (.-key ev) "Enter")
+               (.preventDefault ev)
+
+               (and (= (.-key ev) "`") (.-ctrlKey ev))
+               (do
+                 (.preventDefault ev)
+                 (let [[match] (es6-iterator-seq
+                                (.nodes Editor editor #js {:match (fn [n] (= (.-type n) "code"))}))]
+                   (.setNodes Transforms
+                              editor
+                              #js {:type (if match "paragraph" "code")}
+                              #js {:match (fn [n] (.isBlock Editor editor n))})))
+
+
                ))}))))
 
 (defn app []
@@ -55,10 +74,4 @@
     [:div (tw ["p-2"])
      [:> App]]
     [:div (tw ["p-2"])
-     [:> App]]
-    ]])
-
-
-#_(render
-   (createElement App #js {})
-   (js/document.getElementById "app"))
+     [:> App]]]])
