@@ -4,13 +4,14 @@
   (:require
    [juxt.home.card.config :as config]
    [reagent.dom]
-   [re-frame.core :as rf]
-   [day8.re-frame.tracing :refer [fn-traced]]))
+   [re-frame.core :as rf]))
 
 (rf/reg-event-fx
  :initialize
  (fn [_ _]
-   {:fx [[:dispatch [:get-card "section-containing-checklist-1" #_"task-1"]]]}))
+   {:fx [[:dispatch
+          [:get-card "section-containing-checklist-1"
+           #_"task-1"]]]}))
 
 (rf/reg-event-fx
  :get-card

@@ -151,6 +151,10 @@
    [:h2 (:subtitle section)]
    (card-content section)])
 
+(defmethod render-component "Paragraph" [section]
+  [:div
+   (card-content section)])
+
 (defmethod render-component "Task" [task]
   [:div
    [:input (tw ["mx-2"] {:type "checkbox" :checked (= (:status task) "DONE")})]
@@ -215,5 +219,5 @@
      (case page
        ::nav/index [index]
        ::nav/kanban [:div [:h1.text-lg "Kanban"] [menu]]
-       ::nav/slate [:div [:h1.text-lg "Slate"] [slate/app]]
+       ::nav/slate [slate/card]
        [:div [:h1 "Page not ready"]])]))

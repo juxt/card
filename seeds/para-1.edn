@@ -1,0 +1,4 @@
+{:juxt.site.alpha/type "Paragraph"
+ :author "{{base-uri}}/_site/users/jdt"
+ :classification "INTERNAL"
+ :content [[:text "Here's a section of a document that has a built-in check-list: "]]}

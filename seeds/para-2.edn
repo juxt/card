@@ -1,0 +1,10 @@
+{:juxt.site.alpha/type "Paragraph"
+ :author "{{base-uri}}/_site/users/jdt"
+ :classification "INTERNAL"
+ :content [[:text "Some more text here. "]
+           [:text "We can reference people like "]
+           "{{base-uri}}/_site/users/mal"
+           [:text " here and they will forever be related to this section of the document. "]
+           [:text "This lets us make arbitary links between text, which enables features like "]
+           [:em "structural search"]
+           [:text "."]]}
