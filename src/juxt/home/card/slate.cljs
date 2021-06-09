@@ -31,21 +31,32 @@
         (useState
          #js [#js {:type "paragraph"
                    :children
-                   #js [#js {:text "A line of text in a paragraph."}]}])]
+                   #js [#js {:text ""}]}])]
 
     (createElement
      Slate
      #js {:editor editor
           :value value
           :onChange #(setValue %)}
+
      (createElement
       Editable
-      #js {:className (clj->js (:class (tw ["bg-yellow-200"])))}))))
+      #js {:className (clj->js (:class (tw ["bg-yellow-100"])))
+           :onKeyDown
+           (fn [ev]
+             (case (.-key ev)
+               "Enter" (.preventDefault ev)
+               nil ; do nothing
+               ))}))))
 
 (defn app []
   [:<>
-   [:div (tw ["bg-red-200" "m-4"]) "Hello World!"]
-   [:> App]])
+   [:div (tw ["p-4" "m-4" "border-2"])
+    [:div (tw ["p-2"])
+     [:> App]]
+    [:div (tw ["p-2"])
+     [:> App]]
+    ]])
 
 
 #_(render
