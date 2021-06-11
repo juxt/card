@@ -6,6 +6,7 @@
    [juxt.home.card.subscriptions :as sub]
    [re-frame.core :as rf]
    [tailwind-hiccup.core :refer [tw]]
+   [goog.object :as gobj]
    ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
    ["slate" :as slate :refer [createEditor Editor Transforms]]
    ["slate-react" :refer [Editable Slate withReact]]))
@@ -19,16 +20,16 @@
 
 (defn DefaultElement
   [props]
-  ;;(aset (.-attributes props) "className" "bg-gray-100 p-2")
+  (aset (.-attributes props) "className" "bg-gray-300 p-2")
   (createElement "p" (.-attributes props)
                  (.-children props)))
 
-
-
 (defn Block
-  [block]
+  [props]
   (let [editor (useMemo #(withReact (createEditor)) #js [])
-        [value setValue] (useState (.-content block))
+        [value setValue] (useState (.-content props))
+        save (.-save props)
+        [timeout storeTimeout] (useState nil)
         renderElement (useCallback
                        (fn [props]
                          (case (.-type (.-element props))
@@ -39,7 +40,13 @@
      Slate
      #js {:editor editor
           :value value
-          :onChange #(setValue %)}
+          :onChange (fn [val]
+                      (setValue val)
+                      (when timeout (js/clearTimeout timeout))
+                      (storeTimeout (js/setTimeout
+                                     (fn []
+                                       (when save (save val)))
+                                     1000)))}
 
      (createElement
       Editable
@@ -52,6 +59,7 @@
                (do
                  (.preventDefault ev)
                  ;; TODO: Add block
+                 (rf/dispatch [:new-paragraph (str config/site-api-origin "/card/cards/section-containing-checklist-1")])
                  (println "ENTER!"))
 
                (and (= (.-key ev) "`") (.-ctrlKey ev))
@@ -64,36 +72,46 @@
                               #js {:type (if match "paragraph" "code")}
                               #js {:match (fn [n] (.isBlock Editor editor n))})))))}))))
 
-(defmulti render-component :juxt.site.alpha/type)
+(defmulti render-entity :juxt.site.alpha/type)
 
-(defn render-leaf [child]
-  (cond
-    (vector? child)
-    (let [[type content] child]
-      (case type
-        "text" {:text content}
-        {:text (str "(unknown:<" type ">)")}))
-    (map? child)
-    (render-component child)))
-
-(defmethod render-component "User" [user]
-  {:text (str "@" (:juxt.pass.alpha/username user))})
-
-(defmethod render-component :default [component]
+(defmethod render-entity :default [component]
   [:div (str "type: " (:juxt.site.alpha/type component))])
 
-(defmethod render-component "Paragraph" [component]
-  [:> Block {:content
+;; A segment is an individual component of a linear sequence making up a
+;; paragraph.
+(defn render-segment [child]
+  (cond
+    (vector? child) ; it's a text segment, not an @ mention
+    (let [[type content] child]
+      (case type
+        "text" {:text content} ; return slate 'leaf'
+        {:text (str "(unknown:<" type ">)")}))
+    (map? child)
+    (with-meta
+      (render-entity child)
+      {:key (:crux.db/id child)})))
+
+(defmethod render-entity "User" [user]
+  {:text (str "@" (:juxt.pass.alpha/username user))})
+
+(defmethod render-entity "Paragraph" [component]
+  [:> Block {:id (:crux.db/id component)
+             :content
              [{:type "paragraph"
                :children (for [child (:content component)]
-                           (render-leaf child))}]}])
+                           ^{:key (str (rand-int 10000))}
+                           (render-segment child))}]
+             :save (fn [val]
+                     (rf/dispatch [:save-paragraph (:crux.db/id component) val])
+                     (println "Save! " (:crux.db/id component) " -> " val))}])
 
-(defmethod render-component "Checklist" [component]
-  (for [child (:content component)]
+(defmethod render-entity "Checklist" [component]
+  [:div (pr-str (:crux.db/id component))]
+  #_(for [child (:content component)]
     ^{:key (:crux.db/id child)}
-    (render-component child)))
+    (render-entity child)))
 
-(defmethod render-component "Task" [component]
+(defmethod render-entity "Task" [component]
   [:div (tw ["flex" "m-2"])
    [:label (tw ["flex" "items-center"])
     [:input (tw ["form-checkbox"] {:type "checkbox" :checked (= (:status component) "DONE")})]
@@ -108,13 +126,11 @@
   (let [data @(rf/subscribe
                [::sub/card
                 (str config/site-api-origin
-                     "/card/cards/section-containing-checklist-1"
-                     #_"/card/cards/task-1")])]
+                     "/card/cards/section-containing-checklist-1")])]
     [:<>
      [:div (tw ["p-4" "m-4" "border-2"])
 
-      (for [block (:content data)]
-        ^{:key (:crux.db/id block)}
-        (render-component block))]
+      (for [child (:content data)]
+        (render-segment child))]
 
-     #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) (drop 1 (:content data))]]))
+     #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) (map :crux.db/id (:content data))]]))
