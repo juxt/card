@@ -51,7 +51,7 @@
    (let [id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          new-para {:crux.db/id id
                    :juxt.site.alpha/type "Paragraph"
-                   :content [["text" "hello"]]}]
+                   :content [["text" ""]]}]
      (-> db
          (update-in [:card-components card-id :content] conj id)
          (assoc-in [:card-components id] new-para)))))
@@ -59,7 +59,7 @@
 (rf/reg-event-fx
  :save-paragraph
  (fn [_ [_ id new-value]]
-   (println "Save! " id)
-   (prn new-value)
+   #_(println "Save! " id)
+   #_(prn new-value)
    {}
    ))

@@ -20,7 +20,7 @@
 
 (defn DefaultElement
   [props]
-  (aset (.-attributes props) "className" "bg-gray-300 p-2")
+  (aset (.-attributes props) "className" "bg-gray-300 p-2 m-2")
   (createElement "p" (.-attributes props)
                  (.-children props)))
 
@@ -53,6 +53,11 @@
       #js { ;;:className (clj->js (:class (tw ["bg-yellow-100"])))
            :renderElement renderElement
            :autoFocus true
+           :onFocus (fn [ev]
+                      (let [tmp (.. ev -target -value)]
+                        #_(println "focus: tmp is" tmp)
+                        (set! (.. ev -target -value) "")
+                        (set! (.. ev -target -value) tmp)))
            :onKeyDown
            (fn [ev]
              (cond
@@ -63,6 +68,11 @@
                  (rf/dispatch [:new-paragraph (str config/site-api-origin "/card/cards/section-containing-checklist-1")])
                  (println "ENTER!"))
 
+               (= (.-key ev) "Backspace")
+               (do
+                 (println "Backspace!")
+                 nil)
+
                (and (= (.-key ev) "`") (.-ctrlKey ev))
                (do
                  (.preventDefault ev)
@@ -71,7 +81,9 @@
                    (.setNodes Transforms
                               editor
                               #js {:type (if match "paragraph" "code")}
-                              #js {:match (fn [n] (.isBlock Editor editor n))})))))}))))
+                              #js {:match (fn [n] (.isBlock Editor editor n))})))
+
+               ))}))))
 
 (defmulti render-entity :juxt.site.alpha/type)
 
@@ -104,7 +116,7 @@
                            (render-segment child))}]
              :save (fn [val]
                      (rf/dispatch [:save-paragraph (:crux.db/id component) val])
-                     (println "Save! " (:crux.db/id component) " -> " val))}])
+                     #_(println "Save! " (:crux.db/id component) " -> " val))}])
 
 (defmethod render-entity "Checklist" [component]
   [:div (pr-str (:crux.db/id component))]
