@@ -52,6 +52,7 @@
       Editable
       #js { ;;:className (clj->js (:class (tw ["bg-yellow-100"])))
            :renderElement renderElement
+           :autoFocus true
            :onKeyDown
            (fn [ev]
              (cond
