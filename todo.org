@@ -47,3 +47,23 @@ https://en.wikipedia.org/wiki/Memex
 
 
 ** You know you've nailed it when everybody sets it as their home page
+
+* User Stories
+
+** Creating a new hiring candidate
+
+Jon receives an email from a prospective candidate with a cover note and an
+attached CV. Although there doesn't seem to be an immediate vacancy to fill, the
+CV looks promising and there's a pretty good chance something will come up.
+
+Jon browses https://home.juxt.site and clicks on a link taking him to a page
+displaying a new card.
+
+He pastes the email text into the card
+
+
+
+*** Flow
+
+1. Open browser
+2. Click [New]
