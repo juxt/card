@@ -76,12 +76,20 @@
                                                 [(gobj/get child "_type") (gobj/get child "text")]))))]
      (prn (:content new-card))
 
-     #_(->
-        (js/fetch id
-                  #js {"credentials" "include"
-                       "headers" #js {"accept" "application/json"}
-                       ;;                   "method" "put"
-                       }))
 
-     {:db (assoc-in db [:card-components id] new-card)})
-   ))
+
+     {:db (assoc-in db [:card-components id] new-card)
+      :fx [[:dispatch [:put-entity new-card]]]})))
+
+(rf/reg-event-fx
+ :put-entity
+ (fn [_ [_ entity]]
+   (prn entity)
+   (prn (clj->js entity))
+   (js/fetch (:crux.db/id entity)
+             (clj->js
+              {"credentials" "include"
+               "headers" {"content-type" "application/json"}
+               "method" "put"
+               "body" (js/JSON.stringify (clj->js entity))}))
+   {}))
