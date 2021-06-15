@@ -4,7 +4,8 @@
   (:require
    [juxt.home.card.config :as config]
    [reagent.dom]
-   [re-frame.core :as rf]))
+   [re-frame.core :as rf]
+   [goog.object :as gobj]))
 
 (rf/reg-event-fx
  :initialize
@@ -15,7 +16,7 @@
 
 (rf/reg-event-fx
  :get-card
- (fn [db [_ id]]
+ (fn [_ [_ id]]
    (->
     (js/fetch (str config/site-api-origin "/card/components/" id)
               #js {"credentials" "include"
@@ -58,8 +59,29 @@
 
 (rf/reg-event-fx
  :save-paragraph
- (fn [_ [_ id new-value]]
-   #_(println "Save! " id)
-   #_(prn new-value)
-   {}
+ (fn [{:keys [db]} [_ id new-value]]
+   (println "Save! " id)
+
+   (println "existing card component content:")
+   (prn (:content (get-in db [:card-components id])))
+
+   (println "replace with card component content:")
+
+   (let [old-card (get-in db [:card-components id])
+         _ (assert old-card)
+         new-card (assoc old-card :content (vec
+                                            (for [child (gobj/get (first new-value) "children")]
+                                              (if-let [id (gobj/get child "_id")]
+                                                id
+                                                [(gobj/get child "_type") (gobj/get child "text")]))))]
+     (prn (:content new-card))
+
+     #_(->
+        (js/fetch id
+                  #js {"credentials" "include"
+                       "headers" #js {"accept" "application/json"}
+                       ;;                   "method" "put"
+                       }))
+
+     {:db (assoc-in db [:card-components id] new-card)})
    ))
