@@ -28,10 +28,10 @@
 (defn Leaf
   [props]
   (let [leaf (gobj/get props "leaf")
-        bold (gobj/get leaf "bold")]
+        style (gobj/get leaf "style")]
     (createElement "span"
       (doto (gobj/clone (.-attributes props))
-        (gobj/set "style" #js {:fontWeight (if bold "bold" "normal")}))
+        (gobj/set "style" style))
       (.-children props))))
 
 (defn Block
@@ -114,8 +114,8 @@
     (vector? child) ; it's a text segment, not an @ mention
     (let [[type content] child]
       (case type
-        "text" {:text content} ; return slate 'leaf'
-        "em" {:text content :bold true} ; return slate 'leaf'
+        "text" {:text content}
+        "em" {:text content :style #js {:fontStyle "italic"}}
         {:text (str "(unknown:<" type ">)")}))
     (map? child)
     (with-meta
