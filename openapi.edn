@@ -47,7 +47,8 @@
           204 {}}}}
 
   "/components/{id}"
-  {:parameters
+  {:description "Pull out a card and all its descendant components."
+   :parameters
    [{:name "id"
      :in "path"
      :required true
