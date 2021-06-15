@@ -9,7 +9,8 @@
    [goog.object :as gobj]
    ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
    ["slate" :as slate :refer [createEditor Editor Transforms]]
-   ["slate-react" :refer [Editable Slate withReact]]))
+   ["slate-react" :refer [Editable Slate withReact]]
+   [clojure.string :as str]))
 
 (defn CodeElement
   [props]
@@ -35,7 +36,6 @@
                          (case (.-type (.-element props))
                            "code" (createElement CodeElement props)
                            (createElement DefaultElement props))))]
-
     (createElement
      Slate
      #js {:editor editor
@@ -70,7 +70,10 @@
 
                (= (.-key ev) "Backspace")
                (do
-                 (println "Backspace!")
+                 (println ">! '" (.. ev -target -textContent) "'")
+                 (when (str/blank? (.. ev -target -textContent))
+                   (println "TODO: Remove para!")
+                   (.dir js/console (.. ev -target)))
                  nil)
 
                (and (= (.-key ev) "`") (.-ctrlKey ev))
