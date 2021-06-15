@@ -114,8 +114,11 @@
     (vector? child) ; it's a text segment, not an @ mention
     (let [[type content] child]
       (case type
-        "text" {:text content}
-        "em" {:text content :style #js {:fontStyle "italic"}}
+        "text" {:text content
+                :_type :text}
+        "em" {:text content
+              :_type :em
+              :style #js {:fontStyle "italic"}}
         {:text (str "(unknown:<" type ">)")}))
     (map? child)
     (with-meta
@@ -124,16 +127,18 @@
 
 (defmethod render-entity "User" [user]
   {:text (str "@" (:juxt.pass.alpha/username user))
-   :user user})
+   :_id (:crux.db/id user)})
 
 (defmethod render-entity "Paragraph" [component]
   [:> Block {:id (:crux.db/id component)
              :content
              [{:type "paragraph"
                :id (:crux.db/id component)
-               :children (for [child (:content component)]
-                           ^{:key (str (rand-int 10000))}
-                           (render-segment child))}]
+               :children (map-indexed
+                          (fn [ix child]
+                            ^{:key ix}
+                            (assoc (render-segment child) :_ix ix))
+                          (:content component))}]
              :save (fn [val]
                      (rf/dispatch [:save-paragraph (:crux.db/id component) val])
                      #_(println "Save! " (:crux.db/id component) " -> " val))}])
