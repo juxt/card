@@ -25,6 +25,15 @@
   (createElement "p" (.-attributes props)
                  (.-children props)))
 
+(defn Leaf
+  [props]
+  (let [leaf (gobj/get props "leaf")
+        bold (gobj/get leaf "bold")]
+    (createElement "span"
+      (doto (gobj/clone (.-attributes props))
+        (gobj/set "style" #js {:fontWeight (if bold "bold" "normal")}))
+      (.-children props))))
+
 (defn Block
   [props]
   (let [editor (useMemo #(withReact (createEditor)) #js [])
@@ -35,7 +44,11 @@
                        (fn [props]
                          (case (.-type (.-element props))
                            "code" (createElement CodeElement props)
-                           (createElement DefaultElement props))))]
+                           (createElement DefaultElement props))))
+        renderLeaf (useCallback
+                    (fn renderLeaf [props]
+                      (createElement Leaf props))
+                    #js [])]
     (createElement
      Slate
      #js {:editor editor
@@ -52,6 +65,7 @@
       Editable
       #js { ;;:className (clj->js (:class (tw ["bg-yellow-100"])))
            :renderElement renderElement
+           :renderLeaf renderLeaf
            :autoFocus true
            :onFocus (fn [ev]
                       (let [tmp (.. ev -target -value)]
@@ -101,6 +115,7 @@
     (let [[type content] child]
       (case type
         "text" {:text content} ; return slate 'leaf'
+        "em" {:text content :bold true} ; return slate 'leaf'
         {:text (str "(unknown:<" type ">)")}))
     (map? child)
     (with-meta
@@ -108,12 +123,14 @@
       {:key (:crux.db/id child)})))
 
 (defmethod render-entity "User" [user]
-  {:text (str "@" (:juxt.pass.alpha/username user))})
+  {:text (str "@" (:juxt.pass.alpha/username user))
+   :user user})
 
 (defmethod render-entity "Paragraph" [component]
   [:> Block {:id (:crux.db/id component)
              :content
              [{:type "paragraph"
+               :id (:crux.db/id component)
                :children (for [child (:content component)]
                            ^{:key (str (rand-int 10000))}
                            (render-segment child))}]
