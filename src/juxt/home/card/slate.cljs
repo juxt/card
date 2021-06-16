@@ -21,7 +21,7 @@
 
 (defn DefaultElement
   [props]
-  (aset (.-attributes props) "className" "bg-gray-300 p-2 m-2")
+  (aset (.-attributes props) "className" "bg-gray-100 p-2 border-2")
   (createElement "p" (.-attributes props)
                  (.-children props)))
 
@@ -98,9 +98,7 @@
                    (.setNodes Transforms
                               editor
                               #js {:type (if match "paragraph" "code")}
-                              #js {:match (fn [n] (.isBlock Editor editor n))})))
-
-               ))}))))
+                              #js {:match (fn [n] (.isBlock Editor editor n))})))))}))))
 
 (defmulti render-entity :juxt.site.alpha/type)
 
@@ -132,6 +130,9 @@
 (defmethod render-entity "Paragraph" [component]
   [:> Block {:id (:crux.db/id component)
              :content
+             ;; An entity of type 'Paragraph' maps to a block with a single
+             ;; 'paragraph' child. We don't allow more than one Slate paragraph
+             ;; in a Site paragraph.
              [{:type "paragraph"
                :id (:crux.db/id component)
                :children (map-indexed
@@ -144,8 +145,8 @@
                      #_(println "Save! " (:crux.db/id component) " -> " val))}])
 
 (defmethod render-entity "Checklist" [component]
-  [:div (pr-str (:crux.db/id component))]
-  #_(for [child (:content component)]
+  #_[:div (pr-str (:crux.db/id component))]
+  (for [child (:content component)]
     ^{:key (:crux.db/id child)}
     (render-entity child)))
 
@@ -161,14 +162,13 @@
      ")"]]])
 
 (defn card []
-  (let [data @(rf/subscribe
-               [::sub/card
-                (str config/site-api-origin
-                     "/card/cards/section-containing-checklist-1")])]
+  (let [id (str config/site-api-origin "/card/cards/section-containing-checklist-1")
+        data @(rf/subscribe [::sub/card id])]
     [:<>
-     [:div (tw ["p-4" "m-4" "border-2"])
-
+     [:div (tw ["m-4"])
       (for [child (:content data)]
-        (render-segment child))]
+        [:div (tw ["border-2" "m-2" "p-2"])
+         [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
+         (render-segment child)])]
 
      #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) (map :crux.db/id (:content data))]]))

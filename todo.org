@@ -67,3 +67,32 @@ He pastes the email text into the card
 
 1. Open browser
 2. Click [New]
+
+
+** Slate Editor
+
+*** DONE [#A] Show URLs of each paragraph (to help debug)
+:LOGBOOK:
+CLOCK: [2021-06-16 Wed 16:58]--[2021-06-16 Wed 17:11] =>  0:13
+:END:
+
+*** TODO Get checklist working
+
+*** TODO Set selection on focus to end of text
+
+*** TODO Only open up a new paragraph if text is empty
+
+*** TODO Open a new paragraph below current one
+
+*** TODO Save new paragraphs to Site
+
+*** TODO Image type
+Allow user to turn a paragraph into an image holder
+
+*** TODO Quote type
+
+*** TODO @ mentions
+
+*** TODO bold and italic
+
+*** TODO Use maps rather than vectors in Site model?
