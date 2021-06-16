@@ -39,6 +39,7 @@
   (let [editor (useMemo #(withReact (createEditor)) #js [])
         [value setValue] (useState (.-content props))
         save (.-save props)
+        container-id (.-containerId props)
         [timeout storeTimeout] (useState nil)
         renderElement (useCallback
                        (fn [props]
@@ -79,7 +80,7 @@
                (do
                  (.preventDefault ev)
                  ;; TODO: Add block
-                 (rf/dispatch [:new-paragraph (str config/site-api-origin "/card/cards/section-containing-checklist-1")])
+                 (rf/dispatch [:new-paragraph container-id])
                  (println "ENTER!"))
 
                (= (.-key ev) "Backspace")
@@ -100,14 +101,14 @@
                               #js {:type (if match "paragraph" "code")}
                               #js {:match (fn [n] (.isBlock Editor editor n))})))))}))))
 
-(defmulti render-entity :juxt.site.alpha/type)
+(defmulti render-entity (fn [container-id component] (:juxt.site.alpha/type component)))
 
-(defmethod render-entity :default [component]
+(defmethod render-entity :default [container-id component]
   [:div (str "type: " (:juxt.site.alpha/type component))])
 
 ;; A segment is an individual component of a linear sequence making up a
 ;; paragraph.
-(defn render-segment [child]
+(defn render-segment [container-id child]
   (cond
     (vector? child) ; it's a text segment, not an @ mention
     (let [[type content] child]
@@ -120,15 +121,16 @@
         {:text (str "(unknown:<" type ">)")}))
     (map? child)
     (with-meta
-      (render-entity child)
+      (render-entity container-id child)
       {:key (:crux.db/id child)})))
 
-(defmethod render-entity "User" [user]
+(defmethod render-entity "User" [container-id user]
   {:text (str "@" (:juxt.pass.alpha/username user))
    :_id (:crux.db/id user)})
 
-(defmethod render-entity "Paragraph" [component]
-  [:> Block {:id (:crux.db/id component)
+(defmethod render-entity "Paragraph" [container-id component]
+  [:> Block {:containerId container-id
+             :id (:crux.db/id component)
              :content
              ;; An entity of type 'Paragraph' maps to a block with a single
              ;; 'paragraph' child. We don't allow more than one Slate paragraph
@@ -138,19 +140,19 @@
                :children (map-indexed
                           (fn [ix child]
                             ^{:key ix}
-                            (assoc (render-segment child) :_ix ix))
+                            (assoc (render-segment container-id child) :_ix ix))
                           (:content component))}]
              :save (fn [val]
                      (rf/dispatch [:save-paragraph (:crux.db/id component) val])
                      #_(println "Save! " (:crux.db/id component) " -> " val))}])
 
-(defmethod render-entity "Checklist" [component]
+(defmethod render-entity "Checklist" [container-id component]
   #_[:div (pr-str (:crux.db/id component))]
   (for [child (:content component)]
     ^{:key (:crux.db/id child)}
-    (render-entity child)))
+    (render-entity container-id child)))
 
-(defmethod render-entity "Task" [component]
+(defmethod render-entity "Task" [container-id component]
   [:div (tw ["flex" "m-2"])
    [:label (tw ["flex" "items-center"])
     [:input (tw ["form-checkbox"] {:type "checkbox" :checked (= (:status component) "DONE")})]
@@ -161,14 +163,13 @@
      [:span (str "Deadline: " (:deadline component))]
      ")"]]])
 
-(defn card []
-  (let [id (str config/site-api-origin "/card/cards/section-containing-checklist-1")
-        data @(rf/subscribe [::sub/card id])]
+(defn card [id]
+  (let [data @(rf/subscribe [::sub/card id])]
     [:<>
      [:div (tw ["m-4"])
       (for [child (:content data)]
         [:div (tw ["border-2" "m-2" "p-2"])
          [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
-         (render-segment child)])]
+         (render-segment id child)])]
 
      #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) (map :crux.db/id (:content data))]]))

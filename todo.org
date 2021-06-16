@@ -76,6 +76,11 @@ He pastes the email text into the card
 CLOCK: [2021-06-16 Wed 16:58]--[2021-06-16 Wed 17:11] =>  0:13
 :END:
 
+*** DONE Parameterize card id
+:LOGBOOK:
+CLOCK: [2021-06-16 Wed 17:15]--[2021-06-16 Wed 17:23] =>  0:08
+:END:
+
 *** TODO Get checklist working
 
 *** TODO Set selection on focus to end of text

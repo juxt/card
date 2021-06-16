@@ -219,5 +219,6 @@
      (case page
        ::nav/index [index]
        ::nav/kanban [:div [:h1.text-lg "Kanban"] [menu]]
-       ::nav/slate [slate/card]
+       ::nav/slate [slate/card (str config/site-api-origin "/card/cards/section-containing-checklist-1")]
+
        [:div [:h1 "Page not ready"]])]))
