@@ -147,8 +147,8 @@
                      #_(println "Save! " (:crux.db/id component) " -> " val))}])
 
 (defmethod render-entity "Checklist" [container-id component]
-  #_[:div (pr-str (:crux.db/id component))]
-  (for [child (:content component)]
+  [:div (pr-str (:crux.db/id component))]
+  #_(for [child (:content component)]
     ^{:key (:crux.db/id child)}
     (render-entity container-id child)))
 
@@ -168,6 +168,7 @@
     [:<>
      [:div (tw ["m-4"])
       (for [child (:content data)]
+        ^{:key (:crux.db/id child)}
         [:div (tw ["border-2" "m-2" "p-2"])
          [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
          (render-segment id child)])]

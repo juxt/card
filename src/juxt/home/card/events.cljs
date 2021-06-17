@@ -60,13 +60,6 @@
 (rf/reg-event-fx
  :save-paragraph
  (fn [{:keys [db]} [_ id new-value]]
-   (println "Save! " id)
-
-   (println "existing card component content:")
-   (prn (:content (get-in db [:card-components id])))
-
-   (println "replace with card component content:")
-
    (let [old-card (get-in db [:card-components id])
          _ (assert old-card)
          new-card (assoc old-card :content (vec
@@ -74,18 +67,12 @@
                                               (if-let [id (gobj/get child "_id")]
                                                 id
                                                 [(gobj/get child "_type") (gobj/get child "text")]))))]
-     (prn (:content new-card))
-
-
-
      {:db (assoc-in db [:card-components id] new-card)
       :fx [[:dispatch [:put-entity new-card]]]})))
 
 (rf/reg-event-fx
  :put-entity
  (fn [_ [_ entity]]
-   (prn entity)
-   (prn (clj->js entity))
    (js/fetch (:crux.db/id entity)
              (clj->js
               {"credentials" "include"
