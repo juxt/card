@@ -35,7 +35,7 @@
          (->> (js->clj json :keywordize-keys true)
               (map (juxt :crux.db/id identity))
               (into {}))]
-     (update db :card-components (fnil merge {}) components))))
+     (update db :doc-store (fnil merge {}) components))))
 
 (rf/reg-event-db
  :new-paragraph
@@ -47,29 +47,29 @@
    ;; Set the :juxt.site.alpha/type to 'Paragraph'
    ;; Set the content to a seeded value
    ;; Update the card relating to card-id with the id
-   ;; Insert the new entity into card-components
+   ;; Insert the new entity into doc-store
 
    (let [child-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          new-child {:crux.db/id child-id
                     :juxt.site.alpha/type "Paragraph"
                     :content [["text" ""]]}
-         container (get-in db [:card-components container-id])
+         container (get-in db [:doc-store container-id])
          new-container (update container :content conj child-id)]
      (-> db
-         (assoc-in [:card-components container-id] new-container)
-         (assoc-in [:card-components child-id] new-child)))))
+         (assoc-in [:doc-store container-id] new-container)
+         (assoc-in [:doc-store child-id] new-child)))))
 
 (rf/reg-event-fx
  :save-paragraph
  (fn [{:keys [db]} [_ id new-value]]
-   (let [old-card (get-in db [:card-components id])
+   (let [old-card (get-in db [:doc-store id])
          _ (assert old-card)
          new-card (assoc old-card :content (vec
                                             (for [child (gobj/get (first new-value) "children")]
                                               (if-let [id (gobj/get child "_id")]
                                                 id
                                                 [(gobj/get child "_type") (gobj/get child "text")]))))]
-     {:db (assoc-in db [:card-components id] new-card)
+     {:db (assoc-in db [:doc-store id] new-card)
       :fx [[:dispatch [:put-entity new-card]]]})))
 
 (rf/reg-event-fx

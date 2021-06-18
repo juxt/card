@@ -32,5 +32,5 @@
 (rf/reg-sub
  ::card
  (fn [db [_ id]]
-   (let [card (get-in db [:card-components id])]
-     (resolve-references card (:card-components db)))))
+   (let [card (get-in db [:doc-store id])]
+     (resolve-references card (:doc-store db)))))
