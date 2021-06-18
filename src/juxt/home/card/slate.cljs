@@ -143,9 +143,9 @@
                           (:content component))}]
              :save (fn [val]
                      (let [s (.string Node #js {:children val})]
-                       (when-not (str/blank? s)
-                         (prn "Save! " (:crux.db/id component) " -> " val)
-                         (rf/dispatch [:save-paragraph (:crux.db/id component) val]))))}])
+                       ;; when-not (str/blank? s)
+                       (prn "Save! " (:crux.db/id component) " -> " val)
+                       (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}])
 
 (defmethod render-entity "Checklist" [container-id component]
   [:div (pr-str (:crux.db/id component))]

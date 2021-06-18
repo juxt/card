@@ -40,27 +40,20 @@
 (defn mark-optimistic [o]
   (assoc o :optimistic true))
 
-(rf/reg-event-db
+(rf/reg-event-fx
  :new-paragraph
- (fn [db [_ container-id]]
-   (println "Create a new paragraph on" container-id)
-
-   ;; We create a new entity (which we'll POST to Crux ofc!)
-
-   ;; Set the :juxt.site.alpha/type to 'Paragraph'
-   ;; Set the content to a seeded value
-   ;; Update the card relating to card-id with the id
-   ;; Insert the new entity into doc-store
-
+ (fn [{:keys [db]} [_ container-id]]
    (let [child-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          new-child {:crux.db/id child-id
                     :juxt.site.alpha/type "Paragraph"
                     :content [["text" ""]]}
          container (get-in db [:doc-store container-id])
          new-container (update container :content conj child-id)]
-     (-> db
-         (assoc-in [:doc-store container-id] (mark-optimistic new-container))
-         (assoc-in [:doc-store child-id] (mark-optimistic new-child))))))
+     {:db (-> db
+              (assoc-in [:doc-store container-id] (mark-optimistic new-container))
+              (assoc-in [:doc-store child-id] (mark-optimistic new-child)))
+      :fx [[:dispatch [:put-entity new-child]]
+           [:dispatch [:put-entity new-container]]]})))
 
 (rf/reg-event-fx
  :save-paragraph
