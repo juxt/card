@@ -167,10 +167,14 @@
 (defn card [id]
   (let [data @(rf/subscribe [::sub/card id])]
     [:<>
-     [:div (tw ["m-4"])
+     [:div (tw (cond-> ["m-4" "border-2"]
+                 (:optimistic data) (conj "border-green-200")
+                 (:error data) (conj "border-red-400")))
       (for [child (:content data)]
         ^{:key (:crux.db/id child)}
-        [:div (tw ["border-2" "m-2" "p-2"])
+        [:div (tw (cond-> ["border-2" "m-2" "p-2"]
+                    (:optimistic child) (conj "border-green-200")
+                    (:error data) (conj "border-red-400")))
          [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
          (render-segment id child)])]
 

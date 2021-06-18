@@ -37,6 +37,9 @@
               (into {}))]
      (update db :doc-store (fnil merge {}) components))))
 
+(defn mark-optimistic [o]
+  (assoc o :optimistic true))
+
 (rf/reg-event-db
  :new-paragraph
  (fn [db [_ container-id]]
@@ -56,8 +59,8 @@
          container (get-in db [:doc-store container-id])
          new-container (update container :content conj child-id)]
      (-> db
-         (assoc-in [:doc-store container-id] new-container)
-         (assoc-in [:doc-store child-id] new-child)))))
+         (assoc-in [:doc-store container-id] (mark-optimistic new-container))
+         (assoc-in [:doc-store child-id] (mark-optimistic new-child))))))
 
 (rf/reg-event-fx
  :save-paragraph
@@ -69,16 +72,33 @@
                                               (if-let [id (gobj/get child "_id")]
                                                 id
                                                 [(gobj/get child "_type") (gobj/get child "text")]))))]
-     {:db (assoc-in db [:doc-store id] new-card)
+     {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
       :fx [[:dispatch [:put-entity new-card]]]})))
+
+(rf/reg-event-fx
+ :mark-save-succeeded
+ (fn [{:keys [db]} [_ id]]
+   {:db (update-in db [:doc-store id] dissoc :optimistic)}))
+
+(rf/reg-event-fx
+ :mark-save-failed
+ (fn [{:keys [db]} [_ id]]
+   {:db (update-in db [:doc-store id] assoc :error true)}))
 
 (rf/reg-event-fx
  :put-entity
  (fn [_ [_ entity]]
-   (js/fetch (:crux.db/id entity)
-             (clj->js
-              {"credentials" "include"
-               "headers" {"content-type" "application/json"}
-               "method" "put"
-               "body" (js/JSON.stringify (clj->js entity))}))
+   (let [id (:crux.db/id entity)]
+     (->
+      (js/fetch id
+                (clj->js
+                 {"credentials" "include"
+                  "headers" {"content-type" "application/json"}
+                  "method" "put"
+                  "body" (js/JSON.stringify (clj->js (dissoc entity :optimistic)))}))
+      (.then (fn [response]
+               (let [status (.-status response)]
+                 (if (<= 200 status 299)
+                   (rf/dispatch [:mark-save-succeeded id])
+                   (rf/dispatch [:mark-save-failed id])))))))
    {}))
