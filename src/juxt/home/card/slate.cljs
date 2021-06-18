@@ -40,6 +40,8 @@
         [value setValue] (useState (.-content props))
         save (.-save props)
         container-id (.-containerId props)
+        id (.-id props)
+        index (.-index props)
         [timeout storeTimeout] (useState nil)
         renderElement (useCallback
                        (fn [props]
@@ -67,12 +69,7 @@
       #js { ;;:className (clj->js (:class (tw ["bg-yellow-100"])))
            :renderElement renderElement
            :renderLeaf renderLeaf
-           :autoFocus true
-           :onFocus (fn [ev]
-                      (let [tmp (.. ev -target -value)]
-                        #_(println "focus: tmp is" tmp)
-                        (set! (.. ev -target -value) "")
-                        (set! (.. ev -target -value) tmp)))
+;;           :autoFocus true
            :onKeyDown
            (fn [ev]
              (cond
@@ -80,15 +77,11 @@
                (do
                  (.preventDefault ev)
                  (when-not (str/blank? (.. ev -target -textContent))
-                   (rf/dispatch [:new-paragraph container-id])))
+                   (rf/dispatch [:new-paragraph container-id (inc index)])))
 
                (= (.-key ev) "Backspace")
-               (do
-                 (println ">! '" (.. ev -target -textContent) "'")
-                 (when (str/blank? (.. ev -target -textContent))
-                   (println "TODO: Remove para!")
-                   (.dir js/console (.. ev -target)))
-                 nil)
+               (when (str/blank? (.. ev -target -textContent))
+                 (rf/dispatch [:unlink-paragraph container-id index]))
 
                (and (= (.-key ev) "`") (.-ctrlKey ev))
                (do
@@ -130,6 +123,7 @@
 (defmethod render-entity "Paragraph" [container-id component]
   [:> Block {:containerId container-id
              :id (:crux.db/id component)
+             :index (:ix component)
              :content
              ;; An entity of type 'Paragraph' maps to a block with a single
              ;; 'paragraph' child. We don't allow more than one Slate paragraph
@@ -170,12 +164,16 @@
      [:div (tw (cond-> ["m-4" "border-2"]
                  (:optimistic data) (conj "border-green-200")
                  (:error data) (conj "border-red-400")))
-      (for [child (:content data)]
-        ^{:key (:crux.db/id child)}
-        [:div (tw (cond-> ["border-2" "m-2" "p-2"]
-                    (:optimistic child) (conj "border-green-200")
-                    (:error data) (conj "border-red-400")))
-         [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
-         (render-segment id child)])]
+      (map-indexed
+       (fn [ix child]
+         ^{:key ix}
+         [:div (tw (cond-> ["border-2" "m-2" "p-2"]
+                     (:optimistic child) (conj "border-green-200")
+                     (:error data) (conj "border-red-400")))
+          [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
+          ;; TODO: Arguably should be done in the subscription
+          (render-segment id (assoc child :ix ix))])
+
+       (:content data))]
 
      #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) (map :crux.db/id (:content data))]]))

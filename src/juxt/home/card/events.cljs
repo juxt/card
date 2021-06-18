@@ -42,18 +42,35 @@
 
 (rf/reg-event-fx
  :new-paragraph
- (fn [{:keys [db]} [_ container-id]]
+ (fn [{:keys [db]} [_ container-id ix]]
+   (println "create para from " ix)
    (let [child-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          new-child {:crux.db/id child-id
                     :juxt.site.alpha/type "Paragraph"
                     :content [["text" ""]]}
          container (get-in db [:doc-store container-id])
-         new-container (update container :content conj child-id)]
+         new-container (update container :content
+                               (fn [v]
+                                 (into
+                                  (into (subvec v 0 ix) [child-id])
+                                  (subvec v ix))))]
      {:db (-> db
               (assoc-in [:doc-store container-id] (mark-optimistic new-container))
               (assoc-in [:doc-store child-id] (mark-optimistic new-child)))
       :fx [[:dispatch [:put-entity new-child]]
            [:dispatch [:put-entity new-container]]]})))
+
+(defn drop-nth [coll n]
+  (vec (keep-indexed #(if (not= %1 n) %2) coll)))
+
+(rf/reg-event-fx
+ :unlink-paragraph
+ (fn [{:keys [db]} [_ container-id ix]]
+   (let [container (get-in db [:doc-store container-id])
+         new-container (update container :content drop-nth ix)]
+     {:db (-> db
+              (assoc-in [:doc-store container-id] (mark-optimistic new-container)))
+      :fx [[:dispatch [:put-entity new-container]]]})))
 
 (rf/reg-event-fx
  :save-paragraph
@@ -88,7 +105,7 @@
                  {"credentials" "include"
                   "headers" {"content-type" "application/json"}
                   "method" "put"
-                  "body" (js/JSON.stringify (clj->js (dissoc entity :optimistic)))}))
+                  "body" (js/JSON.stringify (clj->js entity))}))
       (.then (fn [response]
                (let [status (.-status response)]
                  (if (<= 200 status 299)
