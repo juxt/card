@@ -39,8 +39,8 @@
 
 (rf/reg-event-db
  :new-paragraph
- (fn [db [_ card-id]]
-   (println "Create a new paragraph on" card-id)
+ (fn [db [_ container-id]]
+   (println "Create a new paragraph on" container-id)
 
    ;; We create a new entity (which we'll POST to Crux ofc!)
 
@@ -49,13 +49,17 @@
    ;; Update the card relating to card-id with the id
    ;; Insert the new entity into card-components
 
-   (let [id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
-         new-para {:crux.db/id id
-                   :juxt.site.alpha/type "Paragraph"
-                   :content [["text" ""]]}]
+   (let [child-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
+         new-child {:crux.db/id child-id
+                    :juxt.site.alpha/type "Paragraph"
+                    :content [["text" ""]]}
+         parent (or (get-in db [:new-card-components container-id])
+                    (get-in db [:card-components container-id]))
+         new-parent  (update parent :content conj child-id)]
+     ;; We'll keep the modified parent and the new child in :new-card-components
      (-> db
-         (update-in [:card-components card-id :content] conj id)
-         (assoc-in [:card-components id] new-para)))))
+         (assoc-in [:new-card-components container-id] new-parent)
+         (assoc-in [:new-card-components child-id] new-child)))))
 
 (rf/reg-event-fx
  :save-paragraph

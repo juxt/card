@@ -8,7 +8,7 @@
    [tailwind-hiccup.core :refer [tw]]
    [goog.object :as gobj]
    ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
-   ["slate" :as slate :refer [createEditor Editor Transforms]]
+   ["slate" :as slate :refer [createEditor Editor Transforms Node]]
    ["slate-react" :refer [Editable Slate withReact]]
    [clojure.string :as str]))
 
@@ -79,9 +79,8 @@
                (= (.-key ev) "Enter")
                (do
                  (.preventDefault ev)
-                 ;; TODO: Add block
-                 (rf/dispatch [:new-paragraph container-id])
-                 (println "ENTER!"))
+                 (when-not (str/blank? (.. ev -target -textContent))
+                   (rf/dispatch [:new-paragraph container-id])))
 
                (= (.-key ev) "Backspace")
                (do
@@ -143,14 +142,16 @@
                             (assoc (render-segment container-id child) :_ix ix))
                           (:content component))}]
              :save (fn [val]
-                     (rf/dispatch [:save-paragraph (:crux.db/id component) val])
-                     #_(println "Save! " (:crux.db/id component) " -> " val))}])
+                     (let [s (.string Node #js {:children val})]
+                       (when-not (str/blank? s)
+                         (prn "Save! " (:crux.db/id component) " -> " val)
+                         (rf/dispatch [:save-paragraph (:crux.db/id component) val]))))}])
 
 (defmethod render-entity "Checklist" [container-id component]
   [:div (pr-str (:crux.db/id component))]
   #_(for [child (:content component)]
-    ^{:key (:crux.db/id child)}
-    (render-entity container-id child)))
+      ^{:key (:crux.db/id child)}
+      (render-entity container-id child)))
 
 (defmethod render-entity "Task" [container-id component]
   [:div (tw ["flex" "m-2"])
