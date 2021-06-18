@@ -53,13 +53,11 @@
          new-child {:crux.db/id child-id
                     :juxt.site.alpha/type "Paragraph"
                     :content [["text" ""]]}
-         parent (or (get-in db [:new-card-components container-id])
-                    (get-in db [:card-components container-id]))
-         new-parent  (update parent :content conj child-id)]
-     ;; We'll keep the modified parent and the new child in :new-card-components
+         container (get-in db [:card-components container-id])
+         new-container (update container :content conj child-id)]
      (-> db
-         (assoc-in [:new-card-components container-id] new-parent)
-         (assoc-in [:new-card-components child-id] new-child)))))
+         (assoc-in [:card-components container-id] new-container)
+         (assoc-in [:card-components child-id] new-child)))))
 
 (rf/reg-event-fx
  :save-paragraph
