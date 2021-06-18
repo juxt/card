@@ -81,22 +81,38 @@ CLOCK: [2021-06-16 Wed 16:58]--[2021-06-16 Wed 17:11] =>  0:13
 CLOCK: [2021-06-16 Wed 17:15]--[2021-06-16 Wed 17:23] =>  0:08
 :END:
 
+*** DONE Only open up a new paragraph if text is empty
+:LOGBOOK:
+CLOCK: [2021-06-17 Thu 09:31]--[2021-06-17 Thu 09:50] =>  0:19
+:END:
+
+*** DONE Only save a new card when it has text
+
+*** DONE Remove para on backspace (if empty)
+
+*** DONE Open a new paragraph below current one
+
+*** DONE Save new paragraphs to Site
+
 *** TODO Get checklist working
+
+*** TODO @ mentions
+
+*** TODO Ability to create new containers/cards
+
+*** TODO Ability to set attributes on individual cards
+e.g. status, priority, deadline
+
+*** TODO Ability to view all cards
 
 *** TODO Set selection on focus to end of text
 
-*** TODO Only open up a new paragraph if text is empty
-
-*** TODO Open a new paragraph below current one
-
-*** TODO Save new paragraphs to Site
+*** TODO tables!
 
 *** TODO Image type
 Allow user to turn a paragraph into an image holder
 
 *** TODO Quote type
-
-*** TODO @ mentions
 
 *** TODO bold and italic
 
