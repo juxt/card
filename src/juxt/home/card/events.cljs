@@ -82,8 +82,10 @@
                                               (if-let [id (gobj/get child "_id")]
                                                 id
                                                 [(gobj/get child "_type") (gobj/get child "text")]))))]
-     {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
-      :fx [[:dispatch [:put-entity new-card]]]})))
+     (if (= old-card new-card)
+       {:db db}
+       {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
+        :fx [[:dispatch [:put-entity new-card]]]}))))
 
 (rf/reg-event-fx
  :mark-save-succeeded
