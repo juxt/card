@@ -12,7 +12,13 @@
 (rf/reg-event-fx
  :initialize
  (fn [_ _]
-   {:fx [[:dispatch
+   {;; https://code.juxt.site/home/card/issues/2
+    #_#_
+    :interval {:action :start
+               :id :main-global-doc-refresh
+               :frequency 5000
+               :event [:global-doc-refresh]}
+    :fx [[:dispatch
           [:get-card "section-containing-checklist-1"
            #_"task-1"]]]}))
 
@@ -130,3 +136,42 @@
                    (rf/dispatch [:mark-save-succeeded id])
                    (rf/dispatch [:mark-save-failed id])))))))
    {}))
+
+;; https://code.juxt.site/home/card/issues/2
+#_#_#_#_
+(rf/reg-fx
+ :interval
+ (let [live-intervals (atom {})]
+   (fn [{:keys [action id frequency event]}]
+     (if (= action :start) 
+       (swap! live-intervals assoc id (js/setInterval #(rf/dispatch event) frequency)) 
+       (do (js/clearInterval (get @live-intervals id)) 
+           (swap! live-intervals dissoc id))))))
+
+(rf/reg-event-fx
+ :get-doc
+ (fn [{:keys [db]} [_ id]]
+   (->
+    (js/fetch id
+              #js {"credentials" "include"
+                   "headers" #js {"accept" "application/json"}})
+    (.then (fn [response] (.json response)))
+    (.then (fn [json] (rf/dispatch [:received-doc json]))))
+   {:db db}))
+
+(rf/reg-event-db
+ :received-doc
+ (fn [db [kw json]]
+   (let [docs
+         (->> [(js->clj json :keywordize-keys true)]
+              (map (juxt :crux.db/id identity))
+              (into {}))]
+     (update db :doc-store (fnil merge {}) docs))))
+
+(rf/reg-event-fx
+ :global-doc-refresh
+ (fn [{:keys [db]} _]
+   (let [doc-events
+         (doall (for [doc-id (keys (:doc-store db))]
+                  [:dispatch [:get-doc doc-id]]))]
+     {:fx doc-events})))
