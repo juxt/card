@@ -117,3 +117,9 @@ Allow user to turn a paragraph into an image holder
 *** TODO bold and italic
 
 *** TODO Use maps rather than vectors in Site model?
+
+*** Ideas/Someday
+
+**** Source editor
+
+When a user does Ctrl-` the paragraph changes from <p> to <code>. That's a left-over from a Slate tutorial. But what if the code was the code 'behind' the paragraph. For example, the datalog for a table or chart?
