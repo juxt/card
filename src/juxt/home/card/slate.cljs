@@ -9,7 +9,7 @@
    [goog.object :as gobj]
    ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
    ["slate" :as slate :refer [createEditor Editor Transforms Node]]
-   ["slate-react" :refer [Editable Slate withReact]]
+   ["slate-react" :refer [Editable Slate withReact ReactEditor]]
    [clojure.string :as str]))
 
 (defn CodeElement
@@ -52,6 +52,15 @@
                     (fn renderLeaf [props]
                       (createElement Leaf props))
                     #js [])]
+    (aset js/window "focusmap" (assoc (or (aget js/window "focusmap") {})
+                                       id
+                                       (fn []
+                                         (.focus ReactEditor editor)
+                                         ;; setTimeout is a workaround https://github.com/ianstormtaylor/slate/issues/3813
+                                         (js/setTimeout
+                                          #(.move Transforms
+                                                 editor
+                                                 #js {:distance 999999999999}) 0))))
     (createElement
      Slate
      #js {:editor editor

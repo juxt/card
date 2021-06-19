@@ -3,9 +3,11 @@
 (ns juxt.home.card.events
   (:require
    [juxt.home.card.config :as config]
+   [reagent.core :as reagent]
    [reagent.dom]
    [re-frame.core :as rf]
-   [goog.object :as gobj]))
+   [goog.object :as gobj]
+   [goog.dom :as gdom]))
 
 (rf/reg-event-fx
  :initialize
@@ -37,6 +39,15 @@
               (into {}))]
      (update db :doc-store (fnil merge {}) components))))
 
+(rf/reg-fx 
+ :focus-to-element
+ (fn [element-id] 
+   (reagent/after-render #(if-let [el (gdom/getElement element-id)]
+                            (.focus el)
+                            (if-let [focus! (get (or (aget js/window "focusmap") {}) element-id)]
+                              (focus!)
+                              (println "DOM node not found" element-id))))))
+
 (defn mark-optimistic [o]
   (assoc o :optimistic true))
 
@@ -57,6 +68,7 @@
      {:db (-> db
               (assoc-in [:doc-store container-id] (mark-optimistic new-container))
               (assoc-in [:doc-store child-id] (mark-optimistic new-child)))
+      :focus-to-element child-id
       :fx [[:dispatch [:put-entity new-child]]
            [:dispatch [:put-entity new-container]]]})))
 
@@ -67,10 +79,14 @@
  :unlink-paragraph
  (fn [{:keys [db]} [_ container-id ix]]
    (let [container (get-in db [:doc-store container-id])
+         previous-sibling-id (when (> (dec ix) 0)
+                               (nth (:content container) (dec ix)))
          new-container (update container :content drop-nth ix)]
-     {:db (-> db
-              (assoc-in [:doc-store container-id] (mark-optimistic new-container)))
-      :fx [[:dispatch [:put-entity new-container]]]})))
+     (cond-> {:db (-> db
+                      (assoc-in [:doc-store container-id] (mark-optimistic new-container)))
+              :fx [[:dispatch [:put-entity new-container]]]}
+       previous-sibling-id
+       (assoc :focus-to-element previous-sibling-id)))))
 
 (rf/reg-event-fx
  :save-paragraph
