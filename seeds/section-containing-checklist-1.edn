@@ -4,5 +4,6 @@
  :title "Introduction"
  :subtitle "The evolution of cards"
  :content ["{{base-uri}}/card/cards/para-1"
-           "{{base-uri}}/card/cards/checklist-1"
+           "{{base-uri}}/card/cards/task-1a"
+           "{{base-uri}}/card/cards/task-1b"
            "{{base-uri}}/card/cards/para-2"]}

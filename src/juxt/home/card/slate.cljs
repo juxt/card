@@ -130,34 +130,64 @@
    :_id (:crux.db/id user)})
 
 (defmethod render-entity "Paragraph" [container-id component]
-  [:> Block {:containerId container-id
-             :id (:crux.db/id component)
-             :index (:ix component)
-             :content
-             ;; An entity of type 'Paragraph' maps to a block with a single
-             ;; 'paragraph' child. We don't allow more than one Slate paragraph
-             ;; in a Site paragraph.
-             [{:type "paragraph"
-               :id (:crux.db/id component)
-               :children (map-indexed
-                          (fn [ix child]
-                            ^{:key ix}
-                            (assoc (render-segment container-id child) :_ix ix))
-                          (:content component))}]
-             :save (fn [val]
-                     (let [s (.string Node #js {:children val})]
-                       ;; when-not (str/blank? s)
-                       (prn "Save! " (:crux.db/id component) " -> " val)
-                       (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}])
+  [:div
+   [:> Block {:containerId container-id
+              :id (:crux.db/id component)
+              :index (:ix component)
+              :content
+              ;; An entity of type 'Paragraph' maps to a block with a single
+              ;; 'paragraph' child. We don't allow more than one Slate paragraph
+              ;; in a Site paragraph.
+              [{:type "paragraph"
+                :id (:crux.db/id component)
+                :children (map-indexed
+                           (fn [ix child]
+                             ^{:key ix}
+                             (assoc (render-segment container-id child) :_ix ix))
+                           (:content component))}]
+              :save (fn [val]
+                      (let [s (.string Node #js {:children val})]
+                        ;; when-not (str/blank? s)
+                        (prn "Save! " (:crux.db/id component) " -> " val)
+                        (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]])
 
 (defmethod render-entity "Checklist" [container-id component]
-  [:div (pr-str (:crux.db/id component))]
-  #_(for [child (:content component)]
+  #_[:div (pr-str (:crux.db/id component))]
+  (for [child (:content component)]
       ^{:key (:crux.db/id child)}
       (render-entity container-id child)))
 
 (defmethod render-entity "Task" [container-id component]
-  [:div (tw ["flex" "m-2"])
+  [:div
+   [:input (tw ["mx-2"] {:type "checkbox"
+                         :checked (case (:status component) "DONE" true "TODO" false)
+                         :onChange (fn [ev]
+                                     (if (.-checked (.-target ev))
+                                       (rf/dispatch [:check-action (:crux.db/id component)])
+                                       (rf/dispatch [:uncheck-action (:crux.db/id component)])))})]
+   ;;[:input {:type "checkbox" :style {:display "inline"}}]
+   [:> Block {:containerId container-id
+              :id (:crux.db/id component)
+              :index (:ix component)
+              :content
+              ;; An entity of type 'Paragraph' maps to a block with a single
+              ;; 'paragraph' child. We don't allow more than one Slate paragraph
+              ;; in a Site paragraph.
+              [{:type "paragraph"
+                :id (:crux.db/id component)
+                :children (map-indexed
+                           (fn [ix child]
+                             ^{:key ix}
+                             (assoc (render-segment container-id child) :_ix ix))
+                           (:content component))}]
+              :save (fn [val]
+                      (let [s (.string Node #js {:children val})]
+                        ;; when-not (str/blank? s)
+                        (prn "Save! " (:crux.db/id component) " -> " val)
+                        (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]]
+
+
+  #_[:div (tw ["flex" "m-2"])
    [:label (tw ["flex" "items-center"])
     [:input (tw ["form-checkbox"] {:type "checkbox" :checked (= (:status component) "DONE")})]
     [:span (tw ["ml-2"]) (str (:title component))]

@@ -45,9 +45,9 @@
               (into {}))]
      (update db :doc-store (fnil merge {}) components))))
 
-(rf/reg-fx 
+(rf/reg-fx
  :focus-to-element
- (fn [element-id] 
+ (fn [element-id]
    (reagent/after-render #(if-let [el (gdom/getElement element-id)]
                             (.focus el)
                             (if-let [focus! (get (or (aget js/window "focusmap") {}) element-id)]
@@ -137,15 +137,31 @@
                    (rf/dispatch [:mark-save-failed id])))))))
    {}))
 
+(rf/reg-event-fx
+ :check-action
+ (fn [{:keys [db]} [_ id]]
+   (let [old-card (get-in db [:doc-store id])
+         new-card (assoc old-card :status "DONE")]
+     {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
+      :fx [[:dispatch [:put-entity new-card]]]})))
+
+(rf/reg-event-fx
+ :uncheck-action
+ (fn [{:keys [db]} [_ id]]
+   (let [old-card (get-in db [:doc-store id])
+         new-card (assoc old-card :status "TODO")]
+     {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
+      :fx [[:dispatch [:put-entity new-card]]]})))
+
 ;; https://code.juxt.site/home/card/issues/2
 #_#_#_#_
 (rf/reg-fx
  :interval
  (let [live-intervals (atom {})]
    (fn [{:keys [action id frequency event]}]
-     (if (= action :start) 
-       (swap! live-intervals assoc id (js/setInterval #(rf/dispatch event) frequency)) 
-       (do (js/clearInterval (get @live-intervals id)) 
+     (if (= action :start)
+       (swap! live-intervals assoc id (js/setInterval #(rf/dispatch event) frequency))
+       (do (js/clearInterval (get @live-intervals id))
            (swap! live-intervals dissoc id))))))
 
 (rf/reg-event-fx
