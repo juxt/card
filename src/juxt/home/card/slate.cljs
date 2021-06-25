@@ -26,8 +26,8 @@
 
 (defn DefaultElement
   [props]
-  (aset (.-attributes props) "className" "p-2")
-  (createElement "p" (.-attributes props)
+  (aset (.-attributes props) "className" "py-2")
+  (createElement "div" (.-attributes props)
                  (.-children props)))
 
 (defn HeadingElement
@@ -60,24 +60,33 @@
         id (.-id props)
         index (.-index props)
         [timeout storeTimeout] (useState nil)
-        renderElement (useCallback
-                       (fn [props]
-                         (case (.-type (.-element props))
-                           "code" (createElement CodeElement props)
-                           (createElement DefaultElement props))))
-        renderLeaf (useCallback
-                    (fn renderLeaf [props]
-                      (createElement Leaf props))
-                    #js [])]
-    (aset js/window "focusmap" (assoc (or (aget js/window "focusmap") {})
-                                      id
-                                      (fn []
-                                        (.focus ReactEditor editor)
-                                        ;; setTimeout is a workaround https://github.com/ianstormtaylor/slate/issues/3813
-                                        (js/setTimeout
-                                         #(.move Transforms
-                                                 editor
-                                                 #js {:distance 999999999999}) 0))))
+
+        renderElement
+        (useCallback
+         (fn [props]
+           (cond
+             (= (.-type (.-element props)) "code")
+             (createElement CodeElement props)
+             :else
+             (createElement DefaultElement props))))
+
+        renderLeaf
+        (useCallback
+         (fn renderLeaf [props]
+           (createElement Leaf props))
+         #js [])]
+
+    (aset
+     js/window "focusmap"
+     (assoc (or (aget js/window "focusmap") {})
+            id
+            (fn []
+              (.focus ReactEditor editor)
+              ;; setTimeout is a workaround https://github.com/ianstormtaylor/slate/issues/3813
+              (js/setTimeout
+               #(.move Transforms
+                       editor
+                       #js {:distance 999999999999}) 0))))
     (createElement
      Slate
      #js {:editor editor
@@ -92,10 +101,8 @@
 
      (createElement
       Editable
-      #js { ;;:className (clj->js (:class (tw ["bg-yellow-100"])))
-           :renderElement renderElement
+      #js {:renderElement renderElement
            :renderLeaf renderLeaf
-           ;;           :autoFocus true
            :onKeyDown
            (fn [ev]
              (cond
@@ -127,11 +134,14 @@
         id (.-id props)
         eltype ^string (.-eltype props)
         [timeout storeTimeout] (useState nil)
-        renderElement (useCallback (fn [props]
-                                     (createElement "div" #js {"class" "border-2 m-2 border-gray-100"}
-                                                    (createElement (case eltype
-                                                                     "h1" HeadingElement
-                                                                     "h2" SubheadingElement) props))))
+        renderElement
+        (useCallback
+         (fn [props]
+           (createElement
+            "div" #js {"className" "border-2 m-2 border-gray-100"}
+            (createElement (case eltype
+                             "h1" HeadingElement
+                             "h2" SubheadingElement) props))))
         renderLeaf (useCallback
                     (fn renderLeaf [props]
                       (createElement Leaf props))
@@ -155,18 +165,11 @@
            :onKeyDown
            (fn [ev]
              (when
-               (= (.-key ev) "Enter")
-               (.preventDefault ev)
-               ))}))))
+                 (= (.-key ev) "Enter")
+                 (.preventDefault ev)
+                 ))}))))
 
-(defmulti render-entity (fn [container-id component] (:juxt.site.alpha/type component)))
-
-(defmethod render-entity :default [container-id component]
-  [:div (str "type: '" (:juxt.site.alpha/type component) "'")])
-
-(defmethod render-entity "User" [container-id user]
-  {:text (str "@" (:juxt.pass.alpha/username user))
-   :_id (:crux.db/id user)})
+(declare render-paragraph)
 
 ;; A segment is an individual component of a linear sequence making up a
 ;; paragraph.
@@ -182,62 +185,75 @@
               :style #js {:fontStyle "italic"}}
         {:text (str "(unknown:<" type ">)")}))
     (map? child)
-    #_{:text (pr-str child)}
     (with-meta
-      (render-entity container-id child)
+      (render-paragraph container-id child)
       {:key (:crux.db/id child)})))
 
 (defn render-paragraph [container-id component]
-  [:div
-   [:> Paragraph
-    {:containerId container-id
-     :id (:crux.db/id component)
-     :index (:ix component)
-     :content
-     ;; An entity of type 'Paragraph' maps to a block with a single
-     ;; 'paragraph' child. We don't allow more than one Slate paragraph
-     ;; in a Site paragraph.
-     [{:type "paragraph"
-       :id (:crux.db/id component)
-       :children (map-indexed
-                  (fn [ix child]
-                    ^{:key ix}
-                    (assoc (render-segment container-id child) :_ix ix))
-                  (:juxt.card.alpha/content component))}]
-     :save (fn [val]
-             (let [s (.string Node #js {:children val})]
-               ;; when-not (str/blank? s)
-               (prn "Save! " (:crux.db/id component) " -> " val)
-               (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]])
+  (cond
+    (= (:juxt.site.alpha/type component) "User")
+    {:text (str "@" (:juxt.pass.alpha/username component))
+     :_id (:crux.db/id component)}
 
-(defmethod render-entity :default [container-id component]
-  [:div
-   (render-paragraph container-id component)])
+    :else
+    (let [id (:crux.db/id component)]
+      [:div
+       [:div {:className "flex gap-x-3 py-4"}
+        (when (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
+          [:input {:type "checkbox"
+                   :checked (= (:juxt.card.alpha/status component) "DONE")
+                   :onChange (fn [ev]
+                               (rf/dispatch [:set-attribute id :juxt.card.alpha/status
+                                             (if (.-checked (.-target ev))
+                                               "DONE" "TODO")]))}])
+        [:div {:className "flex-grow"}
+         [:> Paragraph
+          {:containerId container-id
+           :id id
+           :index (:ix component)
+           :content
+           ;; An entity of type 'Paragraph' maps to a block with a single
+           ;; 'paragraph' child. We don't allow more than one Slate paragraph
+           ;; in a Site paragraph.
+           [{:type "paragraph"
+             :children (map-indexed
+                        (fn [ix child]
+                          ^{:key ix}
+                          (assoc (render-segment container-id child) :_ix ix))
+                        (:juxt.card.alpha/content component))}]
+           :save (fn [val]
+                   (let [s (.string Node #js {:children val})]
+                     (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]]]
 
-(defmethod render-entity "juxt.card.types/task" [container-id component]
-  [:div
-   [:input (tw ["mx-2"] {:type "checkbox"
-                         :checked (case (:juxt.card.alpha/status component) "DONE" true "TODO" false)
-                         :onChange (fn [ev]
-                                     (if (.-checked (.-target ev))
-                                       (rf/dispatch [:check-action (:crux.db/id component)])
-                                       (rf/dispatch [:uncheck-action (:crux.db/id component)])))})]
-   (render-paragraph container-id component)])
+       [:div {:className "relative flex items-start"}
+        [:div {:className "flex items-center h-5"}
+         [:input
+          {:id (str "task-checkbox-" id)
+           :type "checkbox"
+           :checked (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
+           :onChange (fn [ev]
+                       (if (.-checked (.-target ev))
+                         (rf/dispatch [:set-attribute id :juxt.card.alpha/status "TODO"])
+                         (rf/dispatch [:delete-attribute id :juxt.card.alpha/status])))
+           }]]
+        [:div {:className "ml-1 text-sm"}
+         [:label {:for (str "task-checkbox-" id)} "Action?"]]]])))
 
 (defn field [id label eltype attr provider]
   (let [data @(rf/subscribe [::sub/card id])]
     (let [v (get data attr)]
-      [:div {:class "flex flex-auto"}
+      [:div {:className "flex"}
        [:span (tw ["m-2"]) label]
-       [:> Field
-        {:id id
-         :eltype eltype
-         :content
-         [{:type "paragraph"
-           :children [{:text (or v "")}]}]
-         :save (fn [val]
-                 (let [s (.string Node #js {:children val})]
-                   (rf/dispatch [:set-attribute id attr s])))}]
+       [:div {:className "flex-grow"}
+        [:> Field
+         {:id id
+          :eltype eltype
+          :content
+          [{:type "paragraph"
+            :children [{:text (or v "")}]}]
+          :save (fn [val]
+                  (let [s (.string Node #js {:children val})]
+                    (rf/dispatch [:set-attribute id attr s])))}]]
        [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
 
 (defn card [id]
@@ -251,13 +267,13 @@
       [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id]]
 
       (if (:juxt.card.alpha/title data)
-        [:div
+        [:div (tw ["p-2"])
          (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
         [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
          [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]])
 
       (if (:juxt.card.alpha/subtitle data)
-        [:div
+        [:div (tw ["p-2"])
          (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
         [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
          [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]])
@@ -275,7 +291,7 @@
 
        (:juxt.card.alpha/content data))]
 
-     [:pre (tw ["w-auto" "whitespace-pre-wrap"]) data]]))
+     #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) data]]))
 
 (defn new []
   [:div (tw ["p-4"])

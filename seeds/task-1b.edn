@@ -1,5 +1,4 @@
-{:juxt.site.alpha/type :juxt.card.types/task
- :juxt.pass.alpha/owner "{{base-uri}}/_site/users/jdt"
+{:juxt.pass.alpha/owner "{{base-uri}}/_site/users/jdt"
  :juxt.pass.alpha/classification "INTERNAL"
  :juxt.card.alpha/assignee "{{base-uri}}/_site/users/kat"
  :juxt.card.alpha/priority 4
