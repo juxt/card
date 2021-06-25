@@ -33,7 +33,6 @@
 (def router
   (reitit/router
    [config/application-context
-    ["index.html" {:name ::index}]
     ["kanban.html" {:name ::kanban}]
     ["slate.html" {:name ::slate}]]
    {:data {:coercion rss/coercion}}))
