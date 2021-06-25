@@ -180,6 +180,10 @@
                  (:optimistic data) (conj "border-green-200")
                  (:error data) (conj "border-red-400")))
       [:p (tw ["m-4" "text-gray-400"]) id]
+      (when-let [title (:juxt.card.alpha/title data)]
+        [:h1 (tw ["m-4" "text-xl"]) title])
+      (when-let [subtitle (:juxt.card.alpha/subtitle data)]
+        [:h2 (tw ["m-4" "text-lg"]) subtitle])
       (map-indexed
        (fn [ix child]
          ^{:key ix}
