@@ -129,7 +129,7 @@
   {:text (str "@" (:juxt.pass.alpha/username user))
    :_id (:crux.db/id user)})
 
-(defmethod render-entity :default [container-id component]
+(defn render-block [container-id component]
   [:div
    [:> Block {:containerId container-id
               :id (:crux.db/id component)
@@ -150,6 +150,10 @@
                         ;; when-not (str/blank? s)
                         (prn "Save! " (:crux.db/id component) " -> " val)
                         (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]])
+
+(defmethod render-entity :default [container-id component]
+  [:div
+   (render-block container-id component)])
 
 (defmethod render-entity "Checklist" [container-id component]
   #_[:div (pr-str (:crux.db/id component))]
@@ -166,25 +170,7 @@
                                        (rf/dispatch [:check-action (:crux.db/id component)])
                                        (rf/dispatch [:uncheck-action (:crux.db/id component)])))})]
    ;;[:input {:type "checkbox" :style {:display "inline"}}]
-   [:> Block {:containerId container-id
-              :id (:crux.db/id component)
-              :index (:ix component)
-              :content
-              ;; An entity of type 'Paragraph' maps to a block with a single
-              ;; 'paragraph' child. We don't allow more than one Slate paragraph
-              ;; in a Site paragraph.
-              [{:type "paragraph"
-                :id (:crux.db/id component)
-                :children (map-indexed
-                           (fn [ix child]
-                             ^{:key ix}
-                             (assoc (render-segment container-id child) :_ix ix))
-                           (:juxt.card.alpha/content component))}]
-              :save (fn [val]
-                      (let [s (.string Node #js {:children val})]
-                        ;; when-not (str/blank? s)
-                        (prn "Save! " (:crux.db/id component) " -> " val)
-                        (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]])
+   (render-block container-id component)])
 
 (defn card [id]
   (let [id @(rf/subscribe [::sub/current-card])
