@@ -58,6 +58,9 @@
 (defn mark-optimistic [o]
   (assoc o :optimistic true))
 
+(defn clear-optimistic [o]
+  (dissoc o :optimistic))
+
 (rf/reg-event-fx
  :new-paragraph
  (fn [{:keys [db]} [_ container-id ix]]
@@ -117,7 +120,7 @@
 (rf/reg-event-fx
  :mark-save-succeeded
  (fn [{:keys [db]} [_ id]]
-   {:db (update-in db [:doc-store id] dissoc :optimistic)}))
+   {:db (update-in db [:doc-store id] clear-optimistic)}))
 
 (rf/reg-event-fx
  :mark-save-failed
