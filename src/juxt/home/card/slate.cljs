@@ -125,10 +125,6 @@
       (render-entity container-id child)
       {:key (:crux.db/id child)})))
 
-(defmethod render-entity "User" [container-id user]
-  {:text (str "@" (:juxt.pass.alpha/username user))
-   :_id (:crux.db/id user)})
-
 (defn render-block [container-id component]
   [:div
    [:> Block {:containerId container-id
@@ -155,12 +151,6 @@
   [:div
    (render-block container-id component)])
 
-(defmethod render-entity "Checklist" [container-id component]
-  #_[:div (pr-str (:crux.db/id component))]
-  (for [child (:juxt.card.alpha/content component)]
-      ^{:key (:crux.db/id child)}
-      (render-entity container-id child)))
-
 (defmethod render-entity "juxt.card.types/task" [container-id component]
   [:div
    [:input (tw ["mx-2"] {:type "checkbox"
@@ -169,7 +159,6 @@
                                      (if (.-checked (.-target ev))
                                        (rf/dispatch [:check-action (:crux.db/id component)])
                                        (rf/dispatch [:uncheck-action (:crux.db/id component)])))})]
-   ;;[:input {:type "checkbox" :style {:display "inline"}}]
    (render-block container-id component)])
 
 (defn card [id]
