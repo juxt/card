@@ -156,3 +156,8 @@
          new-card (assoc old-card :juxt.card.alpha/status "TODO")]
      {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
       :fx [[:dispatch [:put-entity new-card]]]})))
+
+(rf/reg-event-fx
+ :new-card
+ (fn [{:keys [db]} [_ id]]
+   (println "TODO: Create a new card in the doc-store and make it the current card")))
