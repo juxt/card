@@ -161,4 +161,16 @@
 (rf/reg-event-fx
  :new-card
  (fn [{:keys [db]} _]
-   {:db (assoc db :current-card (str config/site-api-origin "/card/cards/" (str (random-uuid))))}))
+   (let [card-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
+         card-init-para-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
+         card {:crux.db/id card-id
+               :juxt.card.alpha/content [card-init-para-id]}
+         para {:crux.db/id card-init-para-id
+               :juxt.card.alpha/content [["text" "hello world!"]]}]
+     (prn card)
+     {:db (-> db
+              (assoc-in [:doc-store card-id] (mark-optimistic card))
+              (assoc-in [:doc-store card-init-para-id] (mark-optimistic para))
+              (assoc :current-card card-id))
+      :fx [[:dispatch [:put-entity card]]
+           [:dispatch [:put-entity para]]]})))
