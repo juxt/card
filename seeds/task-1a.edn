@@ -1,12 +1,12 @@
 {:juxt.site.alpha/type "Task"
- :author "{{base-uri}}/_site/users/jdt"
- :classification "INTERNAL"
- :assignee ["{{base-uri}}/_site/users/jon"
-            "{{base-uri}}/_site/users/sdh"]
- :priority 3
- :deadline "2020-12-10"
- :status "DONE"
- :title "Get cake"
- :content [[:text "Organise cake for "]
-           "{{base-uri}}/_site/users/mal"
-           [:text "'s 50th birthday."]]}
+ :juxt.pass.alpha/owner "{{base-uri}}/_site/users/jdt"
+ :juxt.pass.alpha/classification "INTERNAL"
+ :juxt.card.alpha/assignee ["{{base-uri}}/_site/users/jon"
+                            "{{base-uri}}/_site/users/sdh"]
+ :juxt.card.alpha/assignee 3
+ :juxt.card.alpha/deadline "2020-12-10"
+ :juxt.card.alpha/status "DONE"
+ :juxt.card.alpha/title "Get cake"
+ :juxt.card.alpha/content [[:text "Organise cake for "]
+                           "{{base-uri}}/_site/users/mal"
+                           [:text "'s 50th birthday."]]}
