@@ -162,6 +162,22 @@
       :fx [[:dispatch [:put-entity new-card]]]})))
 
 (rf/reg-event-fx
+ :set-attribute
+ (fn [{:keys [db]} [_ id attr val]]
+   (let [old-card (get-in db [:doc-store id])
+         new-card (assoc old-card attr val)]
+     {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
+      :fx [[:dispatch [:put-entity new-card]]]})))
+
+(rf/reg-event-fx
+ :delete-attribute
+ (fn [{:keys [db]} [_ id attr]]
+   (let [old-card (get-in db [:doc-store id])
+         new-card (dissoc old-card attr)]
+     {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
+      :fx [[:dispatch [:put-entity new-card]]]})))
+
+(rf/reg-event-fx
  :new-card
  (fn [{:keys [db]} _]
    (let [card-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))

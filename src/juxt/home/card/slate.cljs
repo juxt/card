@@ -12,6 +12,11 @@
    ["slate-react" :refer [Editable Slate withReact ReactEditor]]
    [clojure.string :as str]))
 
+(defn button [label on-click]
+  [:button (tw ["inline-flex" "items-center" "px-2.5" "my-2" "py-1.5" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-yellow-600" "hover:bg-yellow-700" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-yellow-500"]
+               {:type "button"
+                :onClick on-click}) label])
+
 (defn CodeElement
   [props]
   (aset (.-attributes props) "className" "bg-yellow-100 p-2")
@@ -29,6 +34,12 @@
   [props]
   (aset (.-attributes props) "className" "m-4 text-xl")
   (createElement "h1" (.-attributes props)
+                 (.-children props)))
+
+(defn SubheadingElement
+  [props]
+  (aset (.-attributes props) "className" "m-4 text-lg")
+  (createElement "h2" (.-attributes props)
                  (.-children props)))
 
 (defn Leaf
@@ -108,16 +119,19 @@
                               #js {:type (if match "paragraph" "code")}
                               #js {:match (fn [n] (.isBlock Editor editor n))})))))}))))
 
-(defn Title
+(defn Field
   [props]
   (let [editor (useMemo #(withReact (createEditor)) #js [])
         [value setValue] (useState (.-content props))
         save (.-save props)
         id (.-id props)
+        eltype ^string (.-eltype props)
         [timeout storeTimeout] (useState nil)
-        renderElement (useCallback
-                       (fn [props]
-                         (createElement HeadingElement props)))
+        renderElement (useCallback (fn [props]
+                                     (createElement "div" #js {"class" "border-2 m-2 border-gray-100"}
+                                                    (createElement (case eltype
+                                                                     "h1" HeadingElement
+                                                                     "h2" SubheadingElement) props))))
         renderLeaf (useCallback
                     (fn renderLeaf [props]
                       (createElement Leaf props))
@@ -210,6 +224,22 @@
                                        (rf/dispatch [:uncheck-action (:crux.db/id component)])))})]
    (render-paragraph container-id component)])
 
+(defn field [id label eltype attr provider]
+  (let [data @(rf/subscribe [::sub/card id])]
+    (let [v (get data attr)]
+      [:div {:class "flex flex-auto"}
+       [:span (tw ["m-2"]) label]
+       [:> Field
+        {:id id
+         :eltype eltype
+         :content
+         [{:type "paragraph"
+           :children [{:text (or v "")}]}]
+         :save (fn [val]
+                 (let [s (.string Node #js {:children val})]
+                   (rf/dispatch [:set-attribute id attr s])))}]
+       [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
+
 (defn card [id]
   (let [id @(rf/subscribe [::sub/current-card])
         data @(rf/subscribe [::sub/card id])]
@@ -218,22 +248,20 @@
                  (:optimistic data) (conj "border-green-200")
                  (:error data) (conj "border-red-400")))
 
-      (when-let [title (:juxt.card.alpha/title data)]
-        [:> Title
-         {:id id
-          :content
-          ;; An entity of type 'Paragraph' maps to a block with a single
-          ;; 'paragraph' child. We don't allow more than one Slate paragraph
-          ;; in a Site paragraph.
-          [{:type "paragraph"
-            :children [{:text title}]}]
-          :save (fn [val]
-                  (let [s (.string Node #js {:children val})]
-                    (prn "Save title! " id " -> " s)
-                    (rf/dispatch [:set-attribute :title id s])))}])
-      (when-let [subtitle (:juxt.card.alpha/subtitle data)]
-        [:h2 (tw ["m-4" "text-lg"]) subtitle])
       [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id]]
+
+      (if (:juxt.card.alpha/title data)
+        [:div
+         (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
+        [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+         [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]])
+
+      (if (:juxt.card.alpha/subtitle data)
+        [:div
+         (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
+        [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+         [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]])
+
       (map-indexed
        (fn [ix child]
          ^{:key ix}
@@ -247,10 +275,8 @@
 
        (:juxt.card.alpha/content data))]
 
-     #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) (map :crux.db/id (:juxt.card.alpha/content data))]]))
+     [:pre (tw ["w-auto" "whitespace-pre-wrap"]) data]]))
 
 (defn new []
   [:div (tw ["p-4"])
-   [:button (tw ["inline-flex" "items-center" "px-2.5" "py-1.5" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-yellow-600" "hover:bg-yellow-700" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-yellow-500"]
-                {:type "button"
-                 :onClick (fn [_] (rf/dispatch [:new-card]))}) "New"]])
+   [button "New" (fn [_] (rf/dispatch [:new-card]))]])
