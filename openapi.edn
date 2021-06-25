@@ -77,9 +77,9 @@
                     (is-ancestor-of? root component)]
             :rules [
                     [(is-ancestor-of? ?parent ?child)
-                     [?parent :content ?child]]
+                     [?parent :juxt.card.alpha/content ?child]]
                     [(is-ancestor-of? ?ancestor ?child)
-                     [?parent :content ?child]
+                     [?parent :juxt.card.alpha/content ?child]
                      (is-ancestor-of? ?ancestor ?parent)]
                     [(is-ancestor-of? ?ancestor ?child)
                      [(= ?ancestor ?child)]]]}
@@ -95,9 +95,7 @@
  {:schemas
   {"Card"
    {:type "object"
-    :juxt.jinx.alpha/keyword-mappings {"type" "juxt.site.alpha/type"}
     :properties
-    {"type" {:type "string"}
-     "priority" {:type "number"}
-     "deadline" {:type "string"
-                 :juxt.jinx.alpha/as "inst"}}}}}}
+    {"juxt.card.alpha/priority" {:type "number"}
+     "juxt.card.alpha/deadline" {:type "string"
+                                 :juxt.jinx.alpha/as "inst"}}}}}}

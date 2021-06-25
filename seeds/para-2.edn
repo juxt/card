@@ -1,5 +1,4 @@
-{:juxt.site.alpha/type "Paragraph"
- :juxt.pass.alpha/owner "{{base-uri}}/_site/users/jdt"
+{:juxt.pass.alpha/owner "{{base-uri}}/_site/users/jdt"
  :juxt.pass.alpha/classification "INTERNAL"
  :juxt.card.alpha/content
  [[:text "Some more text here. "]

@@ -53,12 +53,12 @@
                       (createElement Leaf props))
                     #js [])]
     (aset js/window "focusmap" (assoc (or (aget js/window "focusmap") {})
-                                       id
-                                       (fn []
-                                         (.focus ReactEditor editor)
-                                         ;; setTimeout is a workaround https://github.com/ianstormtaylor/slate/issues/3813
-                                         (js/setTimeout
-                                          #(.move Transforms
+                                      id
+                                      (fn []
+                                        (.focus ReactEditor editor)
+                                        ;; setTimeout is a workaround https://github.com/ianstormtaylor/slate/issues/3813
+                                        (js/setTimeout
+                                         #(.move Transforms
                                                  editor
                                                  #js {:distance 999999999999}) 0))))
     (createElement
@@ -68,17 +68,17 @@
           :onChange (fn [val]
                       (setValue val)
                       (when timeout (js/clearTimeout timeout))
-                      (storeTimeout (js/setTimeout
-                                     (fn []
-                                       (when save (save val)))
-                                     1000)))}
+                      (storeTimeout
+                       (js/setTimeout
+                        (fn [] (when save (save val)))
+                        1000)))}
 
      (createElement
       Editable
       #js { ;;:className (clj->js (:class (tw ["bg-yellow-100"])))
            :renderElement renderElement
            :renderLeaf renderLeaf
-;;           :autoFocus true
+           ;;           :autoFocus true
            :onKeyDown
            (fn [ev]
              (cond
@@ -105,7 +105,7 @@
 (defmulti render-entity (fn [container-id component] (:juxt.site.alpha/type component)))
 
 (defmethod render-entity :default [container-id component]
-  [:div (str "type: " (:juxt.site.alpha/type component))])
+  [:div (str "type: '" (:juxt.site.alpha/type component) "'")])
 
 ;; A segment is an individual component of a linear sequence making up a
 ;; paragraph.
@@ -129,7 +129,7 @@
   {:text (str "@" (:juxt.pass.alpha/username user))
    :_id (:crux.db/id user)})
 
-(defmethod render-entity "Paragraph" [container-id component]
+(defmethod render-entity :default [container-id component]
   [:div
    [:> Block {:containerId container-id
               :id (:crux.db/id component)
@@ -144,7 +144,7 @@
                            (fn [ix child]
                              ^{:key ix}
                              (assoc (render-segment container-id child) :_ix ix))
-                           (:content component))}]
+                           (:juxt.card.alpha/content component))}]
               :save (fn [val]
                       (let [s (.string Node #js {:children val})]
                         ;; when-not (str/blank? s)
@@ -153,14 +153,14 @@
 
 (defmethod render-entity "Checklist" [container-id component]
   #_[:div (pr-str (:crux.db/id component))]
-  (for [child (:content component)]
+  (for [child (:juxt.card.alpha/content component)]
       ^{:key (:crux.db/id child)}
       (render-entity container-id child)))
 
-(defmethod render-entity "Task" [container-id component]
+(defmethod render-entity "juxt.card.types/task" [container-id component]
   [:div
    [:input (tw ["mx-2"] {:type "checkbox"
-                         :checked (case (:status component) "DONE" true "TODO" false)
+                         :checked (case (:juxt.card.alpha/status component) "DONE" true "TODO" false)
                          :onChange (fn [ev]
                                      (if (.-checked (.-target ev))
                                        (rf/dispatch [:check-action (:crux.db/id component)])
@@ -179,23 +179,12 @@
                            (fn [ix child]
                              ^{:key ix}
                              (assoc (render-segment container-id child) :_ix ix))
-                           (:content component))}]
+                           (:juxt.card.alpha/content component))}]
               :save (fn [val]
                       (let [s (.string Node #js {:children val})]
                         ;; when-not (str/blank? s)
                         (prn "Save! " (:crux.db/id component) " -> " val)
-                        (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]]
-
-
-  #_[:div (tw ["flex" "m-2"])
-   [:label (tw ["flex" "items-center"])
-    [:input (tw ["form-checkbox"] {:type "checkbox" :checked (= (:status component) "DONE")})]
-    [:span (tw ["ml-2"]) (str (:title component))]
-    [:small (tw ["ml-2"])
-     "("
-     [:span (tw ["mr-2"]) (str "Priority: " (:priority component))]
-     [:span (str "Deadline: " (:deadline component))]
-     ")"]]])
+                        (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]])
 
 (defn card [id]
   (let [data @(rf/subscribe [::sub/card id])]
@@ -210,12 +199,12 @@
                      (:optimistic child) (conj "border-green-200")
                      (:error data) (conj "border-red-400")))
           [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
-          ;; TODO: Arguably should be done in the subscription
+          ;; TODO: Arguably should be done in the (re-frame) subscription
           (render-segment id (assoc child :ix ix))])
 
-       (:content data))]
+       (:juxt.card.alpha/content data))]
 
-     #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) (map :crux.db/id (:content data))]]))
+     #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) (map :crux.db/id (:juxt.card.alpha/content data))]]))
 
 (defn new []
   [:div (tw ["p-4"])

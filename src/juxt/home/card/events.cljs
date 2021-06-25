@@ -64,9 +64,9 @@
    (let [child-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          new-child {:crux.db/id child-id
                     :juxt.site.alpha/type "Paragraph"
-                    :content [["text" ""]]}
+                    :juxt.card.alpha/content [["text" ""]]}
          container (get-in db [:doc-store container-id])
-         new-container (update container :content
+         new-container (update container :juxt.card.alpha/content
                                (fn [v]
                                  (into
                                   (into (subvec v 0 ix) [child-id])
@@ -86,8 +86,8 @@
  (fn [{:keys [db]} [_ container-id ix]]
    (let [container (get-in db [:doc-store container-id])
          previous-sibling-id (when (> (dec ix) 0)
-                               (nth (:content container) (dec ix)))
-         new-container (update container :content drop-nth ix)]
+                               (nth (:juxt.card.alpha/content container) (dec ix)))
+         new-container (update container :juxt.card.alpha/content drop-nth ix)]
      (cond-> {:db (-> db
                       (assoc-in [:doc-store container-id] (mark-optimistic new-container)))
               :fx [[:dispatch [:put-entity new-container]]]}
@@ -99,11 +99,15 @@
  (fn [{:keys [db]} [_ id new-value]]
    (let [old-card (get-in db [:doc-store id])
          _ (assert old-card)
-         new-card (assoc old-card :content (vec
-                                            (for [child (gobj/get (first new-value) "children")]
-                                              (if-let [id (gobj/get child "_id")]
-                                                id
-                                                [(gobj/get child "_type") (gobj/get child "text")]))))]
+         new-card
+         (assoc
+          old-card
+          :juxt.card.alpha/content
+          (vec
+           (for [child (gobj/get (first new-value) "children")]
+             (if-let [id (gobj/get child "_id")]
+               id
+               [(gobj/get child "_type") (gobj/get child "text")]))))]
      (if (= old-card new-card)
        {:db db}
        {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
@@ -128,8 +132,8 @@
                 (clj->js
                  {"credentials" "include"
                   "headers" {"content-type" "application/json"}
-                  "method" "put"
-                  "body" (js/JSON.stringify (clj->js entity))}))
+                  "method" "PUT"
+                  "body" (js/JSON.stringify (clj->js entity :keyword-fn (fn [x] (subs (str x) 1))))}))
       (.then (fn [response]
                (let [status (.-status response)]
                  (if (<= 200 status 299)
@@ -141,7 +145,7 @@
  :check-action
  (fn [{:keys [db]} [_ id]]
    (let [old-card (get-in db [:doc-store id])
-         new-card (assoc old-card :status "DONE")]
+         new-card (assoc old-card :juxt.card.alpha/status "DONE")]
      {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
       :fx [[:dispatch [:put-entity new-card]]]})))
 
@@ -149,7 +153,7 @@
  :uncheck-action
  (fn [{:keys [db]} [_ id]]
    (let [old-card (get-in db [:doc-store id])
-         new-card (assoc old-card :status "TODO")]
+         new-card (assoc old-card :juxt.card.alpha/status "TODO")]
      {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
       :fx [[:dispatch [:put-entity new-card]]]})))
 

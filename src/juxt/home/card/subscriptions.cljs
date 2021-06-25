@@ -18,7 +18,7 @@
 (defn resolve-references [node index]
   (update
    node
-   :content
+   :juxt.card.alpha/content
    (fn [content]
      (mapv (fn [segment]
             (cond

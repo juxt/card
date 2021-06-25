@@ -1,5 +1,5 @@
-{:juxt.site.alpha/type #{:juxt.card.types.alpha/card
-                         :juxt.card.types.alpha/article
-                         :juxt.card.types.alpha/research-paper
-                         :juxt.card.types.alpha/conference-submission}
+{:juxt.site.alpha/type #{:juxt.card.types/card
+                         :juxt.card.types/article
+                         :juxt.card.types/research-paper
+                         :juxt.card.types/conference-submission}
  :juxt.card.alpha/content ["{{base-uri}}/card/cards/section-containing-checklist-1"]}
