@@ -39,4 +39,4 @@
 (rf/reg-sub
  ::current-card
  (fn [db _]
-   (str config/site-api-origin "/card/cards/section-containing-checklist-1")))
+   (:current-card db)))

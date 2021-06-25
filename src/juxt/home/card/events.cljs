@@ -11,13 +11,14 @@
 
 (rf/reg-event-fx
  :initialize
- (fn [_ _]
+ (fn [{:keys [db]} _]
    {;; https://code.juxt.site/home/card/issues/2
     #_#_
     :interval {:action :start
                :id :main-global-doc-refresh
                :frequency 5000
                :event [:global-doc-refresh]}
+    :db (assoc db :current-card (str config/site-api-origin "/card/cards/section-containing-checklist-1"))
     :fx [[:dispatch
           [:get-card "section-containing-checklist-1"
            #_"task-1"]]]}))
@@ -159,5 +160,5 @@
 
 (rf/reg-event-fx
  :new-card
- (fn [{:keys [db]} [_ id]]
-   (println "TODO: Create a new card in the doc-store and make it the current card")))
+ (fn [{:keys [db]} _]
+   {:db (assoc db :current-card (str config/site-api-origin "/card/cards/" (str (random-uuid))))}))
