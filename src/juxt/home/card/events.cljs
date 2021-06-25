@@ -98,21 +98,21 @@
 (rf/reg-event-fx
  :save-paragraph
  (fn [{:keys [db]} [_ id new-value]]
-   (let [old-card (get-in db [:doc-store id])
-         _ (assert old-card)
-         new-card
+   (let [old-para (get-in db [:doc-store id])
+         _ (assert old-para)
+         new-para
          (assoc
-          old-card
+          old-para
           :juxt.card.alpha/content
           (vec
            (for [child (gobj/get (first new-value) "children")]
              (if-let [id (gobj/get child "_id")]
                id
                [(gobj/get child "_type") (gobj/get child "text")]))))]
-     (if (= old-card new-card)
+     (if (= old-para new-para)
        {:db db}
-       {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
-        :fx [[:dispatch [:put-entity new-card]]]}))))
+       {:db (assoc-in db [:doc-store id] (mark-optimistic new-para))
+        :fx [[:dispatch [:put-entity new-para]]]}))))
 
 (rf/reg-event-fx
  :mark-save-succeeded
@@ -166,7 +166,7 @@
          card {:crux.db/id card-id
                :juxt.card.alpha/content [card-init-para-id]}
          para {:crux.db/id card-init-para-id
-               :juxt.card.alpha/content [["text" "hello world!"]]}]
+               :juxt.card.alpha/content [["text" ""]]}]
      (prn card)
      {:db (-> db
               (assoc-in [:doc-store card-id] (mark-optimistic card))
