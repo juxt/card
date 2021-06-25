@@ -25,6 +25,12 @@
   (createElement "p" (.-attributes props)
                  (.-children props)))
 
+(defn HeadingElement
+  [props]
+  (aset (.-attributes props) "className" "m-4 text-xl")
+  (createElement "h1" (.-attributes props)
+                 (.-children props)))
+
 (defn Leaf
   [props]
   (let [leaf (gobj/get props "leaf")
@@ -102,16 +108,57 @@
                               #js {:type (if match "paragraph" "code")}
                               #js {:match (fn [n] (.isBlock Editor editor n))})))))}))))
 
+(defn Title
+  [props]
+  (let [editor (useMemo #(withReact (createEditor)) #js [])
+        [value setValue] (useState (.-content props))
+        save (.-save props)
+        id (.-id props)
+        [timeout storeTimeout] (useState nil)
+        renderElement (useCallback
+                       (fn [props]
+                         (createElement HeadingElement props)))
+        renderLeaf (useCallback
+                    (fn renderLeaf [props]
+                      (createElement Leaf props))
+                    #js [])]
+    (createElement
+     Slate
+     #js {:editor editor
+          :value value
+          :onChange (fn [val]
+                      (setValue val)
+                      (when timeout (js/clearTimeout timeout))
+                      (storeTimeout
+                       (js/setTimeout
+                        (fn [] (when save (save val)))
+                        1000)))}
+
+     (createElement
+      Editable
+      #js {:renderElement renderElement
+           :renderLeaf renderLeaf
+           :onKeyDown
+           (fn [ev]
+             (when
+               (= (.-key ev) "Enter")
+               (.preventDefault ev)
+               ))}))))
+
 (defmulti render-entity (fn [container-id component] (:juxt.site.alpha/type component)))
 
 (defmethod render-entity :default [container-id component]
   [:div (str "type: '" (:juxt.site.alpha/type component) "'")])
 
+(defmethod render-entity "User" [container-id user]
+  {:text (str "@" (:juxt.pass.alpha/username user))
+   :_id (:crux.db/id user)})
+
 ;; A segment is an individual component of a linear sequence making up a
 ;; paragraph.
 (defn render-segment [container-id child]
   (cond
-    (vector? child) ; it's a text segment, not an @ mention
+    (vector? child)                     ; it's a text segment, not an @ mention
     (let [[type content] child]
       (case type
         "text" {:text content
@@ -121,6 +168,7 @@
               :style #js {:fontStyle "italic"}}
         {:text (str "(unknown:<" type ">)")}))
     (map? child)
+    #_{:text (pr-str child)}
     (with-meta
       (render-entity container-id child)
       {:key (:crux.db/id child)})))
@@ -171,7 +219,18 @@
                  (:error data) (conj "border-red-400")))
 
       (when-let [title (:juxt.card.alpha/title data)]
-        [:h1 (tw ["m-4" "text-xl"]) title])
+        [:> Title
+         {:id id
+          :content
+          ;; An entity of type 'Paragraph' maps to a block with a single
+          ;; 'paragraph' child. We don't allow more than one Slate paragraph
+          ;; in a Site paragraph.
+          [{:type "paragraph"
+            :children [{:text title}]}]
+          :save (fn [val]
+                  (let [s (.string Node #js {:children val})]
+                    (prn "Save title! " id " -> " s)
+                    (rf/dispatch [:set-attribute :title id s])))}])
       (when-let [subtitle (:juxt.card.alpha/subtitle data)]
         [:h2 (tw ["m-4" "text-lg"]) subtitle])
       [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id]]
@@ -183,7 +242,8 @@
                      (:error data) (conj "border-red-400")))
           [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
           ;; TODO: Arguably should be done in the (re-frame) subscription
-          (render-segment id (assoc child :ix ix))])
+          (render-segment id (assoc child :ix ix))
+          ])
 
        (:juxt.card.alpha/content data))]
 
