@@ -221,9 +221,7 @@
        ::nav/kanban [:div [:h1.text-lg "Kanban"] [menu]]
        ::nav/slate
        [:<>
-        [slate/card
-         (str config/site-api-origin "/card/cards/section-containing-checklist-1")]
-        [slate/new]
-        ]
+        [slate/card]
+        [slate/new]]
 
        [:div [:h1 "Page not ready"]])]))

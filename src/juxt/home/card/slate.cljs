@@ -187,7 +187,8 @@
                         (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]])
 
 (defn card [id]
-  (let [data @(rf/subscribe [::sub/card id])]
+  (let [id @(rf/subscribe [::sub/current-card])
+        data @(rf/subscribe [::sub/card id])]
     [:<>
      [:div (tw (cond-> ["m-4" "border-2"]
                  (:optimistic data) (conj "border-green-200")

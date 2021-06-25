@@ -2,6 +2,7 @@
 
 (ns juxt.home.card.subscriptions
   (:require
+   [juxt.home.card.config :as config]
    [re-frame.core :as rf]))
 
 (rf/reg-sub
@@ -34,3 +35,8 @@
  (fn [db [_ id]]
    (let [card (get-in db [:doc-store id])]
      (resolve-references card (:doc-store db)))))
+
+(rf/reg-sub
+ ::current-card
+ (fn [db _]
+   (str config/site-api-origin "/card/cards/section-containing-checklist-1")))
