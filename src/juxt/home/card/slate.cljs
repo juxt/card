@@ -34,7 +34,7 @@
         (gobj/set "style" style))
       (.-children props))))
 
-(defn Block
+(defn Paragraph
   [props]
   (let [editor (useMemo #(withReact (createEditor)) #js [])
         [value setValue] (useState (.-content props))
@@ -125,31 +125,32 @@
       (render-entity container-id child)
       {:key (:crux.db/id child)})))
 
-(defn render-block [container-id component]
+(defn render-paragraph [container-id component]
   [:div
-   [:> Block {:containerId container-id
-              :id (:crux.db/id component)
-              :index (:ix component)
-              :content
-              ;; An entity of type 'Paragraph' maps to a block with a single
-              ;; 'paragraph' child. We don't allow more than one Slate paragraph
-              ;; in a Site paragraph.
-              [{:type "paragraph"
-                :id (:crux.db/id component)
-                :children (map-indexed
-                           (fn [ix child]
-                             ^{:key ix}
-                             (assoc (render-segment container-id child) :_ix ix))
-                           (:juxt.card.alpha/content component))}]
-              :save (fn [val]
-                      (let [s (.string Node #js {:children val})]
-                        ;; when-not (str/blank? s)
-                        (prn "Save! " (:crux.db/id component) " -> " val)
-                        (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]])
+   [:> Paragraph
+    {:containerId container-id
+     :id (:crux.db/id component)
+     :index (:ix component)
+     :content
+     ;; An entity of type 'Paragraph' maps to a block with a single
+     ;; 'paragraph' child. We don't allow more than one Slate paragraph
+     ;; in a Site paragraph.
+     [{:type "paragraph"
+       :id (:crux.db/id component)
+       :children (map-indexed
+                  (fn [ix child]
+                    ^{:key ix}
+                    (assoc (render-segment container-id child) :_ix ix))
+                  (:juxt.card.alpha/content component))}]
+     :save (fn [val]
+             (let [s (.string Node #js {:children val})]
+               ;; when-not (str/blank? s)
+               (prn "Save! " (:crux.db/id component) " -> " val)
+               (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]])
 
 (defmethod render-entity :default [container-id component]
   [:div
-   (render-block container-id component)])
+   (render-paragraph container-id component)])
 
 (defmethod render-entity "juxt.card.types/task" [container-id component]
   [:div
@@ -159,7 +160,7 @@
                                      (if (.-checked (.-target ev))
                                        (rf/dispatch [:check-action (:crux.db/id component)])
                                        (rf/dispatch [:uncheck-action (:crux.db/id component)])))})]
-   (render-block container-id component)])
+   (render-paragraph container-id component)])
 
 (defn card [id]
   (let [id @(rf/subscribe [::sub/current-card])
