@@ -21,7 +21,7 @@
 
 (defn DefaultElement
   [props]
-  (aset (.-attributes props) "className" "bg-gray-100 p-2 border-2")
+  (aset (.-attributes props) "className" "p-2")
   (createElement "p" (.-attributes props)
                  (.-children props)))
 
@@ -166,7 +166,7 @@
   (let [id @(rf/subscribe [::sub/current-card])
         data @(rf/subscribe [::sub/card id])]
     [:<>
-     [:div (tw (cond-> ["m-4" "border-2"]
+     [:div (tw (cond-> ["m-4" "border-2" "border-gray-100"]
                  (:optimistic data) (conj "border-green-200")
                  (:error data) (conj "border-red-400")))
 
@@ -174,11 +174,11 @@
         [:h1 (tw ["m-4" "text-xl"]) title])
       (when-let [subtitle (:juxt.card.alpha/subtitle data)]
         [:h2 (tw ["m-4" "text-lg"]) subtitle])
-      [:p (tw ["m-4" "text-gray-400"]) "URL: " [:a {:href id} id]]
+      [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id]]
       (map-indexed
        (fn [ix child]
          ^{:key ix}
-         [:div (tw (cond-> ["border-2" "m-2" "p-2"]
+         [:div (tw (cond-> ["border-2" "m-2" "p-2" "border-gray-100"]
                      (:optimistic child) (conj "border-green-200")
                      (:error data) (conj "border-red-400")))
           [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
