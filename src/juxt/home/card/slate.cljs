@@ -333,4 +333,6 @@
     [button "New Candidate" (fn [_] (rf/dispatch [:new-card]))]
     [button "New Link" (fn [_] (rf/dispatch [:new-card]))]
     [button "New Idea" (fn [_] (rf/dispatch [:new-card]))]
-    [button "New Project" (fn [_] (rf/dispatch [:new-card]))]]])
+    [button "New Project" (fn [_] (rf/dispatch [:new-card]))]
+    [button "New Timesheet" (fn [_] (rf/dispatch [:new-card]))]
+    [button "New Holiday" (fn [_] (rf/dispatch [:new-card]))]]])
