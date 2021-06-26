@@ -324,5 +324,13 @@
      #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) data]]))
 
 (defn new []
-  [:div (tw ["p-4"])
-   [button "New" (fn [_] (rf/dispatch [:new-card]))]])
+  [:div
+   [:div (tw ["p-4 flex gap-x-2"])
+    [button "New" (fn [_] (rf/dispatch [:new-card]))]]
+   [:div (tw ["px-4"])
+    [:h3 "Templates"]]
+   [:div (tw ["p-4 flex gap-x-2"])
+    [button "New Candidate" (fn [_] (rf/dispatch [:new-card]))]
+    [button "New Link" (fn [_] (rf/dispatch [:new-card]))]
+    [button "New Idea" (fn [_] (rf/dispatch [:new-card]))]
+    [button "New Project" (fn [_] (rf/dispatch [:new-card]))]]])
