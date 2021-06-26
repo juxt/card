@@ -328,11 +328,14 @@
    [:div (tw ["p-4 flex gap-x-2"])
     [button "New" (fn [_] (rf/dispatch [:new-card]))]]
    [:div (tw ["px-4"])
-    [:h3 "Templates"]]
+    [:h3 "Stationery"]]
    [:div (tw ["p-4 flex gap-x-2"])
     [button "New Candidate" (fn [_] (rf/dispatch [:new-card]))]
     [button "New Link" (fn [_] (rf/dispatch [:new-card]))]
     [button "New Idea" (fn [_] (rf/dispatch [:new-card]))]
     [button "New Project" (fn [_] (rf/dispatch [:new-card]))]
     [button "New Timesheet" (fn [_] (rf/dispatch [:new-card]))]
-    [button "New Holiday" (fn [_] (rf/dispatch [:new-card]))]]])
+    [button "New Holiday" (fn [_] (rf/dispatch [:new-card]))]
+    [button "New Article" (fn [_] (rf/dispatch [:new-card]))]
+    [button "New Sales Profile" (fn [_] (rf/dispatch [:new-card]))]
+    [button "New Feedback" (fn [_] (rf/dispatch [:new-card]))]]])
