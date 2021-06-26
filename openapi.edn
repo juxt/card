@@ -1,6 +1,6 @@
 {:openapi "3.0.2"
  :info
- {:version "1.0."
+ {:version "1.0.2"
   :title "Card"
   :description
   "Zettelkasten, Kanban"
@@ -20,7 +20,22 @@
     {:required true
      :content {"application/json" {:schema {"$ref" "#/components/schemas/Card"}}}}
     :responses
-    {201 {}}}}
+    {201 {}}}
+
+   :get
+   {:responses
+    {200
+     {:juxt.site.alpha/query
+      #juxt.site.alpha/as-str
+      {:find [(pull e [*]) (pull r [*])]
+       :keys [card request]
+       :where [[e :juxt.card.alpha/content]
+               [e :juxt.site.alpha/request r]
+               [e :juxt.card.alpha/title]
+               #_[(identity {:juxt.site.alpha/ref [:juxt.pass.alpha/subject]}) subject]
+               ]}
+      :content
+      {"application/json" {}}}}}}
 
   "/cards/{id}"
   {:parameters
