@@ -225,19 +225,49 @@
                    (let [s (.string Node #js {:children val})]
                      (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]]]
 
-       [:div {:className "relative flex items-start"}
-        [:div {:className "flex items-center h-5"}
-         [:input
-          {:id (str "task-checkbox-" id)
-           :type "checkbox"
-           :checked (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
-           :onChange (fn [ev]
-                       (if (.-checked (.-target ev))
-                         (rf/dispatch [:set-attribute id :juxt.card.alpha/status "TODO"])
-                         (rf/dispatch [:delete-attribute id :juxt.card.alpha/status])))
-           }]]
-        [:div {:className "ml-1 text-sm"}
-         [:label {:for (str "task-checkbox-" id)} "Action?"]]]])))
+       [:div {:className
+              (str "relative flex h-5 gap-x-4 "
+                   (if (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
+                     "text-gray-700"
+                     "text-gray-300"))}
+
+        [:div {:className "flex items-center"}
+         [:div
+          [:input
+           {:id (str "task-checkbox-" id)
+            :type "checkbox"
+            :checked (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
+            :onChange (fn [ev]
+                        (if (.-checked (.-target ev))
+                          (rf/dispatch [:set-attribute id :juxt.card.alpha/status "TODO"])
+                          (rf/dispatch [:delete-attribute id :juxt.card.alpha/status])))}]]
+
+         [:div {:className "ml-1 text-sm"}
+          [:label {:for (str "task-checkbox-" id)} "Action?"]]]
+
+        (when (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
+          [:div {:className "flex items-center gap-x-2"}
+           [:div {:className "ml-1 text-sm"}
+            [:label {:for (str "task-checkbox2-" id)} "Assignee"]]
+           [:input
+            {:className "border-2"
+             :id (str "task-checkbox2-" id)
+             :type "text"
+             :onChange (fn [ev]
+                         )}]])
+
+        (when (contains? #{"TODO"} (:juxt.card.alpha/status component))
+          [:div {:className "flex items-center gap-x-2"}
+           [:div {:className "ml-1 text-sm"}
+            [:label {:for (str "task-checkbox3-" id)} "Deadline"]]
+           [:input
+            {:className "border-2"
+             :id (str "task-checkbox3-" id)
+             :type "text"
+             :onChange (fn [ev])}]])]
+
+
+       ])))
 
 (defn field [id label eltype attr provider]
   (let [data @(rf/subscribe [::sub/card id])]
