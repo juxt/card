@@ -4,7 +4,7 @@
  :description "Zettelkasten"
  :home-page "{{base-uri}}/card/index.html"
  :icon "{{base-uri}}/_card/icon.svg"
- :juxt.http.alpha/content-type "text/plain;utf-8"
+ :juxt.http.alpha/content-type "text/plain;charset=utf-8"
  :juxt.http.alpha/content "(Metadata about cards application)"
  :juxt.http.alpha/methods #{:get :head :options}}
 
