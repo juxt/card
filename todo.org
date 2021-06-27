@@ -94,18 +94,18 @@ CLOCK: [2021-06-17 Thu 09:31]--[2021-06-17 Thu 09:50] =>  0:19
 
 *** DONE Save new paragraphs to Site
 
-*** TODO Get checklist working
+*** DONE Get checklist working
 
 *** TODO @ mentions
 
-*** TODO Ability to create new containers/cards
+*** DONE Ability to create new containers/cards
 
 *** TODO Ability to set attributes on individual cards
 e.g. status, priority, deadline
 
 *** TODO Ability to view all cards
 
-*** TODO Set selection on focus to end of text
+*** DONE Set selection on focus to end of text
 
 *** TODO tables!
 
@@ -123,3 +123,11 @@ Allow user to turn a paragraph into an image holder
 **** Source editor
 
 When a user does Ctrl-` the paragraph changes from <p> to <code>. That's a left-over from a Slate tutorial. But what if the code was the code 'behind' the paragraph. For example, the datalog for a table or chart?
+
+* <2021-06-26 Sat>
+
+** TODO Create new post
+
+** TODO Get list of my posts through API
+
+https://home.juxt.site/card/cards/7540e62e-1180-4472-a60e-e87117b1774a
