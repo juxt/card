@@ -1,0 +1,24 @@
+<h1>{{juxt..card..alpha/title}}</h1>
+
+<h2>{{juxt..card..alpha/subtitle}}</h2>
+
+{% with owner=juxt..pass..alpha/owner|deref %}
+
+Author: {{owner.name}}
+
+<div style="margin: 4vh 2vh; font-size: 130%; max-width: 60em">
+{% for block in juxt..card..alpha/content %}
+{% with b=block|deref %}
+
+<p style="margin: 2vh 0">
+{% for segment in b.juxt..card..alpha/content %}
+<span>
+{{ segment|render-segment }}
+</span>
+{% endfor %}
+</p>
+
+{% endwith %}
+{% endfor %}
+{% endwith %}
+</div>

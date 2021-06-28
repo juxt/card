@@ -1,0 +1,4 @@
+{:crux.db/id "{{base-uri}}/test.html"
+ :juxt.http.alpha/methods #{:get :head :options}
+ :juxt.site.alpha/template "{{base-uri}}/test-template.html"
+ :juxt.site.alpha/template-model "http://localhost:2021/card/cards/section-containing-checklist-1"}
