@@ -1,24 +1,54 @@
-<h1>{{juxt..card..alpha/title}}</h1>
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
 
-<h2>{{juxt..card..alpha/subtitle}}</h2>
+    <title>{{juxt..card..alpha/title}}</title>
 
-{% with owner=juxt..pass..alpha/owner|deref %}
+    <script type="module">
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+    </script>
 
-Author: {{owner.name}}
+    <link rel="stylesheet" href="/css/styles.css"></link>
 
-<div style="margin: 4vh 2vh; font-size: 130%; max-width: 60em">
-{% for block in juxt..card..alpha/content %}
-{% with b=block|deref %}
+    <meta name="description" content="">
 
-<p style="margin: 2vh 0">
-{% for segment in b.juxt..card..alpha/content %}
-<span>
-{{ segment|render-segment }}
-</span>
-{% endfor %}
-</p>
+  </head>
 
-{% endwith %}
-{% endfor %}
-{% endwith %}
-</div>
+  <body>
+
+    <h1>{{juxt..card..alpha/title}}</h1>
+
+    <h2>{{juxt..card..alpha/subtitle}}</h2>
+
+    {% with owner=juxt..pass..alpha/owner|deref %}
+
+    Author: {{owner.name}}
+
+    <div style="margin: 4vh 2vh; font-size: 130%; max-width: 60em">
+      {% for block in juxt..card..alpha/content %}
+      {% with b=block|deref %}
+
+      <p style="margin: 2vh 0">
+        {% if b.juxt..card..alpha/status = "TODO" %}
+        ☐
+        {% elif b.juxt..card..alpha/status = "DONE" %}
+        ☑
+        {% else %}
+        {% endif %}
+
+        {% for segment in b.juxt..card..alpha/content %}
+        <span>
+          {{ segment|render-segment }}
+        </span>
+        {% endfor %}
+      </p>
+
+      {% endwith %}
+      {% endfor %}
+      {% endwith %}
+    </div>
+  </body>
+</html>
