@@ -11,17 +11,15 @@
 
 (rf/reg-event-fx
  :initialize
+ (fn [{:keys [db]} _]))
+
+(rf/reg-event-fx
+ :set-current-card
  (fn [{:keys [db]} _]
-   {;; https://code.juxt.site/home/card/issues/2
-    #_#_
-    :interval {:action :start
-               :id :main-global-doc-refresh
-               :frequency 5000
-               :event [:global-doc-refresh]}
-    :db (assoc db :current-card (str config/site-api-origin "/card/cards/section-containing-checklist-1"))
-    :fx [[:dispatch
-          [:get-card "section-containing-checklist-1"
-           #_"task-1"]]]}))
+   (let [card-id (get-in db [:current-route :path-params :card])]
+     {:db (assoc db :current-card (str config/site-api-origin "/card/cards/" card-id))
+      :fx [[:dispatch
+            [:get-card card-id]]]})))
 
 (rf/reg-event-fx
  :get-card
@@ -31,8 +29,7 @@
               #js {"credentials" "include"
                    "headers" #js {"accept" "application/json"}})
     (.then (fn [response] (.json response)))
-    (.then (fn [json] (rf/dispatch [:received-card-components json])
-)))
+    (.then (fn [json] (rf/dispatch [:received-card-components json]))))
    ;; Remember to return at least a map
    {}))
 

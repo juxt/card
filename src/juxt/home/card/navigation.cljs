@@ -22,9 +22,23 @@
 (rf/reg-event-fx
  ::navigated
  (fn [{:keys [db]} [_ new-match]]
-   (let [old-match (:current-route db)
-         controllers (rfc/apply-controllers (:controllers old-match) new-match)]
-     {:db (assoc db :current-route (assoc new-match :controllers controllers))})))
+   (let [user "mal";;(:user db)
+         old-match (:current-route db)
+         controllers (rfc/apply-controllers (:controllers old-match) new-match)
+         data (:data new-match)]
+
+     (println ">>> data is" (pr-str data))
+
+     (merge
+      {:db (-> db
+               (assoc
+                :current-route
+                (assoc new-match :controllers controllers)
+                :show-menu? false))}
+      (when-let [fx (:fx data)]
+        (if user
+          {:fx fx}
+          (js/console.warn "Tried to dispatch an 'on navigation' event without a user in db.")))))))
 
 (defn on-navigate [new-match]
   (when new-match
@@ -34,7 +48,9 @@
   (reitit/router
    [config/application-context
     ["kanban.html" {:name ::kanban}]
-    ["slate.html" {:name ::slate}]]
+    ["slate.html" {:name ::slate}]
+    ["card/:card" {:name ::card
+                   :fx [[:dispatch [:set-current-card]]]}]]
    {:data {:coercion rss/coercion}}))
 
 (defn init-routes! []

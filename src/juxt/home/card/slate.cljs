@@ -286,7 +286,7 @@
                     (rf/dispatch [:set-attribute id attr s])))}]]
        [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
 
-(defn card [id]
+(defn card []
   (let [id @(rf/subscribe [::sub/current-card])
         data @(rf/subscribe [::sub/card id])]
     [:<>

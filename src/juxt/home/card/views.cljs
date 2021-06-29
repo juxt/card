@@ -25,4 +25,10 @@
         [slate/new]
         [menu]]
 
+       ::nav/card
+       [:<>
+        [slate/card]
+        [slate/new]
+        [menu]]
+
        [:div [:h1 "Page not ready"]])]))
