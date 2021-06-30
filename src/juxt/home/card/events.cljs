@@ -2,6 +2,8 @@
 
 (ns juxt.home.card.events
   (:require
+   [ajax.core :as ajax]
+   [day8.re-frame.http-fx]
    [juxt.home.card.config :as config]
    [reagent.core :as reagent]
    [reagent.dom]
@@ -21,17 +23,30 @@
       :fx [[:dispatch
             [:get-card card-id]]]})))
 
+(defn http-request [db m]
+  {:db (assoc db :loading? true)
+   :http-xhrio (merge {:timeout 8000
+                       :with-credentials true
+                       :response-format (ajax/json-response-format {:keywords? true})
+                       :on-failure [:http-failure]} m)})
+
+(defn get-request [db m]
+  (http-request db (merge {:method :get} m)))
+
+(defn put-request [db m]
+  ;; This mess is only while we're waiting for the latest ajax to be released
+  ;; with a fix for stringified namespaced-keys. Usually we'd just use a
+  ;; ajax/request-format with :params as the entity
+  (http-request db (merge {:method :put
+                           :headers {"content-type" "application/json"}
+                           :body (js/JSON.stringify (clj->js (:params m) :keyword-fn (fn [x] (subs (str x) 1))))}
+                          m)))
+
 (rf/reg-event-fx
  :get-card
- (fn [_ [_ id]]
-   (->
-    (js/fetch (str config/site-api-origin "/card/components/" id)
-              #js {"credentials" "include"
-                   "headers" #js {"accept" "application/json"}})
-    (.then (fn [response] (.json response)))
-    (.then (fn [json] (rf/dispatch [:received-card-components json]))))
-   ;; Remember to return at least a map
-   {}))
+ (fn [{:keys [db]} [_ id]]
+   (get-request db {:uri (str config/site-api-origin "/card/components/" id)
+                    :on-success [:received-card-components]})))
 
 (rf/reg-event-db
  :received-card-components
@@ -126,21 +141,16 @@
 
 (rf/reg-event-fx
  :put-entity
- (fn [_ [_ entity]]
+ (fn [{:keys [db]} [_ entity]]
    (let [id (:crux.db/id entity)]
-     (->
-      (js/fetch id
-                (clj->js
-                 {"credentials" "include"
-                  "headers" {"content-type" "application/json"}
-                  "method" "PUT"
-                  "body" (js/JSON.stringify (clj->js entity :keyword-fn (fn [x] (subs (str x) 1))))}))
-      (.then (fn [response]
-               (let [status (.-status response)]
-                 (if (<= 200 status 299)
-                   (rf/dispatch [:mark-save-succeeded id])
-                   (rf/dispatch [:mark-save-failed id])))))))
-   {}))
+     (put-request
+      db
+      {:uri id
+       :params entity ;;(js/JSON.stringify (clj->js entity :keyword-fn (fn [x] (subs (str x) 1))))
+       :on-success [:mark-save-succeeded id]
+       :on-failure [:mark-save-failed id]})
+     )
+   ))
 
 (rf/reg-event-fx
  :check-action

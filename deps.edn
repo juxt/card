@@ -7,15 +7,14 @@
                                     cljsjs/js-joda-timezone
                                     cljsjs/js-joda-locale-en-us]}
         metosin/reitit {:mvn/version "0.4.2"}
-        ;;cljs-ajax/cljs-ajax {:mvn/version "0.8.0"}
+
         reagent/reagent {:mvn/version "1.0.0"
                          :exclusions [cljsjs/react cljsjs/react-dom]}
         re-frame/re-frame {:mvn/version "1.2.0"}
         rgm/tailwind-hiccup {:mvn/version "0.2.0"}
 
         day8.re-frame/tracing {:mvn/version "0.6.2"}
-        ;;lilactown/helix {:mvn/version "0.1.1"}
-        }
+        day8.re-frame/http-fx {:mvn/version "0.2.3"}}
 
  :aliases
  {:dev
