@@ -9,7 +9,8 @@
    [reagent.dom]
    [re-frame.core :as rf]
    [goog.object :as gobj]
-   [goog.dom :as gdom]))
+   [goog.dom :as gdom]
+   [juxt.home.card.navigation :as nav]))
 
 (rf/reg-event-fx
  :initialize
@@ -143,6 +144,7 @@
 (rf/reg-event-fx
  :mark-save-succeeded
  (fn [{:keys [db]} [_ id]]
+   (println "Save succeeded!" id)
    {:db (update-in db [:doc-store id] clear-optimistic)}))
 
 (rf/reg-event-fx
@@ -153,7 +155,10 @@
 (rf/reg-event-fx
  :put-entity
  (fn [{:keys [db]} [_ entity]]
-   (let [id (:crux.db/id entity)]
+   (let [id (:crux.db/id entity)
+         ;; TODO: Let's avoid calling put-entity when there's already one in flight
+         entity (dissoc entity :optimistic)]
+     (println "Put entity" id)
      (put-request
       db
       {:uri id
@@ -198,7 +203,8 @@
 (rf/reg-event-fx
  :new-card
  (fn [{:keys [db]} _]
-   (let [card-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
+   (let [segment (str (random-uuid))
+         card-id (str config/site-api-origin "/card/cards/" segment)
          card-init-para-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          card {:crux.db/id card-id
                :juxt.card.alpha/content [card-init-para-id]}
@@ -208,6 +214,8 @@
      {:db (-> db
               (assoc-in [:doc-store card-id] (mark-optimistic card))
               (assoc-in [:doc-store card-init-para-id] (mark-optimistic para))
+              ;; TODO: Let's deprecated :current-card and replace by :current-route
               (assoc :current-card card-id))
       :fx [[:dispatch [:put-entity card]]
-           [:dispatch [:put-entity para]]]})))
+           [:dispatch [:put-entity para]]
+           [:dispatch [:navigate ::nav/card {:card segment}]]]})))
