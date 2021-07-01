@@ -2,6 +2,8 @@
 
 (ns juxt.home.card.slate
   (:require
+   [cljs.pprint :as pprint]
+   [clojure.string :as str]
    [juxt.home.card.config :as config]
    [juxt.home.card.subscriptions :as sub]
    [re-frame.core :as rf]
@@ -10,7 +12,8 @@
    ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
    ["slate" :as slate :refer [createEditor Editor Transforms Node]]
    ["slate-react" :refer [Editable Slate withReact ReactEditor]]
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [juxt.home.card.navigation :as nav]))
 
 (defn button [label on-click]
   [:button (tw ["inline-flex" "items-center" "px-2.5" "my-2" "py-1.5" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-yellow-600" "hover:bg-yellow-700" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-yellow-500"]
@@ -322,6 +325,31 @@
        (:juxt.card.alpha/content data))]
 
      #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) data]]))
+
+(defn pprint-str
+  [x]
+  (with-out-str (pprint/pprint x)))
+
+(defn pprint-code
+  [x]
+     [:code
+      {:style {:text-align "left"}}
+      [:pre (pprint-str x)]])
+
+(defn cards []
+  (let [cards @(rf/subscribe [::sub/cards])]
+    [:div (tw ["p-4"])
+     [:div (tw ["text-xl"])  "Cards"]
+     [:ul
+      (for [{:keys [card]} cards
+            :let [{:juxt.card.alpha/keys [content title]
+                   :crux.db/keys [id]} card]]
+        [:li (tw ["p-4"])
+         [:div (tw ["text-yellow-700"]
+                   {:onClick
+                    (fn [ev]
+                      (rf/dispatch [:navigate ::nav/card {:card (last (str/split id "/"))}]))})
+          (if (not (str/blank? title)) title "(no title)")]])]]))
 
 (defn new []
   [:div

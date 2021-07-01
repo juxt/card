@@ -2,6 +2,7 @@
 
 (ns juxt.home.card.views
   (:require
+   [cljs.pprint :as pprint]
    [juxt.home.card.navigation :as nav]
    [juxt.home.card.config :as config]
    [juxt.home.card.subscriptions :as sub]
@@ -31,4 +32,11 @@
         [slate/new]
         [menu]]
 
+       ::nav/cards
+       [:<>
+        [slate/cards]
+        [slate/new]
+        [menu]]
+
+       ;; else
        [:div [:h1 "Page not ready"]])]))

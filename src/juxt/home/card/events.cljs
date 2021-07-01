@@ -48,15 +48,26 @@
    (get-request db {:uri (str config/site-api-origin "/card/components/" id)
                     :on-success [:received-card-components]})))
 
+(rf/reg-event-fx
+ :get-cards
+ (fn [{:keys [db]} _]
+   (get-request db {:uri (str config/site-api-origin "/card/cards/")
+                    :on-success [:received-cards]})))
+
 (rf/reg-event-db
  :received-card-components
- (fn [db [kw json]]
+ (fn [db [kw card]]
    (println "Received card")
    (let [components
-         (->> (js->clj json :keywordize-keys true)
+         (->> card
               (map (juxt :crux.db/id identity))
               (into {}))]
      (update db :doc-store (fnil merge {}) components))))
+
+(rf/reg-event-db
+ :received-cards
+ (fn [db [_ cards]]
+   (assoc db :cards cards)))
 
 (rf/reg-fx
  :focus-to-element

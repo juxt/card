@@ -27,11 +27,11 @@
     {200
      {:juxt.site.alpha/query
       #juxt.site.alpha/as-str
-      {:find [(pull e [*]) (pull r [*])]
-       :keys [card request]
-       :where [[e :juxt.card.alpha/content]
-               [e :juxt.site.alpha/request r]
-               [e :juxt.card.alpha/title]
+      {:find [(pull e [*]) #_(pull r [*])]
+       :keys [card #_request]
+       :where [[e :juxt.card.alpha/title]
+               [e :juxt.card.alpha/content]
+               ;;[e :juxt.site.alpha/request r]
                #_[(identity {:juxt.site.alpha/ref [:juxt.pass.alpha/subject]}) subject]
                ]}
       :content

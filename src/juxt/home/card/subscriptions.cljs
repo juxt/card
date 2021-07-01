@@ -40,3 +40,8 @@
  ::current-card
  (fn [db _]
    (:current-card db)))
+
+(rf/reg-sub
+ ::cards
+ (fn [db _]
+   (:cards db)))

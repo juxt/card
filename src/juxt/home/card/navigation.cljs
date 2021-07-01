@@ -49,8 +49,11 @@
    [config/application-context
     ["kanban.html" {:name ::kanban}]
     ["slate.html" {:name ::slate}]
-    ["card/:card" {:name ::card
-                   :fx [[:dispatch [:set-current-card]]]}]]
+    ["cards"
+     ["" {:name ::cards
+          :fx [[:dispatch [:get-cards]]]}]
+     ["/:card" {:name ::card
+                :fx [[:dispatch [:set-current-card]]]}]]]
    {:data {:coercion rss/coercion}}))
 
 (defn init-routes! []
