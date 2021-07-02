@@ -14,7 +14,8 @@
         rgm/tailwind-hiccup {:mvn/version "0.2.0"}
 
         day8.re-frame/tracing {:mvn/version "0.6.2"}
-        day8.re-frame/http-fx {:mvn/version "0.2.3"}}
+        ;;day8.re-frame/http-fx {:mvn/version "0.2.3"}
+        superstructor/re-frame-fetch-fx {:mvn/version "0.2.0"}}
 
  :aliases
  {:dev

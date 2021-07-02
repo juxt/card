@@ -2,14 +2,15 @@
 
 (ns juxt.home.card.events
   (:require
-   [ajax.core :as ajax]
-   [day8.re-frame.http-fx]
+   ;;[ajax.core :as ajax]
+   ;;[day8.re-frame.http-fx]
    [juxt.home.card.config :as config]
    [reagent.core :as reagent]
    [reagent.dom]
    [re-frame.core :as rf]
    [goog.object :as gobj]
    [goog.dom :as gdom]
+   [superstructor.re-frame.fetch-fx]
    [juxt.home.card.navigation :as nav]))
 
 (rf/reg-event-fx
@@ -24,43 +25,36 @@
       :fx [[:dispatch
             [:get-card card-id]]]})))
 
-(defn http-request [db m]
-  {:db (assoc db :loading? true)
-   :http-xhrio (merge {:timeout 8000
-                       :with-credentials true
-                       :response-format (ajax/json-response-format {:keywords? true})
-                       :on-failure [:http-failure]} m)})
-
-(defn get-request [db m]
-  (http-request db (merge {:method :get} m)))
-
-(defn put-request [db m]
-  ;; This mess is only while we're waiting for the latest ajax to be released
-  ;; with a fix for stringified namespaced-keys. Usually we'd just use a
-  ;; ajax/request-format with :params as the entity
-  (http-request db (merge {:method :put
-                           :headers {"content-type" "application/json"}
-                           :body (js/JSON.stringify (clj->js (:params m) :keyword-fn (fn [x] (subs (str x) 1))))}
-                          m)))
-
 (rf/reg-event-fx
  :get-card
  (fn [{:keys [db]} [_ id]]
-   (get-request db {:uri (str config/site-api-origin "/card/components/" id)
-                    :on-success [:received-card-components]})))
+   {:fetch
+    {:method :get
+     :url (str config/site-api-origin "/card/components/" id)
+     :timeout 5000
+     :mode :cors
+     :response-content-types {#"application/.*json" :json}
+     :on-success [:received-card-components]
+     :on-failure [:http-failure]}}))
 
 (rf/reg-event-fx
  :get-cards
  (fn [{:keys [db]} _]
-   (get-request db {:uri (str config/site-api-origin "/card/cards/")
-                    :on-success [:received-cards]})))
+   {:fetch
+    {:method :get
+     :url (str config/site-api-origin "/card/cards/")
+     :timeout 5000
+     :mode :cors
+     :response-content-types {#"application/.*json" :json}
+     :on-success [:received-cards]
+     :on-failure [:http-failure]}}))
 
 (rf/reg-event-db
  :received-card-components
  (fn [db [kw card]]
-   (println "Received card")
    (let [components
          (->> card
+              :body
               (map (juxt :crux.db/id identity))
               (into {}))]
      (update db :doc-store (fnil merge {}) components))))
@@ -68,7 +62,7 @@
 (rf/reg-event-db
  :received-cards
  (fn [db [_ cards]]
-   (assoc db :cards cards)))
+   (assoc db :cards (:body cards))))
 
 (rf/reg-fx
  :focus-to-element
@@ -157,16 +151,17 @@
  (fn [{:keys [db]} [_ entity]]
    (let [id (:crux.db/id entity)
          ;; TODO: Let's avoid calling put-entity when there's already one in flight
-         entity (dissoc entity :optimistic)]
-     (println "Put entity" id)
-     (put-request
-      db
-      {:uri id
-       :params entity ;;(js/JSON.stringify (clj->js entity :keyword-fn (fn [x] (subs (str x) 1))))
+         entity (dissoc entity :optimistic)
+         body (js/JSON.stringify (clj->js entity :keyword-fn #(subs (str %) 1)))]
+     {:fetch
+      {:method :put
+       :url id
+       :timeout 5000
+       :mode :cors
+       :body body
+       :headers {"content-type" "application/json"}
        :on-success [:mark-save-succeeded id]
-       :on-failure [:mark-save-failed id]})
-     )
-   ))
+       :on-failure [:http-failure]}})))
 
 (rf/reg-event-fx
  :check-action

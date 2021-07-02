@@ -49,10 +49,10 @@
    [config/application-context
     ["kanban.html" {:name ::kanban}]
     ["slate.html" {:name ::slate}]
-    ["cards"
+    ["cards/"
      ["" {:name ::cards
           :fx [[:dispatch [:get-cards]]]}]
-     ["/:card" {:name ::card
+     [":card" {:name ::card
                 :fx [[:dispatch [:set-current-card]]]}]]]
    {:data {:coercion rss/coercion}}))
 

@@ -338,6 +338,7 @@
 
 (defn cards []
   (let [cards @(rf/subscribe [::sub/cards])]
+    #_(println "cards in slate is " (take 3 cards))
     [:div (tw ["p-4"])
      [:div (tw ["text-xl"])  "Cards"]
      [:ul
@@ -346,11 +347,11 @@
                    :crux.db/keys [id]} card]]
         ^{:key id}
         [:li (tw ["p-4"])
-            [:div (tw ["text-yellow-700"]
-                      {:onClick
-                       (fn [ev]
-                         (rf/dispatch [:navigate ::nav/card {:card (last (str/split id "/"))}]))})
-             (if (not (str/blank? title)) title "(no title)")]])]]))
+         [:div (tw ["text-yellow-700"]
+                   {:onClick
+                    (fn [ev]
+                      (rf/dispatch [:navigate ::nav/card {:card (last (str/split id "/"))}]))})
+          (if (not (str/blank? title)) title "(no title)")]])]]))
 
 (defn new []
   [:div
