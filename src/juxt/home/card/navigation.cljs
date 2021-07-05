@@ -22,12 +22,9 @@
 (rf/reg-event-fx
  ::navigated
  (fn [{:keys [db]} [_ new-match]]
-   (let [user "mal";;(:user db)
-         old-match (:current-route db)
+   (let [old-match (:current-route db)
          controllers (rfc/apply-controllers (:controllers old-match) new-match)
          data (:data new-match)]
-
-     (println ">>> data is" (pr-str data))
 
      (merge
       {:db (-> db
@@ -35,10 +32,9 @@
                 :current-route
                 (assoc new-match :controllers controllers)
                 :show-menu? false))}
-      (when-let [fx (:fx data)]
-        (if user
-          {:fx fx}
-          (js/console.warn "Tried to dispatch an 'on navigation' event without a user in db.")))))))
+      (if-let [fx (:fx data)]
+        {:fx fx}
+        {})))))
 
 (defn on-navigate [new-match]
   (when new-match

@@ -13,7 +13,8 @@
    ["slate" :as slate :refer [createEditor Editor Transforms Node]]
    ["slate-react" :refer [Editable Slate withReact ReactEditor]]
    [clojure.string :as str]
-   [juxt.home.card.navigation :as nav]))
+   [juxt.home.card.navigation :as nav]
+   [juxt.home.card.util :as u]))
 
 (defn button [label on-click]
   [:button (tw ["inline-flex" "items-center" "px-2.5" "my-2" "py-1.5" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-yellow-600" "hover:bg-yellow-700" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-yellow-500"]
@@ -338,7 +339,6 @@
 
 (defn cards []
   (let [cards @(rf/subscribe [::sub/cards])]
-    #_(println "cards in slate is " (take 3 cards))
     [:div (tw ["p-4"])
      [:div (tw ["text-xl"])  "Cards"]
      [:ul
@@ -347,11 +347,9 @@
                    :crux.db/keys [id]} card]]
         ^{:key id}
         [:li (tw ["p-4"])
-         [:div (tw ["text-yellow-700"]
-                   {:onClick
-                    (fn [ev]
-                      (rf/dispatch [:navigate ::nav/card {:card (last (str/split id "/"))}]))})
-          (if (not (str/blank? title)) title "(no title)")]])]]))
+         [:div (u/href
+                (if (not (str/blank? title)) title "(no title)")
+                ::nav/card {:card (last (str/split id "/"))})]])]]))
 
 (defn new []
   [:div
