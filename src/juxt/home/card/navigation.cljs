@@ -47,8 +47,6 @@
 (def router
   (reitit/router
    [config/application-context
-    ["kanban.html" {:name ::kanban}]
-    ["slate.html" {:name ::slate}]
     ["cards/"
      ["" {:name ::cards
           :fx [[:dispatch [:get-cards]]]}]

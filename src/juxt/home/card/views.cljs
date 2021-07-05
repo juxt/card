@@ -10,33 +10,19 @@
    [re-frame.core :as rf]
    [tailwind-hiccup.core :refer [tw]]))
 
-(defn menu []
-  [:div
-   [:ul [:li.text-sm [:a {:href "kanban.html"} "Kanban"]]]
-   [:ul [:li.text-sm [:a {:href "slate.html"} "Slate"]]]])
-
 (defn ui []
   (let [page @(rf/subscribe [::sub/page])]
     [:div
      (case page
-       ::nav/kanban [:div [:h1.text-lg "Kanban"] [menu]]
-       ::nav/slate
-       [:<>
-        [slate/card]
-        [slate/new]
-        [menu]]
-
        ::nav/card
        [:<>
         [slate/card]
-        [slate/new]
-        [menu]]
+        [slate/new]]
 
        ::nav/cards
        [:<>
         [slate/cards]
-        [slate/new]
-        [menu]]
+        [slate/new]]
 
        ;; else
        [:div [:h1 "Page not ready"]])]))
