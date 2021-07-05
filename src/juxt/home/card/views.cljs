@@ -28,7 +28,7 @@
 
        ::nav/cards
        [:<>
-        [slate/cards]
+        [slate/kanban]
         [slate/new]]
 
        ;; else

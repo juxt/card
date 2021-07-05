@@ -7,11 +7,13 @@
    [juxt.home.card.config :as config]
    [juxt.home.card.subscriptions :as sub]
    [re-frame.core :as rf]
+   [reagent.core :as r]
    [tailwind-hiccup.core :refer [tw]]
    [goog.object :as gobj]
    ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
    ["slate" :as slate :refer [createEditor Editor Transforms Node]]
    ["slate-react" :refer [Editable Slate withReact ReactEditor]]
+   ["react-beautiful-dnd" :refer [DragDropContext Draggable Droppable]]
    [clojure.string :as str]
    [juxt.home.card.navigation :as nav]
    [juxt.home.card.util :as u]))
@@ -353,14 +355,14 @@
 
           [:tr
 
-           (for [col ["Title" "Date added"]]
+           (for [col ["Title" "Status" "Content"]]
              ^{:key col}
              [:th (tw ["px-6" "py-3" "text-left" "text-xs" "font-medium" "text-gray-500" "uppercase" "tracking-wider"]
                       {:scope "col"}) col])]]
 
          [:tbody (tw ["bg-white" "divide-y" "divide-gray-200"])
           (for [{:keys [card]} cards
-                :let [{:juxt.card.alpha/keys [content title]
+                :let [{:juxt.card.alpha/keys [content title status content]
                        :crux.db/keys [id]} card]]
             ^{:key id}
             [:tr
@@ -369,9 +371,55 @@
                (if (not (str/blank? title)) title "(no title)")
                ::nav/card {:card (last (str/split id "/"))})]
              [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
-              (u/href
-               (if (not (str/blank? title)) title "(no title)")
-               ::nav/card {:card (last (str/split id "/"))})]])]]]]]]))
+              (if (not (str/blank? status)) status "(no status)")]
+             [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
+              (pr-str content)]])]]]]]]))
+
+(def drag-drop-context (r/adapt-react-class DragDropContext))
+(def droppable (r/adapt-react-class Droppable))
+(def draggable (r/adapt-react-class Draggable))
+
+(defn card-attributes
+  [^js provided ^js snapshot]
+  (merge
+   {:ref (.-innerRef provided)
+    :class (when (.-isDragging snapshot) "column__card--dragged")}
+   (js->clj (.-draggableProps provided))
+   (js->clj (.-dragHandleProps provided))))
+
+(defn on-drag-end [result])
+
+(defn kanban []
+  (let [cards @(rf/subscribe [::sub/cards])]
+    [:div (tw ["flex" "m-4"])
+     [drag-drop-context
+      {:on-drag-end on-drag-end}
+      (for [[status items] (group-by :juxt.card.alpha/status (map :card cards))
+            :when status]
+        ^{:key status}
+        [:div (tw ["flex" "flex-col" #_"bg-yellow-100" "border-2"])
+         [:h2 status]
+         [:div
+          [droppable {:droppable-id status
+                      :key status}
+           (fn [provided _]
+             (r/as-element
+              [:div (merge
+                     {:ref (.-innerRef provided)}
+                     (js->clj (.-droppableProps provided)))
+
+               (for [[{id :crux.db/id
+                       content :juxt.card.alpha/content
+                       :as props} index] (map #(vector %1 %2) items (range))]
+                 [draggable
+                  {:key id
+                   :draggable-id id
+                   :index index}
+                  (fn [provided snapshot]
+                    (r/as-element [:div (tw ["border-2" "my-2"] (card-attributes provided snapshot))
+                                   [:div id]
+                                   [:p (pr-str content)]]))])
+               (.-placeholder provided)]))]]])]]))
 
 (defn new []
   [:div
