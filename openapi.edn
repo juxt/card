@@ -29,7 +29,7 @@
       #juxt.site.alpha/as-str
       {:find [(pull e [*]) #_(pull r [*])]
        :keys [card #_request]
-       :where [[e :juxt.card.alpha/title]
+       :where [;;[e :juxt.card.alpha/title]
                [e :juxt.card.alpha/content]
                ;;[e :juxt.site.alpha/request r]
                #_[(identity {:juxt.site.alpha/ref [:juxt.pass.alpha/subject]}) subject]
