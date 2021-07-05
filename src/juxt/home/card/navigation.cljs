@@ -43,11 +43,13 @@
 (def router
   (reitit/router
    [config/application-context
+    ["kanban" {:name ::kanban
+               :fx [[:dispatch [:get-cards]]]}]
     ["cards/"
      ["" {:name ::cards
           :fx [[:dispatch [:get-cards]]]}]
      [":card" {:name ::card
-                :fx [[:dispatch [:set-current-card]]]}]]]
+               :fx [[:dispatch [:set-current-card]]]}]]]
    {:data {:coercion rss/coercion}}))
 
 (defn init-routes! []

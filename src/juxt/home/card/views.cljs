@@ -12,9 +12,10 @@
    [tailwind-hiccup.core :refer [tw]]))
 
 (defn menu []
-  [:div (tw ["p-4"])
-   [:ul
-    [:li (-> "All Cards" (u/href "/cards/"))]]])
+  [:div
+   [:ul (tw ["p-4" "flex" "flex-row"])
+    [:li (u/href "All Cards" ::nav/cards)]
+    [:li (u/href "Kanban" ::nav/kanban)]]])
 
 (defn ui []
   (let [page @(rf/subscribe [::sub/page])]
@@ -27,6 +28,11 @@
         [slate/new]]
 
        ::nav/cards
+       [:<>
+        [slate/cards]
+        [slate/new]]
+
+       ::nav/kanban
        [:<>
         [slate/kanban]
         [slate/new]]

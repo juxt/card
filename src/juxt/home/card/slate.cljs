@@ -292,6 +292,20 @@
                     (rf/dispatch [:set-attribute id attr s])))}]]
        [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
 
+(defn render-content [id data]
+  (map-indexed
+   (fn [ix child]
+     ^{:key ix}
+     [:div (tw (cond-> ["border-2" "m-2" "p-2" "border-gray-100"]
+                 (:optimistic child) (conj "border-green-200")
+                 (:error data) (conj "border-red-400")))
+      [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
+      ;; TODO: Arguably should be done in the (re-frame) subscription
+      (render-segment id (assoc child :ix ix))
+      ])
+
+   (:juxt.card.alpha/content data)))
+
 (defn card []
   (let [id @(rf/subscribe [::sub/current-card])
         data @(rf/subscribe [::sub/card id])]
@@ -314,18 +328,7 @@
         [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
          [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]])
 
-      (map-indexed
-       (fn [ix child]
-         ^{:key ix}
-         [:div (tw (cond-> ["border-2" "m-2" "p-2" "border-gray-100"]
-                     (:optimistic child) (conj "border-green-200")
-                     (:error data) (conj "border-red-400")))
-          [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
-          ;; TODO: Arguably should be done in the (re-frame) subscription
-          (render-segment id (assoc child :ix ix))
-          ])
-
-       (:juxt.card.alpha/content data))]
+      (render-content id data)]
 
      #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) data]]))
 
@@ -387,7 +390,8 @@
    (js->clj (.-draggableProps provided))
    (js->clj (.-dragHandleProps provided))))
 
-(defn on-drag-end [result])
+(defn on-drag-end [result]
+  (js/console.log "Drag end!" result))
 
 (defn kanban []
   (let [cards @(rf/subscribe [::sub/cards])]
@@ -416,8 +420,16 @@
                    :draggable-id id
                    :index index}
                   (fn [provided snapshot]
-                    (r/as-element [:div (tw ["border-2" "my-2"] (card-attributes provided snapshot))
+                    (r/as-element [:div (tw ["border-2" "my-2"]
+                                            (merge
+                                             {:ref (.-innerRef provided)
+                                              ;;:class (when (.-isDragging snapshot) "column__card--dragged")
+                                              }
+                                             (js->clj (.-draggableProps provided))
+                                             ))
                                    [:div id]
+                                   [:div (js->clj (.-dragHandleProps provided))
+                                    "DRAG ME!"]
                                    [:p (pr-str content)]]))])
                (.-placeholder provided)]))]]])]]))
 
