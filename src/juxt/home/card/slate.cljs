@@ -339,17 +339,39 @@
 
 (defn cards []
   (let [cards @(rf/subscribe [::sub/cards])]
-    [:div (tw ["p-4"])
-     [:div (tw ["text-xl"])  "Cards"]
-     [:ul
-      (for [{:keys [card]} cards
-            :let [{:juxt.card.alpha/keys [content title]
-                   :crux.db/keys [id]} card]]
-        ^{:key id}
-        [:li (tw ["p-4"])
-         [:div (u/href
-                (if (not (str/blank? title)) title "(no title)")
-                ::nav/card {:card (last (str/split id "/"))})]])]]))
+    [:div (tw ["flex" "flex-col"])
+
+     [:div (tw ["-my-2" "overflow-x-auto" "sm:-mx-6" "lg:-mx-8"])
+
+      [:div (tw ["py-2" "align-middle" "inline-block" "min-w-full" "sm:px-6" "lg:px-8"])
+
+       [:div (tw ["shadow" "overflow-hidden" "border-b" "border-gray-200" "sm:rounded-lg"])
+
+        [:div (tw ["min-w-full" "divide-y" "divide-gray-200"])
+
+         [:thead (tw ["bg-gray-50"])
+
+          [:tr
+
+           (for [col ["Title" "Date added"]]
+             ^{:key col}
+             [:th (tw ["px-6" "py-3" "text-left" "text-xs" "font-medium" "text-gray-500" "uppercase" "tracking-wider"]
+                      {:scope "col"}) col])]]
+
+         [:tbody (tw ["bg-white" "divide-y" "divide-gray-200"])
+          (for [{:keys [card]} cards
+                :let [{:juxt.card.alpha/keys [content title]
+                       :crux.db/keys [id]} card]]
+            ^{:key id}
+            [:tr
+             [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
+              (u/href
+               (if (not (str/blank? title)) title "(no title)")
+               ::nav/card {:card (last (str/split id "/"))})]
+             [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
+              (u/href
+               (if (not (str/blank? title)) title "(no title)")
+               ::nav/card {:card (last (str/split id "/"))})]])]]]]]]))
 
 (defn new []
   [:div
