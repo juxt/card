@@ -290,14 +290,14 @@
                     (rf/dispatch [:set-attribute id attr s])))}]]
        [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
 
-(defn card [id parent-id]
+(defn card [id parent-id ix]
   (let [data @(rf/subscribe [::sub/card id])]
     ^{:key id}
     [:div (tw (cond-> ["m-4" "border-2" "border-gray-100"]
                 (:optimistic data) (conj "border-green-200")
                 (:error data) (conj "border-red-400")))
 
-     [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id]]
+     [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id] ", ix="ix]
 
      (when (:juxt.card.alpha/title data)
        [:div (tw ["p-2"])
@@ -313,12 +313,14 @@
 
      (cond
        (:juxt.card.alpha/children data)
-       (doall
-        (for [child-id (:juxt.card.alpha/children data)]
-          (card child-id id)))
+       (map-indexed
+        (fn [ix child-id]
+          (card child-id id ix))
+        (:juxt.card.alpha/children data))
 
+       ;; We're a leaf
        (:juxt.card.alpha/content data)
-       (render-paragraph parent-id data)
+       (render-paragraph parent-id (assoc data :_ix ix))
 
        )]))
 

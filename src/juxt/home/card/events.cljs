@@ -82,7 +82,7 @@
 (rf/reg-event-fx
  :new-paragraph
  (fn [{:keys [db]} [_ container-id ix]]
-   (println "create para from " ix)
+   (println "create para, ix is " ix)
    (let [child-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          new-child {:crux.db/id child-id
                     :juxt.site.alpha/type "Paragraph"
@@ -139,7 +139,6 @@
 (rf/reg-event-fx
  :mark-save-succeeded
  (fn [{:keys [db]} [_ id]]
-   (println "Save succeeded!" id)
    {:db (update-in db [:doc-store id] clear-optimistic)}))
 
 (rf/reg-event-fx
@@ -203,6 +202,8 @@
          card-id (str config/site-api-origin "/card/cards/" segment)
          card-init-para-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          card {:crux.db/id card-id
+               :juxt.card.alpha/title ""
+               :juxt.card.alpha/subtitle ""
                :juxt.card.alpha/children [card-init-para-id]}
          para {:crux.db/id card-init-para-id
                :juxt.card.alpha/content [["text" ""]]}]

@@ -37,7 +37,6 @@
     (update
      :juxt.card.alpha/content
      (fn [content]
-       (println "Resolving content for" (:crux.db/id node))
        (mapv (fn [segment-or-ref]
                (cond
                  (string? segment-or-ref) ; if true, it's a ref

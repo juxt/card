@@ -25,7 +25,7 @@
        ::nav/card
        [:<>
         (let [id @(rf/subscribe [::sub/current-card])]
-          [slate/card id nil])
+          [slate/card id nil nil])
         [slate/new]]
 
        ::nav/cards
