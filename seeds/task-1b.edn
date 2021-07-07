@@ -4,6 +4,5 @@
  :juxt.card.alpha/priority 4
  :juxt.card.alpha/deadline "2020-12-10"
  :juxt.card.alpha/status "TODO"
- :juxt.card.alpha/title "Buy candles"
  :juxt.card.alpha/content
  [[:text "Buy 50 candles"]]}

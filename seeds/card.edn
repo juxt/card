@@ -2,4 +2,5 @@
                          :juxt.card.types/article
                          :juxt.card.types/research-paper
                          :juxt.card.types/conference-submission}
- :juxt.card.alpha/content ["{{base-uri}}/card/cards/section-containing-checklist-1"]}
+ :juxt.card.alpha/title "Article"
+ :juxt.card.alpha/children ["{{base-uri}}/card/cards/section-containing-checklist-1"]}

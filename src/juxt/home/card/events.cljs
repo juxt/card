@@ -88,7 +88,7 @@
                     :juxt.site.alpha/type "Paragraph"
                     :juxt.card.alpha/content [["text" ""]]}
          container (get-in db [:doc-store container-id])
-         new-container (update container :juxt.card.alpha/content
+         new-container (update container :juxt.card.alpha/children
                                (fn [v]
                                  (into
                                   (into (subvec v 0 ix) [child-id])
@@ -106,10 +106,11 @@
 (rf/reg-event-fx
  :unlink-paragraph
  (fn [{:keys [db]} [_ container-id ix]]
+   (println "Unlink paragraph: container-id" container-id "ix" ix)
    (let [container (get-in db [:doc-store container-id])
          previous-sibling-id (when (> (dec ix) 0)
-                               (nth (:juxt.card.alpha/content container) (dec ix)))
-         new-container (update container :juxt.card.alpha/content drop-nth ix)]
+                               (nth (:juxt.card.alpha/children container) (dec ix)))
+         new-container (update container :juxt.card.alpha/children drop-nth ix)]
      (cond-> {:db (-> db
                       (assoc-in [:doc-store container-id] (mark-optimistic new-container)))
               :fx [[:dispatch [:put-entity new-container]]]}
@@ -202,7 +203,7 @@
          card-id (str config/site-api-origin "/card/cards/" segment)
          card-init-para-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          card {:crux.db/id card-id
-               :juxt.card.alpha/content [card-init-para-id]}
+               :juxt.card.alpha/children [card-init-para-id]}
          para {:crux.db/id card-init-para-id
                :juxt.card.alpha/content [["text" ""]]}]
      (prn card)

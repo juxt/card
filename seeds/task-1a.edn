@@ -6,7 +6,6 @@
  :juxt.card.alpha/priority 3
  :juxt.card.alpha/deadline "2020-12-10"
  :juxt.card.alpha/status "DONE"
- :juxt.card.alpha/title "Get cake"
  :juxt.card.alpha/content
  [[:text "Organise cake for "]
   "{{base-uri}}/_site/users/mal"

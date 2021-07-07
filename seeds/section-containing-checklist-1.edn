@@ -2,7 +2,7 @@
  :juxt.pass.alpha/classification "INTERNAL"
  :juxt.card.alpha/title "Introduction"
  :juxt.card.alpha/subtitle "The evolution of cards"
- :juxt.card.alpha/content ["{{base-uri}}/card/cards/para-1"
-                           "{{base-uri}}/card/cards/task-1a"
-                           "{{base-uri}}/card/cards/task-1b"
-                           "{{base-uri}}/card/cards/para-2"]}
+ :juxt.card.alpha/children ["{{base-uri}}/card/cards/para-1"
+                            "{{base-uri}}/card/cards/task-1a"
+                            "{{base-uri}}/card/cards/task-1b"
+                            "{{base-uri}}/card/cards/para-2"]}

@@ -212,21 +212,22 @@
                                (rf/dispatch [:set-attribute id :juxt.card.alpha/status
                                              (if (.-checked (.-target ev))
                                                "DONE" "TODO")]))}])
-        [:div {:className "flex-grow"}
+        [:div {:className "flex-grow border-2"}
          [:> Paragraph
           {:containerId container-id
            :id id
-           :index (:ix component)
+           :index (:_ix component)
            :content
            ;; An entity of type 'Paragraph' maps to a block with a single
            ;; 'paragraph' child. We don't allow more than one Slate paragraph
            ;; in a Site paragraph.
            [{:type "paragraph"
-             :children (map-indexed
-                        (fn [ix child]
-                          ^{:key ix}
-                          (assoc (render-segment container-id child) :_ix ix))
-                        (:juxt.card.alpha/content component))}]
+             :children
+             (map-indexed
+              (fn [ix segment]
+                ^{:key ix}
+                (assoc (render-segment container-id segment) :_ix ix))
+              (:juxt.card.alpha/content component))}]
            :save (fn [val]
                    (let [s (.string Node #js {:children val})]
                      (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]]]
@@ -270,10 +271,7 @@
             {:className "border-2"
              :id (str "task-checkbox3-" id)
              :type "text"
-             :onChange (fn [ev])}]])]
-
-
-       ])))
+             :onChange (fn [ev])}]])]])))
 
 (defn field [id label eltype attr provider]
   (let [data @(rf/subscribe [::sub/card id])]
@@ -292,45 +290,37 @@
                     (rf/dispatch [:set-attribute id attr s])))}]]
        [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
 
-(defn render-content [id data]
-  (map-indexed
-   (fn [ix child]
-     ^{:key ix}
-     [:div (tw (cond-> ["border-2" "m-2" "p-2" "border-gray-100"]
-                 (:optimistic child) (conj "border-green-200")
-                 (:error data) (conj "border-red-400")))
-      [:p (tw ["text-sm" "text-gray-200"]) (:crux.db/id child)]
-      ;; TODO: Arguably should be done in the (re-frame) subscription
-      (render-segment id (assoc child :ix ix))
-      ])
+(defn card [id parent-id]
+  (let [data @(rf/subscribe [::sub/card id])]
+    ^{:key id}
+    [:div (tw (cond-> ["m-4" "border-2" "border-gray-100"]
+                (:optimistic data) (conj "border-green-200")
+                (:error data) (conj "border-red-400")))
 
-   (:juxt.card.alpha/content data)))
+     [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id]]
 
-(defn card []
-  (let [id @(rf/subscribe [::sub/current-card])
-        data @(rf/subscribe [::sub/card id])]
-    [:<>
-     [:div (tw (cond-> ["m-4" "border-2" "border-gray-100"]
-                 (:optimistic data) (conj "border-green-200")
-                 (:error data) (conj "border-red-400")))
+     (when (:juxt.card.alpha/title data)
+       [:div (tw ["p-2"])
+        (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
+       #_[:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+        [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]])
 
-      [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id]]
+     (when (:juxt.card.alpha/subtitle data)
+       [:div (tw ["p-2"])
+        (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
+       #_[:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+        [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]])
 
-      (if (:juxt.card.alpha/title data)
-        [:div (tw ["p-2"])
-         (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
-        [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-         [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]])
+     (cond
+       (:juxt.card.alpha/children data)
+       (doall
+        (for [child-id (:juxt.card.alpha/children data)]
+          (card child-id id)))
 
-      (if (:juxt.card.alpha/subtitle data)
-        [:div (tw ["p-2"])
-         (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
-        [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-         [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]])
+       (:juxt.card.alpha/content data)
+       (render-paragraph parent-id data)
 
-      (render-content id data)]
-
-     #_[:pre (tw ["w-auto" "whitespace-pre-wrap"]) data]]))
+       )]))
 
 (defn pprint-str
   [x]
@@ -354,29 +344,30 @@
 
         [:div (tw ["min-w-full" "divide-y" "divide-gray-200"])
 
-         [:thead (tw ["bg-gray-50"])
+         [:table
+          [:thead (tw ["bg-gray-50"])
 
-          [:tr
+           [:tr
 
-           (for [col ["Title" "Status" "Content"]]
-             ^{:key col}
-             [:th (tw ["px-6" "py-3" "text-left" "text-xs" "font-medium" "text-gray-500" "uppercase" "tracking-wider"]
-                      {:scope "col"}) col])]]
+            (for [col ["Title" "Status" "Content"]]
+              ^{:key col}
+              [:th (tw ["px-6" "py-3" "text-left" "text-xs" "font-medium" "text-gray-500" "uppercase" "tracking-wider"]
+                       {:scope "col"}) col])]]
 
-         [:tbody (tw ["bg-white" "divide-y" "divide-gray-200"])
-          (for [{:keys [card]} cards
-                :let [{:juxt.card.alpha/keys [content title status content]
-                       :crux.db/keys [id]} card]]
-            ^{:key id}
-            [:tr
-             [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
-              (u/href
-               (if (not (str/blank? title)) title "(no title)")
-               ::nav/card {:card (last (str/split id "/"))})]
-             [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
-              (if (not (str/blank? status)) status "(no status)")]
-             [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
-              (pr-str content)]])]]]]]]))
+          [:tbody (tw ["bg-white" "divide-y" "divide-gray-200"])
+           (for [{:keys [card]} cards
+                 :let [{:juxt.card.alpha/keys [children title status]
+                        :crux.db/keys [id]} card]]
+             ^{:key id}
+             [:tr
+              [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
+               (u/href
+                (if (not (str/blank? title)) title "(no title)")
+                ::nav/card {:card (last (str/split id "/"))})]
+              [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
+               (if (not (str/blank? status)) status "(no status)")]
+              [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
+               (pr-str children)]])]]]]]]]))
 
 (def drag-drop-context (r/adapt-react-class DragDropContext))
 (def droppable (r/adapt-react-class Droppable))

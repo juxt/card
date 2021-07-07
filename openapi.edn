@@ -30,7 +30,7 @@
       {:find [(pull e [*]) #_(pull r [*])]
        :keys [card #_request]
        :where [;;[e :juxt.card.alpha/title]
-               [e :juxt.card.alpha/content]
+               [e :juxt.card.alpha/children]
                ;;[e :juxt.site.alpha/request r]
                #_[(identity {:juxt.site.alpha/ref [:juxt.pass.alpha/subject]}) subject]
                ]}
@@ -91,20 +91,23 @@
 
                     (is-ancestor-of? root component)]
             :rules [
+                    [(is-ancestor-of? ?ancestor ?child)
+                     [(= ?ancestor ?child)]]
                     [(is-ancestor-of? ?parent ?child)
-                     [?parent :juxt.card.alpha/content ?child]]
+                     [?parent :juxt.card.alpha/children ?child]]
+                    [(is-ancestor-of? ?ancestor ?child)
+                     [?parent :juxt.card.alpha/children ?child]
+                     (is-ancestor-of? ?ancestor ?parent)]
+                    ;; Finally we consider all the content nodes
                     [(is-ancestor-of? ?ancestor ?child)
                      [?parent :juxt.card.alpha/content ?child]
                      (is-ancestor-of? ?ancestor ?parent)]
-                    [(is-ancestor-of? ?ancestor ?child)
-                     [(= ?ancestor ?child)]]]}
+                    ]}
            :juxt.site.alpha/extract-first-projection? true
 
            :content
            {"application/json"
-            {:schema {"$ref" "#/components/schemas/Card"}}}}}}
-
-   }}
+            {:schema {"$ref" "#/components/schemas/Card"}}}}}}}}
 
  :components
  {:schemas

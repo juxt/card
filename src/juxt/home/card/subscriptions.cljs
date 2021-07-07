@@ -16,25 +16,50 @@
  (fn [current-route _]
    (get-in current-route [:data :name])))
 
-(defn resolve-references [node index]
-  (update
-   node
-   :juxt.card.alpha/content
-   (fn [content]
-     (mapv (fn [segment]
-            (cond
-              (string? segment)
-              (if-let [subnode (get index segment)]
-                (resolve-references subnode index)
-                segment)
-              :else segment))
-          content))))
+(defn unfold-children [node index]
+  (cond-> node
+    (:juxt.card.alpha/children node)
+    (update
+     :juxt.card.alpha/children
+     (fn [children]
+       (mapv (fn [child-or-ref]
+               (cond
+                 (string? child-or-ref) ; if true, it's a ref
+                 (if-let [subnode (get index child-or-ref)]
+                   (unfold-children subnode index)
+                   child-or-ref)
+                 :else child-or-ref))
+             children)))))
+
+(defn resolve-content-references [node index]
+  (cond-> node
+    (:juxt.card.alpha/content node)
+    (update
+     :juxt.card.alpha/content
+     (fn [content]
+       (println "Resolving content for" (:crux.db/id node))
+       (mapv (fn [segment-or-ref]
+               (cond
+                 (string? segment-or-ref) ; if true, it's a ref
+                 (if-let [subnode (get index segment-or-ref)]
+                   subnode
+                   (do
+                     (println "Failed to lookup" segment-or-ref)
+                     segment-or-ref
+                     ))
+                 :else segment-or-ref))
+             content)))))
 
 (rf/reg-sub
  ::card
  (fn [db [_ id]]
    (let [card (get-in db [:doc-store id])]
-     (resolve-references card (:doc-store db)))))
+     (resolve-content-references card (:doc-store db)))))
+
+(rf/reg-sub
+ ::doc
+ (fn [db [_ id]]
+   (get-in db [:doc-store id])))
 
 (rf/reg-sub
  ::current-card

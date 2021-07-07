@@ -24,7 +24,8 @@
      (case page
        ::nav/card
        [:<>
-        [slate/card]
+        (let [id @(rf/subscribe [::sub/current-card])]
+          [slate/card id nil])
         [slate/new]]
 
        ::nav/cards
