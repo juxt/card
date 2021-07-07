@@ -61,6 +61,21 @@
          {201 {}
           204 {}}}}
 
+  "/actions/"
+  {:get
+   {:responses
+    {200
+     {:juxt.site.alpha/query
+      ;; TODO: What if an action is contained by multiple parents? We should run
+      ;; 'distinct' over the parents.
+      #juxt.site.alpha/as-str
+      {:find [(pull action [*]) parent]
+       :keys [action parent]
+       :where [[parent :juxt.card.alpha/children action]
+               [action :juxt.card.alpha/status]]}
+      :content
+      {"application/json" {}}}}}}
+
   "/components/{id}"
   {:description "Pull out a card and all its descendant components."
    :parameters

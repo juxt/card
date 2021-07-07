@@ -69,3 +69,8 @@
  ::cards
  (fn [db _]
    (:cards db)))
+
+(rf/reg-sub
+ ::actions
+ (fn [db _]
+   (:actions db)))

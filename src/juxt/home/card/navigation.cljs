@@ -44,7 +44,7 @@
   (reitit/router
    [config/application-context
     ["kanban" {:name ::kanban
-               :fx [[:dispatch [:get-cards]]]}]
+               :fx [[:dispatch [:get-actions]]]}]
     ["cards/"
      ["" {:name ::cards
           :fx [[:dispatch [:get-cards]]]}]

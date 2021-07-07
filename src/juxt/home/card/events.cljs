@@ -49,6 +49,23 @@
      :on-success [:received-cards]
      :on-failure [:http-failure]}}))
 
+(rf/reg-event-fx
+ :get-actions
+ (fn [{:keys [db]} _]
+   {:fetch
+    {:method :get
+     :url (str config/site-api-origin "/card/actions/")
+     :timeout 5000
+     :mode :cors
+     :response-content-types {#"application/.*json" :json}
+     :on-success [:received-actions]
+     :on-failure [:http-failure]}}))
+
+(rf/reg-event-fx
+ :http-failure
+ (fn [_ o]
+   (println "HTTP FAILURE!" o)))
+
 (rf/reg-event-db
  :received-card-components
  (fn [db [kw card]]
@@ -61,8 +78,18 @@
 
 (rf/reg-event-db
  :received-cards
- (fn [db [_ cards]]
-   (assoc db :cards (:body cards))))
+ (fn [db [_ response]]
+   (assoc db :cards (:body response))))
+
+(rf/reg-event-db
+ :received-actions
+ (fn [db [_ response]]
+   (-> db
+       (update :doc-store (fnil merge {})
+               (into {}
+                     (for [{:keys [action]} (:body response)]
+                       [(:crux.db/id action) action])))
+       (assoc :actions (:body response)))))
 
 (rf/reg-fx
  :focus-to-element
@@ -184,6 +211,7 @@
  (fn [{:keys [db]} [_ id attr val]]
    (let [old-card (get-in db [:doc-store id])
          new-card (assoc old-card attr val)]
+     (assert old-card (str "Failed to get doc with id " id))
      {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
       :fx [[:dispatch [:put-entity new-card]]]})))
 
@@ -192,6 +220,7 @@
  (fn [{:keys [db]} [_ id attr]]
    (let [old-card (get-in db [:doc-store id])
          new-card (dissoc old-card attr)]
+     (assert old-card)
      {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
       :fx [[:dispatch [:put-entity new-card]]]})))
 

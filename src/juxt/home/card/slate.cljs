@@ -294,22 +294,23 @@
 (defn card [id parent-id ix]
   (let [data @(rf/subscribe [::sub/card id])]
     ^{:key id}
-    [:div (tw (cond-> ["m-4" "border-2" "border-gray-100"]
+    [:div (tw (cond-> ["m-4" "border-2" "border-gray-100"
+                       ]
                 (:optimistic data) (conj "border-green-200")
                 (:error data) (conj "border-red-400")))
 
      [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id] ", ix="ix]
 
-     (when (:juxt.card.alpha/title data)
+     (if (:juxt.card.alpha/title data)
        [:div (tw ["p-2"])
         (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
-       #_[:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+       [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
         [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]])
 
-     (when (:juxt.card.alpha/subtitle data)
+     (if (:juxt.card.alpha/subtitle data)
        [:div (tw ["p-2"])
         (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
-       #_[:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+       [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
         [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]])
 
      (cond
@@ -385,14 +386,18 @@
    (js->clj (.-dragHandleProps provided))))
 
 (defn on-drag-end [result]
-  (js/console.log "Drag end!" result))
+  (println
+   [:set-attribute (.-draggableId result) :juxt.card.alpha/status (.. result -destination -droppableId)])
+  (rf/dispatch [:set-attribute (.-draggableId result) :juxt.card.alpha/status (.. result -destination -droppableId)]))
+
+;;@(rf/subscribe [::sub/actions])
 
 (defn kanban []
-  (let [cards @(rf/subscribe [::sub/cards])]
+  (let [actions @(rf/subscribe [::sub/actions])]
     [:div (tw ["flex" "m-4"])
      [drag-drop-context
       {:on-drag-end on-drag-end}
-      (for [[status items] (group-by :juxt.card.alpha/status (map :card cards))
+      (for [[status items] (group-by :juxt.card.alpha/status (map :action actions))
             :when status]
         ^{:key status}
         [:div (tw ["flex" "flex-col" #_"bg-yellow-100" "border-2"])
