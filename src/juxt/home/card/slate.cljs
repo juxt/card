@@ -223,11 +223,12 @@
            ;; in a Site paragraph.
            [{:type "paragraph"
              :children
-             (map-indexed
-              (fn [ix segment]
-                ^{:key ix}
-                (assoc (render-segment container-id segment) :_ix ix))
-              (:juxt.card.alpha/content component))}]
+             (doall
+              (map-indexed
+               (fn [ix segment]
+                 ^{:key ix}
+                 (assoc (render-segment container-id segment) :_ix ix))
+               (:juxt.card.alpha/content component)))}]
            :save (fn [val]
                    (let [s (.string Node #js {:children val})]
                      (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]]]
@@ -313,10 +314,11 @@
 
      (cond
        (:juxt.card.alpha/children data)
-       (map-indexed
-        (fn [ix child-id]
-          (card child-id id ix))
-        (:juxt.card.alpha/children data))
+       (doall
+        (map-indexed
+         (fn [ix child-id]
+           (card child-id id ix))
+         (:juxt.card.alpha/children data)))
 
        ;; We're a leaf
        (:juxt.card.alpha/content data)
@@ -350,7 +352,6 @@
           [:thead (tw ["bg-gray-50"])
 
            [:tr
-
             (for [col ["Title" "Status" "Content"]]
               ^{:key col}
               [:th (tw ["px-6" "py-3" "text-left" "text-xs" "font-medium" "text-gray-500" "uppercase" "tracking-wider"]
