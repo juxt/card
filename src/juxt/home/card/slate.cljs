@@ -396,14 +396,6 @@
 (def droppable (r/adapt-react-class Droppable))
 (def draggable (r/adapt-react-class Draggable))
 
-(defn card-attributes
-  [^js provided ^js snapshot]
-  (merge
-   {:ref (.-innerRef provided)
-    :class (when (.-isDragging snapshot) "column__card--dragged")}
-   (js->clj (.-draggableProps provided))
-   (js->clj (.-dragHandleProps provided))))
-
 (defn on-drag-end [result]
   (println
    [:set-attribute (.-draggableId result) :juxt.card.alpha/status (.. result -destination -droppableId)])
