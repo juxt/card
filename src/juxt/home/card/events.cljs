@@ -245,3 +245,31 @@
       :fx [[:dispatch [:put-entity card]]
            [:dispatch [:put-entity para]]
            [:dispatch [:navigate ::nav/card {:card segment}]]]})))
+
+(rf/reg-event-fx
+ :delete-card
+ (fn [{:keys [db]} [_ id]]
+   (println "Event: delete card" id)
+   {:db (cond-> db
+          id (update :doc-store dissoc id)
+          (= (:current-card db) id) (assoc :current-card nil))
+    :fx [(when (= (:current-card db) id)
+           [:dispatch [:navigate ::nav/cards]])
+         [:dispatch [:delete-entity id]]]}))
+
+
+(rf/reg-event-fx
+ :delete-entity
+ (fn [{:keys [db]} [_ id]]
+   {:fetch
+    {:method :delete
+     :url id
+     :timeout 5000
+     :mode :cors
+     :on-success [:delete-succeeded]
+     :on-failure [:http-failure]}}))
+
+(rf/reg-event-fx
+ :delete-succeeded
+ (fn [{:keys [db]} _]
+   ))

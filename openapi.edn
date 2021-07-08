@@ -59,7 +59,12 @@
           :content {"application/json" {:schema {"$ref" "#/components/schemas/Card"}}}}
          :responses
          {201 {}
-          204 {}}}}
+          204 {}}}
+
+   :delete {:summary "Deletes a card"
+            :operationId "deleteCard"
+            :responses
+            {204 {:description "Card successfully deleted"}}}}
 
   "/actions/"
   {:get

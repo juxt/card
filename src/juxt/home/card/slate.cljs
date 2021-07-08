@@ -23,6 +23,11 @@
                {:type "button"
                 :onClick on-click}) label])
 
+(defn red-button [label on-click]
+  [:button (tw ["inline-flex" "items-center" "px-2.5" "my-2" "py-1.5" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-red-700" "hover:bg-red-900" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-red-700"]
+               {:type "button"
+                :onClick on-click}) label])
+
 (defn CodeElement
   [props]
   (aset (.-attributes props) "className" "bg-yellow-100 p-2")
@@ -300,6 +305,7 @@
                 (:error data) (conj "border-red-400")))
 
      [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " id]
+     [red-button "Delete" (fn [ev] (rf/dispatch [:delete-card id]))]
 
      (if (:juxt.card.alpha/title data)
        [:div (tw ["p-2"])
