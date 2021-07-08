@@ -299,7 +299,7 @@
                 (:optimistic data) (conj "border-green-200")
                 (:error data) (conj "border-red-400")))
 
-     [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " [:a {:href id} id] ", ix="ix]
+     [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " id]
 
      (if (:juxt.card.alpha/title data)
        [:div (tw ["p-2"])

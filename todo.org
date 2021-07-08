@@ -126,8 +126,16 @@ When a user does Ctrl-` the paragraph changes from <p> to <code>. That's a left-
 
 * <2021-06-26 Sat>
 
-** TODO Create new post
+** DONE Create new post
 
-** TODO Get list of my posts through API
+** DONE Get list of my posts through API
 
 https://home.juxt.site/card/cards/7540e62e-1180-4472-a60e-e87117b1774a
+
+* <2021-07-08 Thu>
+
+** Snags
+- [X] Remove ix=
+- [X] Make URLs easier to click
+
+** TODO Delete paragraphs
