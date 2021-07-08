@@ -325,7 +325,7 @@
          [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
           [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]]))
 
-     (if (:juxt.site.alpha/type data)
+     (if (and (:juxt.card.alpha/children data) (:juxt.site.alpha/type data))
        [:div (tw ["p-2"])
         (field id "type" "h2" :juxt.site.alpha/type SubheadingElement)]
        (when (:juxt.card.alpha/children data)
