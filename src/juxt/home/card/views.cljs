@@ -8,6 +8,7 @@
    [juxt.home.card.util :as u]
    [juxt.home.card.subscriptions :as sub]
    [juxt.home.card.slate :as slate]
+   [juxt.home.card.kanban :as kanban]
    [re-frame.core :as rf]
    [tailwind-hiccup.core :refer [tw]]))
 
@@ -16,6 +17,13 @@
    [:ul (tw ["p-4" "flex" "flex-row" "space-x-2"])
     [:li (u/href "All Cards" ::nav/cards)]
     [:li (u/href "Kanban" ::nav/kanban)]]])
+
+(defn actions-kanban []
+  (->>
+   @(rf/subscribe [::sub/actions])
+   (map :action)
+   (group-by :juxt.card.alpha/status)
+   (kanban/kanban)))
 
 (defn ui []
   (let [page @(rf/subscribe [::sub/page])]
@@ -35,7 +43,7 @@
 
        ::nav/kanban
        [:<>
-        [slate/actions-kanban]
+        [actions-kanban]
         [slate/new]]
 
        ;; else
