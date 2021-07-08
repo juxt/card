@@ -13,7 +13,7 @@
 
 (defn menu []
   [:div
-   [:ul (tw ["p-4" "flex" "flex-row"])
+   [:ul (tw ["p-4" "flex" "flex-row" "space-x-2"])
     [:li (u/href "All Cards" ::nav/cards)]
     [:li (u/href "Kanban" ::nav/kanban)]]])
 
