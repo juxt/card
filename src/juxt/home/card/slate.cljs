@@ -1,5 +1,7 @@
 ;; Copyright © 2021, JUXT LTD.
 
+;; TODO: Rename this namespace!
+
 (ns juxt.home.card.slate
   (:require
    [cljs.pprint :as pprint]
@@ -301,7 +303,7 @@
 (defn card [id parent-id ix]
   (let [data @(rf/subscribe [::sub/card id])]
     ^{:key id}
-    [:div (tw (cond-> ["m-4" "border-2" "border-dotted" "border-gray-100" "bg-gray-100"]
+    [:div (tw (cond-> ["m-4" "border-2" "border-dotted" "border-gray-200" "bg-gray-100"]
                 (:optimistic data) (conj "border-green-200")
                 (:error data) (conj "border-red-400")))
 
@@ -322,6 +324,13 @@
        (when (:juxt.card.alpha/children data)
          [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
           [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]]))
+
+     (if (:juxt.site.alpha/type data)
+       [:div (tw ["p-2"])
+        (field id "type" "h2" :juxt.site.alpha/type SubheadingElement)]
+       (when (:juxt.card.alpha/children data)
+         [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+          [button "Add type" (fn [ev] (rf/dispatch [:set-attribute id :juxt.site.alpha/type "Card"]))]]))
 
      (cond
        (:juxt.card.alpha/children data)
@@ -400,47 +409,47 @@
    [:set-attribute (.-draggableId result) :juxt.card.alpha/status (.. result -destination -droppableId)])
   (rf/dispatch [:set-attribute (.-draggableId result) :juxt.card.alpha/status (.. result -destination -droppableId)]))
 
-;;@(rf/subscribe [::sub/actions])
+(defn kanban [items-grouped-by-status]
+  [:div (tw ["flex" "m-4"])
+   [drag-drop-context
+    {:on-drag-end on-drag-end}
+    (for [[status items] items-grouped-by-status
+          :when status]
+      ^{:key status}
+      [:div (tw ["flex" "flex-col" #_"bg-yellow-100" "border-2"])
+       [:h2 status]
+       [:div
+        [droppable {:droppable-id status
+                    :key status}
+         (fn [provided _]
+           (r/as-element
+            [:div (merge
+                   {:ref (.-innerRef provided)}
+                   (js->clj (.-droppableProps provided)))
 
-(defn kanban []
-  (let [actions @(rf/subscribe [::sub/actions])]
-    [:div (tw ["flex" "m-4"])
-     [drag-drop-context
-      {:on-drag-end on-drag-end}
-      (for [[status items] (group-by :juxt.card.alpha/status (map :action actions))
-            :when status]
-        ^{:key status}
-        [:div (tw ["flex" "flex-col" #_"bg-yellow-100" "border-2"])
-         [:h2 status]
-         [:div
-          [droppable {:droppable-id status
-                      :key status}
-           (fn [provided _]
-             (r/as-element
-              [:div (merge
-                     {:ref (.-innerRef provided)}
-                     (js->clj (.-droppableProps provided)))
+             (for [[{id :crux.db/id
+                     content :juxt.card.alpha/content
+                     :as props} index] (map #(vector %1 %2) items (range))]
+               [draggable
+                {:key id
+                 :draggable-id id
+                 :index index}
+                (fn [provided snapshot]
+                  (r/as-element [:div (tw ["border-2" "my-2"]
+                                          (merge
+                                           {:ref (.-innerRef provided)
+                                            ;;:class (when (.-isDragging snapshot) "column__card--dragged")
+                                            }
+                                           (js->clj (.-draggableProps provided))
+                                           ))
+                                 [:div id]
+                                 [:div (js->clj (.-dragHandleProps provided))
+                                  "DRAG ME!"]
+                                 [:p (pr-str content)]]))])
+             (.-placeholder provided)]))]]])]])
 
-               (for [[{id :crux.db/id
-                       content :juxt.card.alpha/content
-                       :as props} index] (map #(vector %1 %2) items (range))]
-                 [draggable
-                  {:key id
-                   :draggable-id id
-                   :index index}
-                  (fn [provided snapshot]
-                    (r/as-element [:div (tw ["border-2" "my-2"]
-                                            (merge
-                                             {:ref (.-innerRef provided)
-                                              ;;:class (when (.-isDragging snapshot) "column__card--dragged")
-                                              }
-                                             (js->clj (.-draggableProps provided))
-                                             ))
-                                   [:div id]
-                                   [:div (js->clj (.-dragHandleProps provided))
-                                    "DRAG ME!"]
-                                   [:p (pr-str content)]]))])
-               (.-placeholder provided)]))]]])]]))
+(defn actions-kanban []
+  (kanban (group-by :juxt.card.alpha/status (map :action @(rf/subscribe [::sub/actions])))))
 
 (defn new []
   [:div

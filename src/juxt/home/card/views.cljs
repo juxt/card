@@ -35,7 +35,7 @@
 
        ::nav/kanban
        [:<>
-        [slate/kanban]
+        [slate/actions-kanban]
         [slate/new]]
 
        ;; else

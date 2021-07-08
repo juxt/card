@@ -215,6 +215,16 @@
      {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
       :fx [[:dispatch [:put-entity new-card]]]})))
 
+;; Consider reinstating for multiple types
+#_(rf/reg-event-fx
+ :conj-attribute
+ (fn [{:keys [db]} [_ id attr val]]
+   (let [old-card (get-in db [:doc-store id])
+         _ (assert old-card (str "Failed to get doc with id " id))
+         new-card (update old-card attr conj val)]
+     {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
+      :fx [[:dispatch [:put-entity new-card]]]})))
+
 (rf/reg-event-fx
  :delete-attribute
  (fn [{:keys [db]} [_ id attr]]
