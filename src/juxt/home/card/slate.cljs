@@ -19,12 +19,12 @@
    [juxt.home.card.util :as u]))
 
 (defn button [label on-click]
-  [:button (tw ["inline-flex" "items-center" "px-2.5" "my-2" "py-1.5" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-yellow-600" "hover:bg-yellow-700" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-yellow-500"]
+  [:button (tw ["inline-flex" "items-center" "px-2.5" "my-2" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-yellow-600" "hover:bg-yellow-700" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-yellow-500"]
                {:type "button"
                 :onClick on-click}) label])
 
 (defn red-button [label on-click]
-  [:button (tw ["inline-flex" "items-center" "px-2.5" "my-2" "py-1.5" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-red-700" "hover:bg-red-900" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-red-700"]
+  [:button (tw ["inline-flex" "items-center" "px-2.5" "my-2" "border" "border-transparent" "text-xs" "font-medium" "rounded" "shadow-sm" "text-white" "bg-red-300" "hover:bg-red-900" "focus:outline-none" "focus:ring-2" "focus:ring-offset-2" "focus:ring-red-700"]
                {:type "button"
                 :onClick on-click}) label])
 
@@ -43,7 +43,7 @@
 
 (defn HeadingElement
   [props]
-  (aset (.-attributes props) "className" "m-4 text-xl")
+  (aset (.-attributes props) "className" "my-4 text-xl")
   (createElement "h1" (.-attributes props)
                  (.-children props)))
 
@@ -149,7 +149,7 @@
         (useCallback
          (fn [props]
            (createElement
-            "div" #js {"className" "border-2 m-2 border-gray-100"}
+            "div" #js {"className" "m-1"}
             (createElement (case eltype
                              "h1" HeadingElement
                              "h2" SubheadingElement) props))))
@@ -209,37 +209,8 @@
     :else
     (let [id (:crux.db/id component)]
       [:div
-       [:div {:className "flex gap-x-3 py-4"}
-        (when (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
-          [:input {:type "checkbox"
-                   :checked (= (:juxt.card.alpha/status component) "DONE")
-                   :onChange (fn [ev]
-                               (rf/dispatch [:set-attribute id :juxt.card.alpha/status
-                                             (if (.-checked (.-target ev))
-                                               "DONE" "TODO")]))}])
-        [:div {:className "flex-grow border-2"}
-         [:> Paragraph
-          {:containerId container-id
-           :id id
-           :index (:_ix component)
-           :content
-           ;; An entity of type 'Paragraph' maps to a block with a single
-           ;; 'paragraph' child. We don't allow more than one Slate paragraph
-           ;; in a Site paragraph.
-           [{:type "paragraph"
-             :children
-             (doall
-              (map-indexed
-               (fn [ix segment]
-                 ^{:key ix}
-                 (assoc (render-segment container-id segment) :_ix ix))
-               (:juxt.card.alpha/content component)))}]
-           :save (fn [val]
-                   (let [s (.string Node #js {:children val})]
-                     (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]]]
-
        [:div {:className
-              (str "relative flex h-5 gap-x-4 "
+              (str "right-0 mx-4 flex flex-row h-5 gap-x-4"
                    (if (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
                      "text-gray-700"
                      "text-gray-300"))}
@@ -263,7 +234,7 @@
            [:div {:className "ml-1 text-sm"}
             [:label {:for (str "task-checkbox2-" id)} "Assignee"]]
            [:input
-            {:className "border-2"
+            {:className "border-2 w-10"
              :id (str "task-checkbox2-" id)
              :type "text"
              :onChange (fn [ev]
@@ -277,14 +248,45 @@
             {:className "border-2"
              :id (str "task-checkbox3-" id)
              :type "text"
-             :onChange (fn [ev])}]])]])))
+             :onChange (fn [ev])}]])]
+
+       [:div {:className "flex gap-x-3 py-0"}
+        (when (contains? #{"TODO" "DONE"} (:juxt.card.alpha/status component))
+          [:input {:type "checkbox"
+                   :checked (= (:juxt.card.alpha/status component) "DONE")
+                   :onChange (fn [ev]
+                               (rf/dispatch [:set-attribute id :juxt.card.alpha/status
+                                             (if (.-checked (.-target ev))
+                                               "DONE" "TODO")]))}])
+        [:div {:className "flex-grow my-2 hover:bg-white focus:bg-white"}
+         [:> Paragraph
+          {:containerId container-id
+           :id id
+           :index (:_ix component)
+           :content
+           ;; An entity of type 'Paragraph' maps to a block with a single
+           ;; 'paragraph' child. We don't allow more than one Slate paragraph
+           ;; in a Site paragraph.
+           [{:type "paragraph"
+             :children
+             (doall
+              (map-indexed
+               (fn [ix segment]
+                 ^{:key ix}
+                 (assoc (render-segment container-id segment) :_ix ix))
+               (:juxt.card.alpha/content component)))}]
+           :save (fn [val]
+                   (let [s (.string Node #js {:children val})]
+                     (rf/dispatch [:save-paragraph (:crux.db/id component) val])))}]]]
+
+       ])))
 
 (defn field [id label eltype attr provider]
   (let [data @(rf/subscribe [::sub/card id])]
     (let [v (get data attr)]
       [:div {:className "flex"}
-       [:span (tw ["m-2"]) label]
-       [:div {:className "flex-grow"}
+       [:span (tw ["m-2" "text-gray-300"]) label]
+       [:div {:className "flex-grow hover:bg-white"}
         [:> Field
          {:id id
           :eltype eltype
@@ -299,25 +301,27 @@
 (defn card [id parent-id ix]
   (let [data @(rf/subscribe [::sub/card id])]
     ^{:key id}
-    [:div (tw (cond-> ["m-4" "border-2" "border-gray-100"
-                       ]
+    [:div (tw (cond-> ["m-4" "border-2" "border-dotted" "border-gray-100" "bg-gray-100"]
                 (:optimistic data) (conj "border-green-200")
                 (:error data) (conj "border-red-400")))
 
-     [:p (tw ["m-4" "text-gray-500" "text-sm"]) "URL: " id]
-     [red-button "Delete" (fn [ev] (rf/dispatch [:delete-card id]))]
+     [:div (tw ["px-4" "right-0" "flex" "flex-row"])
+      [red-button "Delete" (fn [ev] (rf/dispatch [:delete-card id]))]
+      [:p (tw ["mx-4" "py-2" "text-gray-300" "text-xs"]) "URL: " id]]
 
      (if (:juxt.card.alpha/title data)
        [:div (tw ["p-2"])
         (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
-       [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-        [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]])
+       (when (:juxt.card.alpha/children data)
+         [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+          [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]]))
 
      (if (:juxt.card.alpha/subtitle data)
        [:div (tw ["p-2"])
         (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
-       [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-        [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]])
+       (when (:juxt.card.alpha/children data)
+         [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+          [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]]))
 
      (cond
        (:juxt.card.alpha/children data)
@@ -441,7 +445,7 @@
 (defn new []
   [:div
    [:div (tw ["p-4 flex gap-x-2"])
-    [button "New" (fn [_] (rf/dispatch [:new-card]))]]
+    [button "New Card" (fn [_] (rf/dispatch [:new-card]))]]
    [:div (tw ["px-4"])
     [:h3 "Stationery"]]
    [:div (tw ["p-4 flex gap-x-2"])
