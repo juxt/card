@@ -109,7 +109,6 @@
 (rf/reg-event-fx
  :new-paragraph
  (fn [{:keys [db]} [_ container-id ix]]
-   (println "create para, ix is " ix)
    (let [child-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          new-child {:crux.db/id child-id
                     :juxt.site.alpha/type "Paragraph"
@@ -281,5 +280,4 @@
 
 (rf/reg-event-fx
  :delete-succeeded
- (fn [{:keys [db]} _]
-   ))
+ (fn [{:keys [db]} _]))

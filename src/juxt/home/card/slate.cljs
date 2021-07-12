@@ -300,57 +300,72 @@
                     (rf/dispatch [:set-attribute id attr s])))}]]
        [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
 
+(declare card)
+
+(defmulti render-card (fn [card _ _] (:juxt.site.alpha/type card)))
+
+(defmethod render-card :default [{id :crux.db/id :as data} parent-id ix]
+  [:div (tw (cond-> ["m-4" "border-2" "border-dotted" "border-gray-200" "bg-gray-100"]
+              (:optimistic data) (conj "border-green-200")
+              (:error data) (conj "border-red-400")))
+
+   [:div (tw ["px-4" "right-0" "flex" "flex-row"])
+    [red-button "Delete" (fn [ev] (rf/dispatch [:delete-card id]))]
+    [:p (tw ["mx-4" "py-2" "text-gray-300" "text-xs"]) "URL: " id]]
+
+   (if (:juxt.card.alpha/title data)
+     [:div (tw ["p-2"])
+      (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
+     (when (:juxt.card.alpha/children data)
+       [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+        [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]]))
+
+   (if (:juxt.card.alpha/subtitle data)
+     [:div (tw ["p-2"])
+      (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
+     (when (:juxt.card.alpha/children data)
+       [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+        [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]]))
+
+   (if (and (:juxt.card.alpha/children data) (:juxt.site.alpha/type data))
+     [:div (tw ["p-2"])
+      (field id "type" "h2" :juxt.site.alpha/type SubheadingElement)]
+     (when (:juxt.card.alpha/children data)
+       [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+        [button "Add type" (fn [ev] (rf/dispatch [:set-attribute id :juxt.site.alpha/type "Card"]))]]))
+
+   (cond
+     (:juxt.card.alpha/children data)
+     (doall
+      (map-indexed
+       (fn [ix child-id]
+         (card child-id id ix))
+       (:juxt.card.alpha/children data)))
+
+     ;; We're a leaf
+     (:juxt.card.alpha/content data)
+     (render-paragraph parent-id (assoc data :_ix ix)))])
+
+(defmethod render-card "Kanban" [{id :crux.db/id
+                                  children :juxt.card.alpha/children
+                                  title :juxt.card.alpha/title
+                                  :as card} parent-id ix]
+  [:<>
+   [:h1 title]
+   (kanban/kanban
+    (into {}
+          (map-indexed
+           (fn [ix id]
+             (let [col @(rf/subscribe [::sub/card id])]
+               [(str ix ":"  (:juxt.card.alpha/title col)) [{:crux.db/id "foo" :juxt.card.alpha/content [["text" "Hello World!"]]}]]))
+           children)
+))
+   [:div (tw ["p-4"])
+    [button "New Column" (fn [_] (rf/dispatch [:new-paragraph id (count children)]))]]])
+
 (defn card [id parent-id ix]
   (let [data @(rf/subscribe [::sub/card id])]
-    ^{:key id}
-    (cond
-      (= (:juxt.site.alpha/type data) "Kanban")
-      (kanban/kanban {"TODO" [{:crux.db/id "foo" :juxt.card.alpha/content [["text" "Hello World!"]]}]
-                      "DONE" [{:crux.db/id "bar" :juxt.card.alpha/content [["text" "Goodbye!"]]}
-                              {:crux.db/id "zip" :juxt.card.alpha/content [["text" "Cruel World!"]]}]})
-      :else
-      [:div (tw (cond-> ["m-4" "border-2" "border-dotted" "border-gray-200" "bg-gray-100"]
-                  (:optimistic data) (conj "border-green-200")
-                  (:error data) (conj "border-red-400")))
-
-       [:div (tw ["px-4" "right-0" "flex" "flex-row"])
-        [red-button "Delete" (fn [ev] (rf/dispatch [:delete-card id]))]
-        [:p (tw ["mx-4" "py-2" "text-gray-300" "text-xs"]) "URL: " id]]
-
-       (if (:juxt.card.alpha/title data)
-         [:div (tw ["p-2"])
-          (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
-         (when (:juxt.card.alpha/children data)
-           [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-            [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]]))
-
-       (if (:juxt.card.alpha/subtitle data)
-         [:div (tw ["p-2"])
-          (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
-         (when (:juxt.card.alpha/children data)
-           [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-            [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]]))
-
-       (if (and (:juxt.card.alpha/children data) (:juxt.site.alpha/type data))
-         [:div (tw ["p-2"])
-          (field id "type" "h2" :juxt.site.alpha/type SubheadingElement)]
-         (when (:juxt.card.alpha/children data)
-           [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-            [button "Add type" (fn [ev] (rf/dispatch [:set-attribute id :juxt.site.alpha/type "Card"]))]]))
-
-       (cond
-         (:juxt.card.alpha/children data)
-         (doall
-          (map-indexed
-           (fn [ix child-id]
-             (card child-id id ix))
-           (:juxt.card.alpha/children data)))
-
-         ;; We're a leaf
-         (:juxt.card.alpha/content data)
-         (render-paragraph parent-id (assoc data :_ix ix))
-
-         )])))
+    ^{:key id} (render-card data parent-id ix)))
 
 (defn pprint-str
   [x]
