@@ -336,11 +336,16 @@
 
    (cond
      (:juxt.card.alpha/children data)
-     (doall
-      (map-indexed
-       (fn [ix child-id]
-         (card child-id id ix))
-       (:juxt.card.alpha/children data)))
+     [:div
+      (doall
+       (map-indexed
+        (fn [ix child-id]
+          (card child-id id ix))
+        (:juxt.card.alpha/children data)))
+      ;; By 'New Child' we mean new paragraph, new image, new task, new thing...
+      ;; We will make this label more concrete later
+      [button "New Child" (fn [ev]
+                            (rf/dispatch [:new-paragraph id (inc ix)]))]]
 
      ;; We're a leaf
      (:juxt.card.alpha/content data)
