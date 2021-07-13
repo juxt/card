@@ -377,6 +377,12 @@
       {:style {:text-align "left"}}
       [:pre (pprint-str x)]])
 
+(defn comma-separate [word-or-words]
+  (cond
+    (nil? word-or-words) ""
+    (sequential? word-or-words) (str/join ", " word-or-words)
+    :else (str word-or-words)))
+
 (defn cards []
   (let [cards @(rf/subscribe [::sub/cards])]
     [:div (tw ["flex" "flex-col"])
@@ -393,14 +399,15 @@
           [:thead (tw ["bg-gray-50"])
 
            [:tr
-            (for [col ["Title" "Status" "Content"]]
+            (for [col ["Title" "Types" "Content"]]
               ^{:key col}
               [:th (tw ["px-6" "py-3" "text-left" "text-xs" "font-medium" "text-gray-500" "uppercase" "tracking-wider"]
                        {:scope "col"}) col])]]
 
           [:tbody (tw ["bg-white" "divide-y" "divide-gray-200"])
            (for [{:keys [card]} cards
-                 :let [{:juxt.card.alpha/keys [children title status]
+                 :let [{:juxt.card.alpha/keys [children title]
+                        typ :juxt.site.alpha/type
                         :crux.db/keys [id]} card]]
              ^{:key id}
              [:tr
@@ -409,7 +416,7 @@
                 (if (not (str/blank? title)) title "(no title)")
                 ::nav/card {:card (last (str/split id "/"))})]
               [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
-               (if (not (str/blank? status)) status "(no status)")]
+               (comma-separate typ)]
               [:td (tw ["px-6" "py-4" "whitespace-nowrap"])
                (pr-str children)]])]]]]]]]))
 
