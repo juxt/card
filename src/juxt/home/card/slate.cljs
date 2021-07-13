@@ -301,92 +301,98 @@
                     (rf/dispatch [:set-attribute id attr s])))}]]
        [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
 
-(declare card)
+(declare card-view)
 
 (def drag-drop-context (r/adapt-react-class DragDropContext))
 (def droppable (r/adapt-react-class Droppable))
 (def draggable (r/adapt-react-class Draggable))
 
-(defmulti render-card (fn [card _ _] (:juxt.site.alpha/type card)))
+(defmulti render-card (fn [card _ _ _] (:juxt.site.alpha/type card)))
 
-(defmethod render-card :default [{id :crux.db/id :as data} parent-id ix]
-  [drag-drop-context
-   {:on-drag-end (fn [result]
-                   (println "Drag end!" result))}
-   [:div
-    [droppable {:droppable-id id :key id}
-     (fn [provided _]
-       (r/as-element
-        [:div (tw (cond-> ["m-4" "border-2" "border-dotted" "border-gray-200" "bg-gray-100"]
-                    (:optimistic data) (conj "border-green-200")
-                    (:error data) (conj "border-red-400"))
-                  (merge
-                   {:ref (.-innerRef provided)}
-                   (js->clj (.-droppableProps provided))))
+(defmethod render-card :default [{id :crux.db/id :as card} parent-id ix context-provided]
+  (when card ; could have been evicted
+    [drag-drop-context
+     {:on-drag-end (fn [result]
+                     (println "Drag end!" result)
+                     (assert (= (.. result -source -droppableId) (.. result -destination -droppableId) id))
+                     (rf/dispatch [:swap-children id (.. result -source -index) (.. result -destination -index)]))}
+     [:div
+      [droppable {:droppable-id id :key id}
+       (fn [provided _]
+         (r/as-element
+          [:div (tw (cond-> ["m-4" "border-2" "border-dotted" "border-gray-200" "bg-gray-100"]
+                      (:optimistic card) (conj "border-green-200")
+                      (:error card) (conj "border-red-400"))
+                    (merge
+                     {:ref (.-innerRef provided)}
+                     (js->clj (.-droppableProps provided))))
 
-         [:div (tw ["px-4" "right-0" "flex" "flex-row"])
-          [red-button "Delete" (fn [ev] (rf/dispatch [:delete-card id]))]
-          [:p (tw ["mx-4" "py-2" "text-gray-300" "text-xs"]) "URL: " id]]
+           (if context-provided
+             [:div
+              (tw ["border-2"] (js->clj (.-dragHandleProps context-provided)))
+              "☷"]
+             [:div "no context"])
 
-         (if (:juxt.card.alpha/title data)
-           [:div (tw ["p-2"])
-            (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
-           (when (:juxt.card.alpha/children data)
-             [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-              [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]]))
+           [:div (tw ["px-4" "right-0" "flex" "flex-row"])
+            [red-button "Delete" (fn [ev] (rf/dispatch [:delete-card id]))]
+            [:p (tw ["mx-4" "py-2" "text-gray-300" "text-xs"]) "URL: " id]]
 
-         (if (:juxt.card.alpha/subtitle data)
-           [:div (tw ["p-2"])
-            (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
-           (when (:juxt.card.alpha/children data)
-             [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-              [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]]))
+           (if (:juxt.card.alpha/title card)
+             [:div (tw ["p-2"])
+              (field id "title" "h1" :juxt.card.alpha/title HeadingElement)]
+             (when (:juxt.card.alpha/children card)
+               [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+                [button "Add title" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/title ""]))]]))
 
-         (if (and (:juxt.card.alpha/children data) (:juxt.site.alpha/type data))
-           [:div (tw ["p-2"])
-            (field id "type" "h2" :juxt.site.alpha/type SubheadingElement)]
-           (when (:juxt.card.alpha/children data)
-             [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
-              [button "Add type" (fn [ev] (rf/dispatch [:set-attribute id :juxt.site.alpha/type "Card"]))]]))
+           (if (:juxt.card.alpha/subtitle card)
+             [:div (tw ["p-2"])
+              (field id "subtitle" "h2" :juxt.card.alpha/subtitle SubheadingElement)]
+             (when (:juxt.card.alpha/children card)
+               [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+                [button "Add subtitle" (fn [ev] (rf/dispatch [:set-attribute id :juxt.card.alpha/subtitle ""]))]]))
 
-         (cond
-           (:juxt.card.alpha/children data)
-           [:div
-            (doall
-             (map-indexed
-              (fn [ix child-id]
-                [draggable
-                 {:key child-id
-                  :draggable-id child-id
-                  :index ix}
-                 (fn [provided snapshot]
-                   (r/as-element
-                    [:div
-                     (merge
-                      {:ref (.-innerRef provided)}
-                      (js->clj (.-draggableProps provided)))
-                     [:div
+           (if (and (:juxt.card.alpha/children card) (:juxt.site.alpha/type card))
+             [:div (tw ["p-2"])
+              (field id "type" "h2" :juxt.site.alpha/type SubheadingElement)]
+             (when (:juxt.card.alpha/children card)
+               [:div (tw ["m-4" "flex" "flex-auto" "gap-x-2" "text-gray-500" "text-sm"])
+                [button "Add type" (fn [ev] (rf/dispatch [:set-attribute id :juxt.site.alpha/type "Card"]))]]))
+
+           (cond
+             (:juxt.card.alpha/children card)
+             [:div
+              (doall
+               (map-indexed
+                (fn [ix child-id]
+                  [draggable
+                   {:key child-id
+                    :draggable-id child-id
+                    :index ix}
+                   (fn [provided snapshot]
+                     (r/as-element
                       [:div
-                       (tw ["border-2"] (js->clj (.-dragHandleProps provided)))
-                       "DRAG ME!"]
-                      (card child-id id ix)]]))])
-              (:juxt.card.alpha/children data)))
-            ;; By 'New Child' we mean new paragraph, new image, new task, new thing...
-            ;; We will make this label more concrete later
-            [button "New Child" (fn [ev]
-                                  (rf/dispatch [:new-paragraph id (inc ix)]))]]
+                       (merge
+                        {:ref (.-innerRef provided)}
+                        (js->clj (.-draggableProps provided)))
+                       [:div
+                        (card-view child-id id ix provided)]]))])
+                (:juxt.card.alpha/children card)))
+              ;; By 'New Child' we mean new paragraph, new image, new task, new thing...
+              ;; We will make this label more concrete later
+              [button "New Child" (fn [ev]
+                                    (rf/dispatch [:new-paragraph id (inc ix)]))]]
 
-           ;; We're a leaf
-           (:juxt.card.alpha/content data)
-           (render-paragraph parent-id (assoc data :_ix ix)))
+             ;; We're a leaf
+             (:juxt.card.alpha/content card)
+             (render-paragraph parent-id (assoc card :_ix ix)))
 
-         (.-placeholder provided)
-         ]))]]])
+           (.-placeholder provided)
+           ]))]]]))
 
 (defmethod render-card "Kanban" [{id :crux.db/id
                                   children :juxt.card.alpha/children
                                   title :juxt.card.alpha/title
-                                  :as card} parent-id ix]
+                                  :as card} parent-id ix context-provided]
   [:<>
    [:h1 title]
    (kanban/kanban
@@ -400,9 +406,9 @@
    [:div (tw ["p-4"])
     [button "New Column" (fn [_] (rf/dispatch [:new-paragraph id (count children)]))]]])
 
-(defn card [id parent-id ix]
+(defn card-view [id parent-id ix context-provided]
   (let [card @(rf/subscribe [::sub/card id])]
-    ^{:key id} (render-card card parent-id ix)))
+    ^{:key id} (render-card card parent-id ix context-provided)))
 
 (defn pprint-str
   [x]

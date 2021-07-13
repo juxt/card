@@ -33,7 +33,7 @@
        ::nav/card
        [:<>
         (let [id @(rf/subscribe [::sub/current-card])]
-          [slate/card id nil nil])
+          [slate/card-view id nil nil nil])
         [slate/new]]
 
        ::nav/cards

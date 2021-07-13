@@ -281,3 +281,17 @@
 (rf/reg-event-fx
  :delete-succeeded
  (fn [{:keys [db]} _]))
+
+(defn swap
+  [items i j]
+  (assert (< -1 i (count items)))
+  (assert (< -1 j (count items)))
+  (assoc items i (items j) j (items i)))
+
+(rf/reg-event-fx
+ :swap-children
+ (fn [{:keys [db]} [_ id source-index destination-index]]
+   (let [card (get-in db [:doc-store id])
+         new-card (update card :juxt.card.alpha/children swap source-index destination-index)]
+     {:db (assoc-in db [:doc-store id] (mark-optimistic new-card))
+      :fx [[:dispatch [:put-entity new-card]]]})))
