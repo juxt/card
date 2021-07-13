@@ -364,8 +364,8 @@
     [button "New Column" (fn [_] (rf/dispatch [:new-paragraph id (count children)]))]]])
 
 (defn card [id parent-id ix]
-  (let [data @(rf/subscribe [::sub/card id])]
-    ^{:key id} (render-card data parent-id ix)))
+  (let [card @(rf/subscribe [::sub/card id])]
+    ^{:key id} (render-card card parent-id ix)))
 
 (defn pprint-str
   [x]
