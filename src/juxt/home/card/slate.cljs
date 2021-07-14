@@ -301,15 +301,41 @@
                     (rf/dispatch [:set-attribute id attr s])))}]]
        [button "Delete" (fn [ev] (rf/dispatch [:delete-attribute id attr]))]])))
 
-(declare card-view)
-
 (def drag-drop-context (r/adapt-react-class DragDropContext))
 (def droppable (r/adapt-react-class Droppable))
 (def draggable (r/adapt-react-class Draggable))
 
-(defmulti render-card (fn [card _ _ _] (:juxt.site.alpha/type card)))
+(defn render-child-inner [id parent-id ix provided]
+  (if-let [card @(rf/subscribe [::sub/card id])]
+    [:div
+     (merge
+      {:ref (.-innerRef provided)}
+      (js->clj (.-draggableProps provided)))
+     [:div
+      (tw ["border-2"] (js->clj (.-dragHandleProps provided)))
+      "☷"]
+     [:div
+      (render-paragraph parent-id (assoc card :_ix ix))]]
+    [:div
+     (merge
+      {:ref (.-innerRef provided)}
+      (js->clj (.-draggableProps provided)))
+     [:div
+      (tw ["border-2"] (js->clj (.-dragHandleProps provided)))
+      "☷"]
+     [:div "<card is nil>"]]))
 
-(defmethod render-card :default [{id :crux.db/id :as card} parent-id ix context-provided]
+(defn render-child [id parent-id ix]
+  ^{:key id}
+  [draggable
+   {:key id
+    :draggable-id id
+    :index ix}
+   (fn [provided snapshot]
+     (r/as-element
+      [render-child-inner id parent-id ix provided]))])
+
+(defn render-card [{id :crux.db/id :as card} parent-id ix context-provided]
   (when card ; could have been evicted
     [drag-drop-context
      {:on-drag-end (fn [result]
@@ -364,47 +390,19 @@
               (doall
                (map-indexed
                 (fn [ix child-id]
-                  [draggable
-                   {:key child-id
-                    :draggable-id child-id
-                    :index ix}
-                   (fn [provided snapshot]
-                     (r/as-element
-                      [:div
-                       (merge
-                        {:ref (.-innerRef provided)}
-                        (js->clj (.-draggableProps provided)))
-                       [:div
-                        (card-view child-id id ix provided)]]))])
+                  (render-child child-id id ix))
                 (:juxt.card.alpha/children card)))
               ;; By 'New Child' we mean new paragraph, new image, new task, new thing...
               ;; We will make this label more concrete later
-              [button "New Child" (fn [ev]
+              #_[button "New Child" (fn [ev]
                                     (rf/dispatch [:new-paragraph id (inc ix)]))]]
 
              ;; We're a leaf
-             (:juxt.card.alpha/content card)
+             #_#_(:juxt.card.alpha/content card)
              (render-paragraph parent-id (assoc card :_ix ix)))
 
            (.-placeholder provided)
            ]))]]]))
-
-(defmethod render-card "Kanban" [{id :crux.db/id
-                                  children :juxt.card.alpha/children
-                                  title :juxt.card.alpha/title
-                                  :as card} parent-id ix context-provided]
-  [:<>
-   [:h1 title]
-   (kanban/kanban
-    (into {}
-          (map-indexed
-           (fn [ix id]
-             (let [col @(rf/subscribe [::sub/card id])]
-               [(str ix ":"  (:juxt.card.alpha/title col)) [{:crux.db/id "foo" :juxt.card.alpha/content [["text" "Hello World!"]]}]]))
-           children)
-))
-   [:div (tw ["p-4"])
-    [button "New Column" (fn [_] (rf/dispatch [:new-paragraph id (count children)]))]]])
 
 (defn card-view [id parent-id ix context-provided]
   (let [card @(rf/subscribe [::sub/card id])]
