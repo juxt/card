@@ -2,6 +2,7 @@
 
 (ns juxt.home.card.views
   (:require
+;;   ["/demo/bar" :as bar :refer (myComponent)]
    [cljs.pprint :as pprint]
    [juxt.home.card.navigation :as nav]
    [juxt.home.card.config :as config]
@@ -28,6 +29,8 @@
 (defn ui []
   (let [page @(rf/subscribe [::sub/page])]
     [:div
+     [:h1 "MViews"]
+     #_[bar/myComponent]
      [menu]
      (case page
        ::nav/card
