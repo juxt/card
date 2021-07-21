@@ -2,8 +2,6 @@
 
  :dev-http {8000 {:roots ["public" "target/dev/app"]}}
 
- :source-paths ["src" "gen"]
-
  :builds
  {:app
   {:target :browser
