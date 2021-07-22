@@ -49,7 +49,9 @@
      ["" {:name ::cards
           :fx [[:dispatch [:get-cards]]]}]
      [":card" {:name ::card
-               :fx [[:dispatch [:set-current-card]]]}]]]
+               :fx [[:dispatch [:set-current-card]]]}]]
+
+    ["test" {:name ::test}]]
    {:data {:coercion rss/coercion}}))
 
 (defn init-routes! []
