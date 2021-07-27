@@ -1,6 +1,6 @@
 ;; Copyright © 2021, JUXT LTD.
 
-{:paths ["src/cljs"]
+{:paths ["src/cljs" "gen"]
  :deps {org.clojure/clojurescript {:mvn/version "1.10.866"}
         #_#_tick/tick {:mvn/version "0.4.27-alpha"
                        :exclusions [cljsjs/js-joda

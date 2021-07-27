@@ -10,10 +10,12 @@
    [juxt.home.card.slate :as slate]
    [juxt.home.card.kanban :as kanban]
    [re-frame.core :as rf]
-   [tailwind-hiccup.core :refer [tw]]))
+   [tailwind-hiccup.core :refer [tw]]
+   ["/juxt/card/navbar" :refer (NavBar)]))
 
 (defn menu []
-  [:div
+  [:> NavBar {"logo" "https://home.juxt.site/x-on-dark.svg"}]
+  #_[:div
    [:ul (tw ["p-4" "flex" "flex-row" "space-x-2"])
     [:li (u/href "All Cards" ::nav/cards)]
     [:li (u/href "Kanban" ::nav/kanban)]]])
