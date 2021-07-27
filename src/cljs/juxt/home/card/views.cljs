@@ -13,17 +13,19 @@
    [tailwind-hiccup.core :refer [tw]]
    ["/juxt/card/navbar" :refer (NavBar)]))
 
+(def menu-items [{"label" "All Cards"
+                  :target ::nav/cards}
+                 {"label" "Kanban"
+                  :target  ::nav/kanban}])
+
 (defn menu []
-  [:> NavBar {"logo" "https://home.juxt.site/x-on-dark.svg"
-              "navigation" [{"label" "Dashboard"}
-                            {"label" "Projects"}
-                            {"label" "Calendar"
-                             "current" true}
-                            {"label" "People"}]}]
-  #_[:div
-   [:ul (tw ["p-4" "flex" "flex-row" "space-x-2"])
-    [:li (u/href "All Cards" ::nav/cards)]
-    [:li (u/href "Kanban" ::nav/kanban)]]])
+  (let [page @(rf/subscribe [::sub/page])]
+    [:> NavBar {:logo "https://home.juxt.site/x-on-dark.svg"
+                :navigation
+                (for [{:keys [target] :as item} menu-items]
+                  (assoc item
+                         :href (u/route->url target)
+                         :current (= page target)))}]))
 
 (defn actions-kanban []
   (->>
