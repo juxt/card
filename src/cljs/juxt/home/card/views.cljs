@@ -13,9 +13,11 @@
    [tailwind-hiccup.core :refer [tw]]
    ["/juxt/card/navbar" :refer (NavBar)]))
 
-(def menu-items [{"label" "All Cards"
+(def menu-items [{:id "all-cards"
+                  "label" "All Cards"
                   :target ::nav/cards}
-                 {"label" "Kanban"
+                 {:id "kanban"
+                  "label" "Kanban"
                   :target  ::nav/kanban}])
 
 (defn menu []
