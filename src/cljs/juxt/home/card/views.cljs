@@ -14,7 +14,12 @@
    ["/juxt/card/navbar" :refer (NavBar)]))
 
 (defn menu []
-  [:> NavBar {"logo" "https://home.juxt.site/x-on-dark.svg"}]
+  [:> NavBar {"logo" "https://home.juxt.site/x-on-dark.svg"
+              "navigation" [{"label" "Dashboard"}
+                            {"label" "Projects"}
+                            {"label" "Calendar"
+                             "current" true}
+                            {"label" "People"}]}]
   #_[:div
    [:ul (tw ["p-4" "flex" "flex-row" "space-x-2"])
     [:li (u/href "All Cards" ::nav/cards)]
