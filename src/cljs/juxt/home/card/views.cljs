@@ -25,7 +25,10 @@
                 (for [{:keys [target] :as item} menu-items]
                   (assoc item
                          :href (u/route->url target)
-                         :current (= page target)))}]))
+                         :current (= page target)))
+                :user {:name "Jeremy Taylor"
+                       :email "jdt@juxt.pro"
+                       :imageUrl "https://home.juxt.site/_site/users/jdt/slack/jdt.jpg"}}]))
 
 (defn actions-kanban []
   (->>
