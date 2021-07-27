@@ -112,7 +112,7 @@
    (let [child-id (str config/site-api-origin "/card/cards/" (str (random-uuid)))
          new-child {:crux.db/id child-id
                     :juxt.site.alpha/type "Paragraph"
-                    :juxt.card.alpha/content [["text" ""]]}
+                    :juxt.card.alpha/content [{"text" ""}]}
          container (get-in db [:doc-store container-id])
          new-container (update container :juxt.card.alpha/children
                                (fn [v]
@@ -156,7 +156,7 @@
            (for [child (gobj/get (first new-value) "children")]
              (if-let [id (gobj/get child "_id")]
                id
-               [(gobj/get child "_type") (gobj/get child "text")]))))]
+               (clj->js (dissoc (js->clj child) "_ix"))))))]
      (if (= old-para new-para)
        {:db db}
        {:db (assoc-in db [:doc-store id] (mark-optimistic new-para))
@@ -244,7 +244,7 @@
                :juxt.card.alpha/subtitle ""
                :juxt.card.alpha/children [card-init-para-id]}
          para {:crux.db/id card-init-para-id
-               :juxt.card.alpha/content [["text" ""]]}]
+               :juxt.card.alpha/content [{"text" ""}]}]
      (prn card)
      {:db (-> db
               (assoc-in [:doc-store card-id] (mark-optimistic card))

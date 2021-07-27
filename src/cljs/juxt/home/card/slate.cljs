@@ -188,20 +188,13 @@
 ;; A segment is an individual component of a linear sequence making up a
 ;; paragraph.
 (defn render-segment [container-id child]
-  (cond
-    (vector? child)                     ; it's a text segment, not an @ mention
-    (let [[type content] child]
-      (case type
-        "text" {:text content
-                :_type :text}
-        "em" {:text content
-              :_type :em
-              :style #js {:fontStyle "italic"}}
-        {:text (str "(unknown:<" type ">)")}))
-    (map? child)
+  (case (:juxt.site.alpha/type child)
+    "User"
     (with-meta
       (render-paragraph container-id child)
-      {:key (:crux.db/id child)})))
+      {:key (:crux.db/id child)})
+
+    (js->clj child)))
 
 (defn render-paragraph [container-id component]
   (cond
