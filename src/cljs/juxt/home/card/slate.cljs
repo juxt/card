@@ -16,6 +16,7 @@
    ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
    ["slate" :as slate :refer [createEditor Editor Transforms Node]]
    ["slate-react" :refer [Editable Slate withReact ReactEditor]]
+   ["/juxt/card/card" :refer (Card)]
    [clojure.string :as str]
    [juxt.home.card.navigation :as nav]
    [juxt.home.card.util :as u]
@@ -399,7 +400,15 @@
 
 (defn card-view [id parent-id ix context-provided]
   (let [card @(rf/subscribe [::sub/card id])]
-    ^{:key id} (render-card card parent-id ix context-provided)))
+    [:div (tw ["p-4"])
+     (let [card-props @(rf/subscribe [::sub/card-props id])]
+       [:<>
+        [:> Card card-props]
+        [:pre (with-out-str (cljs.pprint/pprint (sort card-props)))]])
+
+     (let [card @(rf/subscribe [::sub/card id])]
+       (render-card card parent-id ix context-provided))])
+  )
 
 (defn pprint-str
   [x]

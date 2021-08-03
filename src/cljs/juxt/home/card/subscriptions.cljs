@@ -56,6 +56,17 @@
      (resolve-content-references card (:doc-store db)))))
 
 (rf/reg-sub
+ ::card-props
+ (fn [db [_ id]]
+   (let [card (get-in db [:doc-store id])
+         card (resolve-content-references card (:doc-store db))]
+     {"title" (:juxt.card.alpha/title card)
+      "subtitle" (:juxt.card.alpha/subtitle card)
+      "id" (:crux.db/id card)
+      })))
+
+
+(rf/reg-sub
  ::doc
  (fn [db [_ id]]
    (get-in db [:doc-store id])))
