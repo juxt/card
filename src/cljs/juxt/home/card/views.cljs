@@ -27,7 +27,6 @@
 (defn menu []
   (let [page @(rf/subscribe [::sub/page])]
     [:> NavBar {:logo "https://home.juxt.site/x-on-dark.svg"
-                :foo "World!"
                 :navigation
                 (for [{:keys [target] :as item} menu-items]
                   (assoc item
