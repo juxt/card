@@ -9,6 +9,7 @@
    [juxt.home.card.subscriptions :as sub]
    [juxt.home.card.slate :as slate]
    [juxt.home.card.kanban :as kanban]
+   [juxt.home.card.people :as people]
    [re-frame.core :as rf]
    [tailwind-hiccup.core :refer [tw]]
    ["/juxt/card/navbar" :refer (NavBar)]))
@@ -18,11 +19,15 @@
                   :target ::nav/cards}
                  {:id "kanban"
                   "label" "Kanban"
-                  :target  ::nav/kanban}])
+                  :target  ::nav/kanban}
+                 {:id "people"
+                  "label" "People"
+                  :target  ::nav/people}])
 
 (defn menu []
   (let [page @(rf/subscribe [::sub/page])]
     [:> NavBar {:logo "https://home.juxt.site/x-on-dark.svg"
+                :foo "World!"
                 :navigation
                 (for [{:keys [target] :as item} menu-items]
                   (assoc item
@@ -59,6 +64,11 @@
        [:<>
         [actions-kanban]
         [slate/new]]
+
+       ::nav/people
+       [:<>
+        [people/people]
+        ]
 
        ;; else
        [:div [:h1 "Page not ready"]])]))
