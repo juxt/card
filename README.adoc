@@ -3,11 +3,11 @@
 == Development
 
 ----
-$ npm run shadow-dev
+$ npm run dev
 ----
 
 == Release
 
 ----
-$ npm run shadow-release
+$ npm run release
 ----
