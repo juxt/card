@@ -21,7 +21,8 @@
      juxt.home.card.config/dev? true
      juxt.home.card.config/site-api-origin "https://home.juxt.site" #_"http://localhost:2021"
      juxt.home.card.config/application-context "/"
-     re-frame.trace/trace-enabled? true}}
+     day8.re-frame.tracing.trace-enabled? true
+     re-frame.trace.trace-enabled? true}}
 
    :release
    {:compiler-options {:optimizations :advanced}
@@ -31,8 +32,7 @@
      ;; We need the full origin because we currently use it to construct card
      ;; ids
      juxt.home.card.config/site-api-origin "https://home.juxt.site"
-     juxt.home.card.config/application-context "/card/"
-     re-frame.trace/trace-enabled? true}
+     juxt.home.card.config/application-context "/card/"}
     :build-options
     {:ns-aliases
      {day8.re-frame.tracing day8.re-frame.tracing-stubs}}}}}}
