@@ -1,5 +1,14 @@
+.DS_Store
 .cpcache/
 target/
 node_modules/
 .shadow-cljs/
 gen/
+
+/public/js
+/public/css
+
+.clj-kondo/*
+!.clj-kondo/.gitkeep
+!.clj-kondo/config.edn
+.lsp
