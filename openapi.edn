@@ -1,6 +1,6 @@
 {:openapi "3.0.2"
  :info
- {:version "1.0.2"
+ {:version "1.0.3"
   :title "Card"
   :description
   "Zettelkasten, Kanban"
@@ -127,7 +127,32 @@
 
            :content
            {"application/json"
-            {:schema {"$ref" "#/components/schemas/Card"}}}}}}}}
+            {:schema {"$ref" "#/components/schemas/Card"}}}}}}}
+
+
+  "/users/"
+  {:get
+   {:summary "Returns a list of all the users you're allowed to view"
+    :operationId "findUsers"
+    :tags ["Users"]
+
+    :responses
+    {200
+     {:juxt.site.alpha/query
+      #juxt.site.alpha/as-str
+      {:find [(pull user [*])
+              (pull slack [*])
+              username]
+       :strs [user slack username]
+       :where [[user :juxt.site.alpha/type "User"]
+               [user :juxt.pass.alpha/username username]
+               [slack :juxt.site.alpha/type "SlackUserDetails"]
+               [slack :juxt.pass.alpha/user user]]
+       :order-by [[username :asc]]}
+
+      :content
+      {"application/json"
+       {:schema {}}}}}}}}
 
  :components
  {:schemas

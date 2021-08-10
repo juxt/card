@@ -65,9 +65,7 @@
         [slate/new]]
 
        ::nav/people
-       [:<>
-        [people/people]
-        ]
+       [people/people]
 
        ;; else
        [:div [:h1 "Page not ready"]])]))

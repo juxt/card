@@ -62,6 +62,19 @@
      :on-failure [:http-failure]}}))
 
 (rf/reg-event-fx
+ :get-people
+ (fn [{:keys [db]} _]
+   {:fetch
+    {:method :get
+     :url (str config/site-api-origin "/card/users/")
+     :timeout 5000
+     :mode :cors
+     :response-content-types {#"application/.*json" :json}
+     :on-success [:received-people]
+     :on-failure [:http-failure]}}))
+
+
+(rf/reg-event-fx
  :http-failure
  (fn [_ o]
    (println "HTTP FAILURE!" o)))
@@ -90,6 +103,13 @@
                      (for [{:keys [action]} (:body response)]
                        [(:crux.db/id action) action])))
        (assoc :actions (:body response)))))
+
+(rf/reg-event-db
+ :received-people
+ (fn [db [_ response]]
+   (def response response)
+   (-> db
+       (assoc :people (:body response)))))
 
 (rf/reg-fx
  :focus-to-element

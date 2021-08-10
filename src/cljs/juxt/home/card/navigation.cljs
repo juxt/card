@@ -50,9 +50,10 @@
           :fx [[:dispatch [:get-cards]]]}]
      [":card" {:name ::card
                :fx [[:dispatch [:set-current-card]]]}]]
+
     ["people/" {:name ::people
-                ;;:fx [[:dispatch [:get-people]]]
-                }]]
+                :fx [[:dispatch [:get-people]]]}]]
+
    {:data {:coercion rss/coercion}}))
 
 (defn init-routes! []
