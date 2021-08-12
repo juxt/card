@@ -120,7 +120,8 @@
  (fn [db _]
    (->> db
         :people
-        (map process-db-user))))
+        (map process-db-user)
+        (sort-by :name))))
 
 (rf/reg-sub
  ::current-user-profile
@@ -145,5 +146,4 @@
  :<- [::people]
  (fn [people _]
    (->> people
-        (sort-by :name)
         (group-by last-initial))))

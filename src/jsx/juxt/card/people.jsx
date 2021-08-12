@@ -98,6 +98,14 @@ function classNames(...classes) {
 
 function People({ profile, directory }, ...props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const groupedPeople = (letter) => {
+    return directory[letter].filter(
+      (person) =>
+        // Filter people in search results
+        person.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+    );
+  };
   return (
     <div className="relative h-screen flex overflow-hidden bg-white">
       <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -509,7 +517,7 @@ function People({ profile, directory }, ...props) {
               <p className="mt-1 text-sm text-gray-600">
                 Search directory of 3,018 employees
               </p>
-              <form className="mt-6 flex space-x-4" action="#">
+              <form className="mt-6 flex space-x-4">
                 <div className="flex-1 min-w-0">
                   <label htmlFor="search" className="sr-only">
                     Search
@@ -525,6 +533,7 @@ function People({ profile, directory }, ...props) {
                       type="search"
                       name="search"
                       id="search"
+                      onChange={(e) => setSearchText(e.target.value)}
                       className="focus:ring-pink-500 focus:border-pink-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                       placeholder="Search"
                     />
@@ -548,43 +557,49 @@ function People({ profile, directory }, ...props) {
               aria-label="Directory"
             >
               {Object.keys(directory)
-              .map((letter) => (
-                <div key={letter} className="relative">
-                  <div className="z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 px-6 py-1 text-sm font-medium text-gray-500">
-                    <h3>{letter}</h3>
+                .sort()
+                .filter((letter) => groupedPeople(letter)?.length > 0)
+                .map((letter) => (
+                  <div key={letter} className="relative">
+                    <div className="z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 px-6 py-1 text-sm font-medium text-gray-500">
+                      <h3>{letter}</h3>
+                    </div>
+                    <ul className="relative z-0 divide-y divide-gray-200">
+                      {letter &&
+                        groupedPeople(letter).map((person) => (
+                          <li key={person.id}>
+                            <div className="relative px-6 py-5 flex items-center space-x-3 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-pink-500">
+                              <div className="flex-shrink-0">
+                                <img
+                                  className="h-10 w-10 rounded-full"
+                                  src={person.imageUrl}
+                                  alt=""
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <a
+                                  href={`/people?selected=${person.id}`}
+                                  className="focus:outline-none"
+                                >
+                                  {/* Extend touch target to entire panel */}
+                                  <span
+                                    className="absolute inset-0"
+                                    aria-hidden="true"
+                                  />
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {person.name}
+                                  </p>
+                                  <p className="text-sm text-gray-500 truncate">
+                                    {person.role}
+                                  </p>
+                                </a>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                    </ul>
                   </div>
-                  <ul className="relative z-0 divide-y divide-gray-200">
-                    {directory[letter].map((person) => (
-                      <li key={person.id}>
-                        <div className="relative px-6 py-5 flex items-center space-x-3 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-pink-500">
-                          <div className="flex-shrink-0">
-                            <img
-                              className="h-10 w-10 rounded-full"
-                              src={person.imageUrl}
-                              alt=""
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <a href={`/people?selected=${person.id}`} className="focus:outline-none">
-                              {/* Extend touch target to entire panel */}
-                              <span
-                                className="absolute inset-0"
-                                aria-hidden="true"
-                              />
-                              <p className="text-sm font-medium text-gray-900">
-                                {person.name}
-                              </p>
-                              <p className="text-sm text-gray-500 truncate">
-                                {person.role}
-                              </p>
-                            </a>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+                ))}
             </nav>
           </aside>
         </div>
