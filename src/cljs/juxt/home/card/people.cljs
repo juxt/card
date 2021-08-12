@@ -8,7 +8,7 @@
   )
 
 (defn people []
-  (let [profile (rf/subscribe [::sub/current-user-profile])
-        directory (rf/subscribe [::sub/user-directory])]
-    [:> People {:profile @profile
-                :directory @directory}]))
+  (let [profile @(rf/subscribe [::sub/current-user-profile])
+        directory @(rf/subscribe [::sub/user-directory])]
+    [:> People {:profile profile
+                :directory directory}]))

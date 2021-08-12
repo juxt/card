@@ -565,7 +565,7 @@ function People({ profile, directory }, ...props) {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <a href="#" className="focus:outline-none">
+                            <a href={`/people?selected=${person.id}`} className="focus:outline-none">
                               {/* Extend touch target to entire panel */}
                               <span
                                 className="absolute inset-0"

@@ -3,6 +3,7 @@
 (ns juxt.home.card.subscriptions
   (:require
    [juxt.home.card.config :as config]
+   [potpuri.core :as p]
    [re-frame.core :as rf]
    [clojure.string :as str]))
 
@@ -89,9 +90,10 @@
 
 (defn process-db-user
   [{:keys [user slack]}]
-  (let [{:keys [name email]} user
+  (let [{:keys [name email juxt.pass.alpha/username]} user
         {:juxt.home/keys [slack-profile-pic]} slack]
     {:name name
+     :id username
      :imageUrl
      slack-profile-pic
      :coverImageUrl
@@ -109,15 +111,30 @@
               :Birthday "June 8, 1990"}}))
 
 (rf/reg-sub
- ::current-user-profile
+ ::route-params
+ (fn [db _]
+   (-> db :current-route :parameters)))
+
+(rf/reg-sub
+ ::people
  (fn [db _]
    (->> db
         :people
-        first
-        process-db-user)))
+        (map process-db-user))))
+
+(rf/reg-sub
+ ::current-user-profile
+ :<- [::people]
+ :<- [::route-params]
+ (fn [[people route-params] _]
+   (let [current-user-id
+         (or
+          (-> route-params :query :selected)
+          (-> people first :id))]
+     (p/find-first people {:id current-user-id}))))
 
 (defn last-initial
-  [{:keys [name] :as user}]
+  [{:keys [name]}]
   ;;get first letter of last word in name
   (let [name-split (str/split name " ")
         last-initial (first (last name-split))]
@@ -125,9 +142,8 @@
 
 (rf/reg-sub
  ::user-directory
- (fn [db _]
-   (->> db
-        :people
-        (map process-db-user)
+ :<- [::people]
+ (fn [people _]
+   (->> people
         (sort-by :name)
         (group-by last-initial))))
