@@ -134,11 +134,14 @@
           (-> people first :id))]
      (p/find-first people {:id current-user-id}))))
 
-(defn last-initial
+(defn- last-name
+  [name]
+  (last (str/split name " ")))
+
+(defn- last-initial
+  "get first letter of last word in name"
   [{:keys [name]}]
-  ;;get first letter of last word in name
-  (let [name-split (str/split name " ")
-        last-initial (first (last name-split))]
+  (let [last-initial (first (last-name name))]
     last-initial))
 
 (rf/reg-sub
@@ -146,4 +149,6 @@
  :<- [::people]
  (fn [people _]
    (->> people
+        (map #(assoc % :last-name (:name %)))
+        (sort-by (comp last-name :name))
         (group-by last-initial))))
