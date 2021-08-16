@@ -8,5 +8,8 @@
   )
 
 (defn people []
-  (let [profile (rf/subscribe [::sub/current-user-profile])]
-    [:> People {:profile @profile}]))
+  (let [profile @(rf/subscribe [::sub/current-user-profile])
+        directory @(rf/subscribe [::sub/user-directory])]
+    (when (and (:id profile) (map? directory))
+      [:> People {:profile profile
+                  :directory directory}])))

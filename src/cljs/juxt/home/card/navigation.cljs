@@ -45,13 +45,13 @@
    [config/application-context
     ["kanban" {:name ::kanban
                :fx [[:dispatch [:get-actions]]]}]
-    ["cards/"
+    ["cards"
      ["" {:name ::cards
           :fx [[:dispatch [:get-cards]]]}]
-     [":card" {:name ::card
+     ["/:card" {:name ::card
                :fx [[:dispatch [:set-current-card]]]}]]
 
-    ["people/" {:name ::people
+    ["people" {:name ::people
                 :fx [[:dispatch [:get-people]]]}]]
 
    {:data {:coercion rss/coercion}}))
