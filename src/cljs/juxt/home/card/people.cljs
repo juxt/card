@@ -2,7 +2,7 @@
 
 (ns juxt.home.card.people
   (:require
-   ["/juxt/card/people" :refer (People)]
+   ["/juxt/card/People" :refer (People)]
    [juxt.home.card.subscriptions :as sub]
    [re-frame.core :as rf]))
 

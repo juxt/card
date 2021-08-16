@@ -4,7 +4,7 @@ site put-asset --file templates/index-template.html --type 'text/html;charset=ut
 site post-resources --file resources/resources.edn
 site post-resources --file resources/permissions.edn
 
-if [ -f target/release/app/js/main.js ]
+if [ -f public/js/main.js ]
 then
-    site put-asset --file target/release/app/js/main.js --type 'application/javascript' --path /card/js/main.js
+    site put-asset --file public/js/main.js --type 'application/javascript' --path /card/js/main.js
 fi
