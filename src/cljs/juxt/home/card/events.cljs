@@ -15,7 +15,8 @@
 
 (rf/reg-event-fx
  :initialize
- (fn [{:keys [db]} _]))
+ (fn [{:keys [db]} _]
+   {:dispatch [:get-self]}))
 
 (rf/reg-event-fx
  :set-current-card
@@ -73,6 +74,22 @@
      :on-success [:received-people]
      :on-failure [:http-failure]}}))
 
+(rf/reg-event-fx
+ :get-self
+ (fn [{:keys [db]} _]
+   {:fetch
+    {:method :get
+     :url (str config/site-api-origin "/_site/user")
+     :timeout 5000
+     :mode :cors
+     :response-content-types {#"application/.*json" :json}
+     :on-success [:received-self]
+     :on-failure [:http-failure]}}))
+
+(rf/reg-event-fx
+ :received-self
+ (fn [{:keys [db]} [_ {self :body}]]
+   {:db (assoc db :user-info self)}))
 
 (rf/reg-event-fx
  :http-failure

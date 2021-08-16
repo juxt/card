@@ -124,14 +124,20 @@
         (sort-by :name))))
 
 (rf/reg-sub
+ ::user-info
+ (fn [db]
+   (:user-info db)))
+
+(rf/reg-sub
  ::current-user-profile
  :<- [::people]
+ :<- [::user-info]
  :<- [::route-params]
- (fn [[people route-params] _]
+ (fn [[people {logged-in-user :username} route-params] _]
    (let [current-user-id
          (or
           (-> route-params :query :selected)
-          (-> people first :id))]
+          logged-in-user)]
      (p/find-first people {:id current-user-id}))))
 
 (defn- last-name
