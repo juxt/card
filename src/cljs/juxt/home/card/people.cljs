@@ -4,12 +4,13 @@
   (:require
    ["/juxt/card/people" :refer (People)]
    [juxt.home.card.subscriptions :as sub]
-   [re-frame.core :as rf])
-  )
+   [re-frame.core :as rf]))
 
 (defn people []
   (let [profile @(rf/subscribe [::sub/current-user-profile])
-        directory @(rf/subscribe [::sub/user-directory])]
+        directory @(rf/subscribe [::sub/user-directory])
+        user @(rf/subscribe [::sub/logged-in-user-profile])]
     (when (and (:id profile) (map? directory))
       [:> People {:profile profile
-                  :directory directory}])))
+                  :directory directory
+                  :user user}])))

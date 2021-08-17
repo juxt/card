@@ -140,6 +140,13 @@
           logged-in-user)]
      (p/find-first people {:id current-user-id}))))
 
+(rf/reg-sub
+ ::logged-in-user-profile
+ :<- [::people]
+ :<- [::user-info]
+ (fn [[people {logged-in-user :username}] _]
+   (p/find-first people {:id logged-in-user})))
+
 (defn- last-name
   [name]
   (last (str/split name " ")))

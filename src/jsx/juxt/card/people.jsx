@@ -96,7 +96,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function People({ profile, directory }, ...props) {
+function People({ profile, user, directory }, ...props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const groupedPeople = (letter) => {
