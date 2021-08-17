@@ -1,6 +1,6 @@
 import { classNames } from "./utils";
 
-export function Tabs({ tabs }) {
+export function Tabs({ tabs, selectedTab, setSelectedTab }) {
   return (
     <div className="mt-6 sm:mt-2 2xl:mt-5">
       <div className="border-b border-gray-200">
@@ -9,9 +9,9 @@ export function Tabs({ tabs }) {
             {tabs.map((tab) => (
               <a
                 key={tab.name}
-                href={tab.href}
+                onClick={() => setSelectedTab(tab.name)}
                 className={classNames(
-                  tab.current
+                  tab.name === selectedTab
                     ? "border-pink-500 text-gray-900"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
                   "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"

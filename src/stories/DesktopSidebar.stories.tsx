@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/outline";
 
 export default {
-  title: "Card/DesktopSidebar",
+  title: "People/DesktopSidebar",
   component: Sidebar,
 };
 

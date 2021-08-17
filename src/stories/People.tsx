@@ -101,19 +101,19 @@ export function People({ profile, directory }, ...props) {
     navigation: navigation,
     secondaryNavigation: secondaryNavigation,
     tabs: tabs,
-    user: user,
   };
   return (
     <div className="relative h-screen flex overflow-hidden bg-white">
       <MobileSidebar
         {...fakeProps}
+        {...props}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
       {/* Static sidebar for desktop */}
       <div className="hidden lg:flex lg:flex-shrink-0">
         <div className="flex flex-col w-64">
-          <Sidebar {...fakeProps} />
+          <Sidebar {...fakeProps} {...props} />
         </div>
       </div>
 
