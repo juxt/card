@@ -52,7 +52,7 @@
     "babel-loader": "^8.2.2",
     "cross-env": "^7.0.3",
     "postcss": "8.3.6",
-    "shadow-cljs": "^2.15.3",
+    "shadow-cljs": "^2.14.4",
     "tailwindcss": "2.2.7"
   }
 }

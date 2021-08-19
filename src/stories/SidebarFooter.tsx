@@ -10,14 +10,14 @@ export function SidebarFooter(props: { user: User }) {
               className="inline-block h-9 w-9 rounded-full"
               src={
                 props.user?.imageUrl ||
-                "https://eu.ui-avatars.com/api/?name=" + props.user.name
+                "https://eu.ui-avatars.com/api/?name=" + props.user?.name
               }
-              alt={props.user.name + "'s imageUrl"}
+              alt={props.user?.name + "'s imageUrl"}
             />
           </div>
           <div className="ml-3">
             <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-              {props.user.name}
+              {props.user?.name}
             </p>
             <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
               View profile
