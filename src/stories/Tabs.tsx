@@ -1,6 +1,20 @@
 import { classNames } from "./utils";
 
-export function Tabs({ tabs, selectedTab, setSelectedTab }) {
+type Tab = {
+  name: string;
+  href: string;
+  current: boolean;
+};
+
+export function Tabs({
+  tabs,
+  selectedTab,
+  setSelectedTab,
+}: {
+  tabs: Tab[];
+  selectedTab: string;
+  setSelectedTab: (tab: string) => void;
+}): JSX.Element {
   return (
     <div className="mt-6 sm:mt-2 2xl:mt-5">
       <div className="border-b border-gray-200">

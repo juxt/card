@@ -18,17 +18,30 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-let BasicCalendar = ({ events }) => (
-  <div className="h-full p-4">
-    <Calendar
-      events={events || []}
-      step={15}
-      timeslots={8}
-      localizer={localizer}
-      defaultView={Views.WEEK}
-      defaultDate={new Date()}
-    />
-  </div>
-);
+export type CalendarProps = {
+  events: Array<{
+    allDay?: boolean | undefined;
+    title?: string | undefined;
+    start?: Date | undefined;
+    end?: Date | undefined;
+    resource?: any;
+    desc?: string;
+  }>;
+};
+
+let BasicCalendar = ({ events }: CalendarProps) => {
+  return (
+    <div className="h-full p-4">
+      <Calendar
+        events={events || []}
+        step={15}
+        timeslots={8}
+        localizer={localizer}
+        defaultView={Views.WEEK}
+        defaultDate={new Date()}
+      />
+    </div>
+  );
+};
 
 export default BasicCalendar;

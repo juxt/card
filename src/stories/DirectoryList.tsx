@@ -1,13 +1,15 @@
-import {
-  FilterIcon,
-  SearchIcon,
-} from "@heroicons/react/solid";
+import { FilterIcon, SearchIcon } from "@heroicons/react/solid";
 import { useState } from "react";
+import { User, Directory } from "./types";
 
-export function DirectoryList(props) {
+export type DirectoryListProps = {
+  directory: Directory;
+};
+
+export function DirectoryList({ directory }: DirectoryListProps) {
   const [searchText, setSearchText] = useState("");
-  const groupedPeople = (letter) => {
-    return props.directory[letter].filter(
+  const groupedPeople = (letter: string) => {
+    return directory[letter].filter(
       (person) =>
         // Filter people in search results
         person.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
@@ -18,7 +20,7 @@ export function DirectoryList(props) {
       <div className="px-6 pt-6 pb-4">
         <h2 className="text-lg font-medium text-gray-900">Directory</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Search directory of {Object.values(props.directory).length} employees
+          Search directory of {Object.values(directory).length} employees
         </p>
         <form className="mt-6 flex space-x-4">
           <div className="flex-1 min-w-0">
@@ -52,8 +54,8 @@ export function DirectoryList(props) {
         </form>
       </div>
       <nav className="flex-1 min-h-0 overflow-y-auto" aria-label="Directory">
-        {props?.directory &&
-          Object.keys(props.directory)
+        {directory &&
+          Object.keys(directory)
             .sort()
             .filter((letter) => groupedPeople(letter)?.length > 0)
             .map((letter) => (

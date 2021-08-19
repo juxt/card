@@ -7,13 +7,15 @@ import {
   InboxIcon,
   UsersIcon,
 } from "@heroicons/react/outline";
+import { Meta, Story } from "@storybook/react";
+import { PeopleProps } from "./types";
 
 export default {
   title: "People/dashboard",
   component: People,
 };
 
-const Template = (args) => <People {...args} />;
+const Template: Story<PeopleProps> = (args) => <People {...args} />;
 
 export const PeoplePage = Template.bind({});
 PeoplePage.args = {

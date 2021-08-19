@@ -34,6 +34,9 @@ import { Tabs } from "./Tabs";
 import { DescriptionList } from "./DescriptionList";
 import { TeamMemberList } from "./TeamMemberList";
 import { DirectoryList } from "./DirectoryList";
+import { PeopleProps } from "./types";
+import Breadcrumb from "./Breadcrumb";
+import BasicCalendar from "./Calendar";
 
 const user = {
   name: "Tom Cook",
@@ -91,12 +94,13 @@ const team = [
   },
 ];
 
-export function classNames(...classes) {
+export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function People({ profile, directory }, ...props) {
+export function People({ profile, directory, ...props }: PeopleProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(tabs[0].name);
   const fakeProps = {
     navigation: navigation,
     secondaryNavigation: secondaryNavigation,
@@ -141,28 +145,22 @@ export function People({ profile, directory }, ...props) {
         </div>
         <div className="flex-1 relative z-0 flex overflow-hidden">
           <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none xl:order-last">
-            {/* Breadcrumb */}
-            <nav
-              className="flex items-start px-4 py-3 sm:px-6 lg:px-8 xl:hidden"
-              aria-label="Breadcrumb"
-            >
-              <a
-                href="#"
-                className="inline-flex items-center space-x-3 text-sm font-medium text-gray-900"
-              >
-                <ChevronLeftIcon
-                  className="-ml-2 h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-                <span>Directory</span>
-              </a>
-            </nav>
+            <Breadcrumb />
 
             <article>
               <ProfileHeader profile={profile}></ProfileHeader>
-              <Tabs tabs={tabs} />
-              <DescriptionList profile={profile}></DescriptionList>
-              <TeamMemberList team={team}></TeamMemberList>
+              <Tabs
+                tabs={tabs}
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+              />
+              {selectedTab === "Profile" && (
+                <>
+                  <DescriptionList profile={profile}></DescriptionList>
+                  <TeamMemberList team={team}></TeamMemberList>
+                </>
+              )}
+              {selectedTab === "Calendar" && <BasicCalendar events={[]} />}
             </article>
           </main>
           <DirectoryList directory={directory} />

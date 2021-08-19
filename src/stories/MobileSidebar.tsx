@@ -4,13 +4,22 @@ import { Fragment } from "react";
 
 import { SidebarFooter } from "./SidebarFooter";
 import { SidebarNav } from "./SidebarNav";
+import { NavigationItem, User } from "./types";
+
+export type MobileSidebarProps = {
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  user: User;
+  navigation: NavigationItem[];
+  secondaryNavigation: NavigationItem[];
+};
 
 export const MobileSidebar = ({
   sidebarOpen,
   setSidebarOpen,
   user,
   ...props
-}) => (
+}: MobileSidebarProps) => (
   <Transition.Root show={sidebarOpen} as={Fragment}>
     <Dialog
       as="div"

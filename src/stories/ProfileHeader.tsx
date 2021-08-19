@@ -2,8 +2,14 @@ import {
   MailIcon,
   PhoneIcon
 } from "@heroicons/react/solid";
+import { User } from "./types";
 
-export function ProfileHeader({ profile }) {
+export type ProfileHeaderProps = {
+  profile: User;
+};
+
+
+export function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
     <div>
       <div>

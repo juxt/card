@@ -1,4 +1,4 @@
-import { User } from "./Types";
+import { User } from "./types";
 
 export function SidebarFooter(props: { user: User }) {
   return (

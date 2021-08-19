@@ -11,6 +11,7 @@
               :reload-strategy :full
               :preloads [devtools.preload
                          day8.re-frame-10x.preload]}
+   :js-options {:ignore-asset-requires true}
    :dev
    {:output-dir "public/js"
     :asset-path "/js"

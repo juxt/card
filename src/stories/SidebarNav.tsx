@@ -1,11 +1,18 @@
 import { classNames } from "./utils";
-import { NavigationItem } from "./Types";
+import { NavigationItem } from "./types";
 
-export function SidebarNav(props) {
+export interface SidebarNavProps {
+  navigation: NavigationItem[];
+  secondaryNavigation: NavigationItem[];
+ // selectedIndex: number;
+ // onSelect: (index: number) => void;
+}
+
+export function SidebarNav(props: SidebarNavProps) {
   return (
     <nav aria-label="Sidebar" className="mt-5">
       <div className="px-2 space-y-1">
-        {props.navigation.map((item: NavigationItem) => (
+        {props.navigation.map((item) => (
           <a
             key={item.name}
             href={item.href}
@@ -33,7 +40,7 @@ export function SidebarNav(props) {
         <>
           <hr className="border-t border-gray-200 my-5" aria-hidden="true" />
           <div className="px-2 space-y-1">
-            {props.secondaryNavigation.map((item: NavigationItem) => (
+            {props.secondaryNavigation.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
