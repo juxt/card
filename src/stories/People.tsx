@@ -36,7 +36,7 @@ import { TeamMemberList } from "./TeamMemberList";
 import { DirectoryList } from "./DirectoryList";
 import { PeopleProps } from "./types";
 import Breadcrumb from "./Breadcrumb";
-import BasicCalendar from "./Calendar";
+import { BasicCalendar } from "./Calendar";
 
 const user = {
   name: "Tom Cook",
@@ -160,7 +160,7 @@ export function People({ profile, directory, ...props }: PeopleProps) {
                   <TeamMemberList team={team}></TeamMemberList>
                 </>
               )}
-              {selectedTab === "Calendar" && <BasicCalendar events={[]} />}
+              {selectedTab === "Calendar" && <BasicCalendar initialEvents={[]} />}
             </article>
           </main>
           <DirectoryList directory={directory} />
