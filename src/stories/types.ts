@@ -1,5 +1,11 @@
 import React from "react";
 
+export type SidebarProps = {
+  user: User;
+  navigation: NavigationItem[];
+  secondaryNavigation: NavigationItem[];
+};
+
 export type NavigationItem = {
   name: string;
   href?: string;
@@ -33,4 +39,5 @@ export type PeopleProps = {
   user: User;
   profile: User;
   directory: Directory;
+  handleCreateEvent: (event: any) => void;
 };

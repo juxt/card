@@ -1,4 +1,4 @@
-import { Sidebar, SidebarProps } from "./DesktopSidebar";
+import { Sidebar } from "./DesktopSidebar";
 import { Meta, Story } from "@storybook/react";
 import {
   CalendarIcon,
@@ -8,6 +8,7 @@ import {
   InboxIcon,
   UsersIcon,
 } from "@heroicons/react/outline";
+import { SidebarProps } from "./types";
 
 export default {
   title: "People/DesktopSidebar",

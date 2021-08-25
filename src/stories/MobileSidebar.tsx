@@ -4,15 +4,14 @@ import { Fragment } from "react";
 
 import { SidebarFooter } from "./SidebarFooter";
 import { SidebarNav } from "./SidebarNav";
-import { NavigationItem, User } from "./types";
+import { SidebarProps } from "./types";
 
-export type MobileSidebarProps = {
+type AdditionalSidebarProps = {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
-  user: User;
-  navigation: NavigationItem[];
-  secondaryNavigation: NavigationItem[];
 };
+
+export type MobileSidebarProps = SidebarProps & AdditionalSidebarProps;
 
 export const MobileSidebar = ({
   sidebarOpen,
