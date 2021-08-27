@@ -91,8 +91,10 @@
 (defn process-db-user
   [{:keys [user slack]}]
   (let [{:keys [name email juxt.pass.alpha/username]} user
-        {:juxt.home/keys [slack-profile-pic]} slack]
+        {:juxt.home/keys [slack-profile-pic]
+         :juxt.pass.alpha/keys [user]} slack]
     {:name name
+     :user-id user
      :id username
      :imageUrl
      slack-profile-pic
@@ -110,17 +112,35 @@
               :Salary "$145,000",
               :Birthday "June 8, 1990"}}))
 
+(defn- assoc-holidays
+  [holidays people]
+  (for [{:keys [user-id] :as user} people
+        :let [user-holidays (get holidays user-id)]]
+    (assoc user :holidays user-holidays)))
+
 (rf/reg-sub
  ::route-params
  (fn [db _]
    (-> db :current-route :parameters)))
 
 (rf/reg-sub
+ ::holidays
+ (fn [db] (:holidays db)))
+
+(rf/reg-sub
+ ::raw-people
+ (fn [db] (:people db)))
+
+(rf/reg-sub
  ::people
- (fn [db _]
-   (->> db
-        :people
+ :<- [::raw-people]
+ :<- [::holidays]
+ (fn [[people holidays]]
+   (def people people)
+   (def holidays holidays)
+   (->> people
         (map process-db-user)
+        (assoc-holidays holidays)
         (sort-by :name))))
 
 (rf/reg-sub

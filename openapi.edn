@@ -1,6 +1,6 @@
 {:openapi "3.0.2"
  :info
- {:version "1.0.3"
+ {:version "1.0.4"
   :title "Card"
   :description
   "Zettelkasten, Kanban"
@@ -134,7 +134,7 @@
   {:get
    {:summary "Returns a list of all the users you're allowed to view"
     :operationId "findUsers"
-    :tags ["Users"]
+    :tags ["People"]
 
     :responses
     {200
@@ -149,6 +149,23 @@
                [slack :juxt.site.alpha/type "SlackUserDetails"]
                [slack :juxt.pass.alpha/user user]]
        :order-by [[username :asc]]}
+
+      :content
+      {"application/json"
+       {:schema {}}}}}}}
+
+  "/holidays"
+  {:get
+   {:summary "Returns a list of all holidays"
+    :operationId "getHoliday"
+    :tags ["People"]
+
+    :responses
+    {200
+     {:juxt.site.alpha/query
+      #juxt.site.alpha/as-str
+      {:find [(pull holiday [*])]
+       :where [[holiday :juxt.site.alpha/type "Holiday"]]}
 
       :content
       {"application/json"

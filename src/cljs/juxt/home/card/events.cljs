@@ -75,6 +75,18 @@
      :on-failure [:http-failure]}}))
 
 (rf/reg-event-fx
+ :get-holidays
+ (fn [{:keys [db]} _]
+   {:fetch
+    {:method :get
+     :url (str config/site-api-origin "/card/holidays")
+     :timeout 5000
+     :mode :cors
+     :response-content-types {#"application/.*json" :json}
+     :on-success [:received-holidays]
+     :on-failure [:http-failure]}}))
+
+(rf/reg-event-fx
  :get-self
  (fn [{:keys [db]} _]
    {:fetch
@@ -124,9 +136,14 @@
 (rf/reg-event-db
  :received-people
  (fn [db [_ response]]
-   (def response response)
-   (-> db
-       (assoc :people (:body response)))))
+   (assoc db :people (:body response))))
+
+(rf/reg-event-db
+ :received-holidays
+ (fn [db [_ response]]
+   (let [raw-holidays (:body response)
+         holidays (group-by :juxt.pass.alpha/user (flatten raw-holidays))]
+     (assoc db :holidays holidays))))
 
 (rf/reg-fx
  :focus-to-element
