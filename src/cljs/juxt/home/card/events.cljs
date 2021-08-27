@@ -145,6 +145,20 @@
          holidays (group-by :juxt.pass.alpha/user (flatten raw-holidays))]
      (assoc db :holidays holidays))))
 
+(rf/reg-event-fx
+ :put-holiday
+ (fn [{db :db} [_ holiday]]
+   ;; todo make put endpoint for holidays
+   (let [user (get-in db [:user-info :id])
+         {:keys [startDate endDate description]} holiday
+         holiday {:crux.db/id (str config/site-api-origin "/card/holidays/" (str (random-uuid)))
+                  :start-date startDate
+                  :end-date endDate
+                  :description description
+                  :juxt.site.alpha/type "Holiday"
+                  :juxt.pass.alpha/user user}]
+     {:fx [[:dispatch [:put-entity holiday]]]})))
+
 (rf/reg-fx
  :focus-to-element
  (fn [element-id]
