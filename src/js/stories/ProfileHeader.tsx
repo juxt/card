@@ -2,7 +2,7 @@ import {
   MailIcon,
   PhoneIcon
 } from "@heroicons/react/solid";
-import { User } from "./types";
+import { User } from "../types";
 
 export type ProfileHeaderProps = {
   profile: User;

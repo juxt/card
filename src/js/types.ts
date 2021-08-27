@@ -41,3 +41,11 @@ export type PeopleProps = {
   directory: Directory;
   handleCreateEvent: (event: any) => void;
 };
+
+export type CalendarFormData = {
+  title: string;
+  description?: string;
+  start: string;
+  end: string;
+  allDay?: boolean;
+};

@@ -16,15 +16,18 @@ Calendar.args = {
       allDay: true,
       start: new Date(2021, 8, 0),
       end: new Date(2021, 8, 1),
-      id: "1"
+      id: "1",
     },
     {
       title: "Long Event",
       start: new Date(2021, 8, 7),
       end: new Date(2021, 8, 10),
-      id: "2"
+      id: "2",
     },
   ],
+  onCreateEvent: (event) => {
+    console.log("Event Created!", event);
+  },
 };
 
 export const CalendarNoEvents = Template.bind({});

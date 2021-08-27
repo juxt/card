@@ -34,7 +34,7 @@ import { Tabs } from "./Tabs";
 import { DescriptionList } from "./DescriptionList";
 import { TeamMemberList } from "./TeamMemberList";
 import { DirectoryList } from "./DirectoryList";
-import { PeopleProps } from "./types";
+import { PeopleProps } from "../types";
 import Breadcrumb from "./Breadcrumb";
 import { BasicCalendar } from "./Calendar";
 
@@ -98,12 +98,7 @@ export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function People({
-  profile,
-  directory,
-  handleCreateEvent,
-  ...props
-}: PeopleProps) {
+export function People({ profile, directory, ...props }: PeopleProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(tabs[0].name);
   const fakeProps = {
@@ -168,7 +163,7 @@ export function People({
               {selectedTab === "Calendar" && (
                 <BasicCalendar
                   initialEvents={[]}
-                  onCreateEvent={handleCreateEvent}
+                  onCreateEvent={props.handleCreateEvent}
                 />
               )}
             </article>

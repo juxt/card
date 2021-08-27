@@ -4,7 +4,7 @@ import { Fragment } from "react";
 
 import { SidebarFooter } from "./SidebarFooter";
 import { SidebarNav } from "./SidebarNav";
-import { SidebarProps } from "./types";
+import { SidebarProps } from "../types";
 
 type AdditionalSidebarProps = {
   sidebarOpen: boolean;

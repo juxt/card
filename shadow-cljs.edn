@@ -7,7 +7,6 @@
 
    :devtools {:http-root "public/"
               :http-port 8000
-              :loader-mode :script
               :reload-strategy :full
               :preloads [devtools.preload
                          day8.re-frame-10x.preload]}

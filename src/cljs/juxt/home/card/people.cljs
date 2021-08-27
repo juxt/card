@@ -13,4 +13,5 @@
     (when (and (:id profile) (map? directory) (map? user))
       [:> People {:profile profile
                   :directory directory
+                  :onCreateEvent #(prn "create event!" %)
                   :user user}])))

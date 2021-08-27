@@ -19,6 +19,7 @@ const Template: Story<PeopleProps> = (args) => <People {...args} />;
 
 export const PeoplePage = Template.bind({});
 PeoplePage.args = {
+  handleCreateEvent: (event) => console.log("event", event),
   profile: {
     name: "Mike Bruce",
     id: "mic",

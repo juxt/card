@@ -10,29 +10,28 @@ import FullCalendar, {
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import useMobileDetect, { createEventId } from "./utils";
+import useMobileDetect, { createEventId } from "../utils";
 import Modal from "./Modal";
 import { ExclamationIcon } from "@heroicons/react/solid";
 import { Dialog } from "@headlessui/react";
-import { CreateEventForm, SubmitEventProps } from "./CreateEventForm";
+import { CreateEventForm } from "./CreateEventForm";
+import { CalendarFormData } from "../types";
 
 export type CalendarProps = {
   initialEvents: EventInput[];
-  onCreateEvent: (props: SubmitEventProps) => void;
+  onCreateEvent: (props: CalendarFormData) => void;
 };
 
 export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
   const [currentEvents, setCurrentEvents] = React.useState<EventApi[]>([]);
   const [weekendsVisible, setWeekendsVisible] = React.useState(true);
-  const [modalProps, setModalProps] = React.useState<DateSelectArg>();
+  const [modalProps, setModalProps] = React.useState<DateSelectArg | null>();
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
   };
   const isMobile = useMobileDetect();
-
   const saveDateSelect = (selectInfo: DateSelectArg, { title }) => {
-    let calendarApi = selectInfo.view.calendar;
-
+    const calendarApi = selectInfo.view.calendar;
     calendarApi.unselect(); // clear date selection
     if (title) {
       calendarApi.addEvent({
@@ -43,10 +42,6 @@ export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
         allDay: selectInfo.allDay,
       });
     }
-  };
-  const handleDateSelect = (selectInfo: DateSelectArg) => {
-    let title = "Please enter a new title for your event";
-    setModalProps(selectInfo);
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
@@ -80,28 +75,11 @@ export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
   );
   return (
     <div className="demo-app">
-      <Modal
-        onCancel={() => {}}
-        onConfirm={() => {}}
-        confirmText="Save"
-        cancelText="Cancel"
-        open={Boolean(modalProps)}
-        setOpen={setModalProps}
-      >
-        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <div className="sm:flex sm:items-start">
-            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <Dialog.Title
-                as="h3"
-                className="text-lg leading-6 font-medium text-gray-900"
-              >
-                Create new event
-              </Dialog.Title>
-              <CreateEventForm dateRange={modalProps} onSubmit={onCreateEvent} />
-           </div>
-          </div>
-        </div>
-      </Modal>
+      <CreateEventForm
+        dateRange={modalProps}
+        setDateRange={setModalProps}
+        onSubmit={onCreateEvent}
+      />
       <div className="demo-app-sidebar">
         <div className="demo-app-sidebar-section">
           <h2>Instructions</h2>
@@ -142,7 +120,7 @@ export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
           dayMaxEvents={true}
           weekends={weekendsVisible}
           initialEvents={initialEvents}
-          select={handleDateSelect}
+          select={setModalProps}
           eventContent={renderEventContent} // custom render function
           eventClick={handleEventClick}
           eventsSet={setCurrentEvents} // called after events are initialized/added/changed/removed

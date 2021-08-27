@@ -1,6 +1,6 @@
 import { FilterIcon, SearchIcon } from "@heroicons/react/solid";
 import { useState } from "react";
-import { User, Directory } from "./types";
+import { User, Directory } from "../types";
 
 export type DirectoryListProps = {
   directory: Directory;

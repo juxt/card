@@ -1,6 +1,6 @@
 import { SidebarFooter } from "./SidebarFooter";
 import { SidebarNav } from "./SidebarNav";
-import { SidebarProps } from "./types";
+import { SidebarProps } from "../types";
 
 export function Sidebar({ user, ...props }: SidebarProps) {
   return (

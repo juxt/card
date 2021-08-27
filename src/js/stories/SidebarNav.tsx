@@ -1,5 +1,5 @@
-import { classNames } from "./utils";
-import { NavigationItem } from "./types";
+import { classNames } from "../utils";
+import { NavigationItem } from "../types";
 
 export interface SidebarNavProps {
   navigation: NavigationItem[];
