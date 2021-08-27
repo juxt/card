@@ -9,14 +9,18 @@ import { createEventId } from "../utils";
 
 export function useCalendarForm(
   submitFn: SubmitEventFn,
-  dateRange: DateSelectArg | null
+  dateRange: DateSelectArg | null,
+  setDateRange: (dateRange: DateSelectArg | null) => void
 ) {
   const validationSchema = useMemo(
     () =>
       yup.object().shape({
-        title: yup.string().required("Title is required"),
-        start: yup.string().required("Start date is requred"),
-        end: yup.string().required("End date is requred"),
+        description: yup.string().required("Please provide a description"),
+        start: yup.date().required("Start date is requred"),
+        end: yup
+          .date()
+          .required("End date is requred")
+          .min(yup.ref("start"), "End date must be after start date"),
       }),
     []
   );
@@ -31,26 +35,25 @@ export function useCalendarForm(
   });
 
   const onSubmit: SubmitHandler<CalendarFormData> = (formValues) => {
-    console.log("form", formValues);
-    if (dateRange) {
+    if (dateRange?.start && dateRange?.end) {
       const calendarApi = dateRange.view.calendar;
       calendarApi.unselect(); // clear date selection
-      if (formValues?.title) {
-        calendarApi.addEvent({
-          id: createEventId(),
-          title: formValues.title,
-          start: dateRange.startStr,
-          end: dateRange.endStr,
-          allDay: dateRange.allDay,
-        });
-      }
+      calendarApi.addEvent({
+        id: createEventId(),
+        title: formValues.description,
+        start: dateRange.startStr,
+        end: dateRange.endStr,
+        allDay: dateRange.allDay,
+      });
       submitFn(formValues);
       reset();
+      //closes modal
+      setDateRange(null);
     }
   };
 
   const onError: SubmitErrorHandler<CalendarFormData> = (errors) => {
-    console.log("errors", errors);
+    console.log("Calendar form errors", errors);
   };
 
   return {

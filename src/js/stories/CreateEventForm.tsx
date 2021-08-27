@@ -1,6 +1,8 @@
 import { DateSelectArg } from "@fullcalendar/react";
 import { Dialog } from "@headlessui/react";
-import { FC, useRef } from "react";
+import { FC, useEffect, useRef } from "react";
+import { Path } from "react-hook-form";
+import { DeepMap, FieldError } from "react-hook-form";
 import { useCalendarForm } from "../hooks/useCalendarForm";
 import { CalendarFormData } from "../types";
 import Modal from "./Modal";
@@ -13,63 +15,122 @@ export type Props = {
   onSubmit: SubmitEventFn;
 };
 
-export const CreateEventForm: FC<Props> = ({
-  dateRange,
-  setDateRange,
-  ...props
-}) => {
-  const confirmButtonRef = useRef(null);
-  const { register, onSubmit, errors, reset } = useCalendarForm(
-    props.onSubmit,
-    dateRange
-  );
-  //I think I need the hook in the modal to make things work.. a little messy but whatever
+type FormInputs = {
+  name: string;
+  inputName: Path<CalendarFormData>;
+  label?: string;
+  type: string;
+  placeholder?: string;
+  error?: FieldError;
+  wrapperClass?: string;
+  required?: boolean;
+}[];
 
+export const CreateEventForm: FC<Props> = (props) => {
+  const confirmButtonRef = useRef(null);
+
+  const { dateRange, setDateRange } = props;
   const formatDate = (dateStr: string | undefined) => {
     if (!dateStr) return "";
+    if (dateRange?.allDay && dateStr.length === 10) {
+      return dateStr;
+    }
     return dateStr.length === 10 ? `${dateStr}T00:00:00` : dateStr.slice(0, 19);
   };
 
-  return (
-    <Modal
-      setOpen={setDateRange}
-      initialRef={confirmButtonRef}
-      open={!!dateRange}
-      onClose={reset}
-    >
-      <form
-        onSubmit={(e) => {
-          onSubmit(e);
-          setDateRange(null);
-        }}
-      >
-        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <div className="sm:flex sm:items-start">
-            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <Dialog.Title
-                as="h3"
-                className="text-lg leading-6 font-medium text-gray-900"
-              >
-                Create new event
-              </Dialog.Title>
-              <>
-                <input type="text" {...register("title")} />
-                <input
-                  type="datetime-local"
-                  defaultValue={
-                    (dateRange && formatDate(dateRange.startStr)) || ""
+  const Form: FC<Props> = ({ setDateRange }) => {
+    const { register, onSubmit, errors, reset } = useCalendarForm(
+      props.onSubmit,
+      dateRange,
+      setDateRange
+    );
+    useEffect(() => {
+      reset({
+        start: formatDate(dateRange?.startStr),
+        end: formatDate(dateRange?.endStr),
+      });
+    }, [reset, dateRange]);
+
+    const inputs: FormInputs = [
+      {
+        inputName: "description",
+        label: "Description",
+        type: "text",
+        placeholder: "Going anywhere nice?",
+        error: errors?.description,
+        ...register("description"),
+      },
+      {
+        inputName: "start",
+        label: "Start Date",
+        type: dateRange?.allDay ? "date" : "datetime-local",
+        required: true,
+        error: errors?.start,
+        ...register("start"),
+      },
+      {
+        inputName: "end",
+        label: "End Date",
+        type: dateRange?.allDay ? "date" : "datetime-local",
+        required: true,
+        error: errors?.end,
+        wrapperClass: "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1",
+        ...register("end"),
+      },
+    ];
+    return (
+      <form className="space-y-8 divide-y divide-gray-200" onSubmit={onSubmit}>
+        <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+          <div>
+            <Dialog.Title
+              as="h3"
+              className="text-lg leading-6 font-medium text-gray-900"
+            >
+              Create new event
+            </Dialog.Title>
+
+            <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+              {inputs.map(({ inputName, wrapperClass, ...inputProps }, i) => (
+                <div
+                  key={inputName}
+                  className={
+                    wrapperClass ??
+                    "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5"
                   }
-                  {...register("start")}
-                />
-                <input
-                  type="datetime-local"
-                  defaultValue={formatDate(dateRange?.endStr)}
-                  {...register("end")}
-                />
-              </>
+                >
+                  {inputProps?.label && (
+                    <label
+                      htmlFor={inputName}
+                      className={`block text-sm font-medium sm:mt-px sm:pt-2 ${
+                        errors[inputName] ? "text-red-600" : "text-gray-700"
+                      }`}
+                    >
+                      {inputProps.label}
+                    </label>
+                  )}
+                  <div className="mt-1 sm:mt-0 sm:col-span-2">
+                    <div className="max-w-lg flex shadow-sm">
+                      <input
+                        {...inputProps}
+                        className="flex-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0 sm:text-sm border-gray-300"
+                      />
+                    </div>
+                  </div>
+                  {errors[inputName] && (
+                    <>
+                      <p></p>
+                      <p className="mt-2 text-sm text-red-600">
+                        {" "}
+                        {errors[inputName]?.message}{" "}
+                      </p>
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
+
         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button
             type="submit"
@@ -90,6 +151,18 @@ export const CreateEventForm: FC<Props> = ({
           </button>
         </div>
       </form>
+    );
+  };
+
+  return (
+    <Modal
+      setOpen={setDateRange}
+      initialRef={confirmButtonRef}
+      open={!!dateRange}
+    >
+      <div className="p-4">
+        <Form {...props} />
+      </div>
     </Modal>
   );
 };

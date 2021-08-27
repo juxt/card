@@ -25,23 +25,13 @@ export type CalendarProps = {
 export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
   const [currentEvents, setCurrentEvents] = React.useState<EventApi[]>([]);
   const [weekendsVisible, setWeekendsVisible] = React.useState(true);
-  const [modalProps, setModalProps] = React.useState<DateSelectArg | null>();
+  const isMobile = useMobileDetect();
+  const [modalProps, setModalProps] = React.useState<DateSelectArg | null>(
+    null
+  );
+
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
-  };
-  const isMobile = useMobileDetect();
-  const saveDateSelect = (selectInfo: DateSelectArg, { title }) => {
-    const calendarApi = selectInfo.view.calendar;
-    calendarApi.unselect(); // clear date selection
-    if (title) {
-      calendarApi.addEvent({
-        id: createEventId(),
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay,
-      });
-    }
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
