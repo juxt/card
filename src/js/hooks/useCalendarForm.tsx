@@ -6,11 +6,12 @@ import * as yup from "yup";
 import { SubmitEventFn } from "../stories/CreateEventForm";
 import { DateSelectArg } from "@fullcalendar/react";
 import { createEventId } from "../utils";
+import { CalendarModalProps } from "../stories/Calendar";
 
 export function useCalendarForm(
   submitFn: SubmitEventFn,
-  dateRange: DateSelectArg | null,
-  setDateRange: (dateRange: DateSelectArg | null) => void
+  dateRange: CalendarModalProps,
+  setDateRange: (dateRange: CalendarModalProps) => void
 ) {
   const validationSchema = useMemo(
     () =>
@@ -36,15 +37,7 @@ export function useCalendarForm(
 
   const onSubmit: SubmitHandler<CalendarFormData> = (formValues) => {
     if (dateRange?.start && dateRange?.end) {
-      const calendarApi = dateRange.view.calendar;
-      calendarApi.unselect(); // clear date selection
-      calendarApi.addEvent({
-        id: createEventId(),
-        title: formValues.description,
-        start: dateRange.startStr,
-        end: dateRange.endStr,
-        allDay: dateRange.allDay,
-      });
+      // fn passed from cljs, calling it updates events in reframe which rerenders calendar
       submitFn(formValues);
       reset();
       //closes modal

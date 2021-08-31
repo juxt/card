@@ -1,3 +1,4 @@
+import { ViewApi } from "@fullcalendar/react";
 import React from "react";
 
 export type SidebarProps = {
@@ -43,8 +44,8 @@ export type PeopleProps = {
 };
 
 export type CalendarFormData = {
-  title: string;
-  description?: string;
+  id?: string;
+  description: string;
   start: string;
   end: string;
   allDay?: boolean;

@@ -5,24 +5,34 @@ import { Path } from "react-hook-form";
 import { DeepMap, FieldError } from "react-hook-form";
 import { useCalendarForm } from "../hooks/useCalendarForm";
 import { CalendarFormData } from "../types";
+import { CalendarModalProps } from "./Calendar";
 import Modal from "./Modal";
 
 export type SubmitEventFn = (props: CalendarFormData) => void;
 
 export type Props = {
-  dateRange: DateSelectArg | null;
-  setDateRange: (dateRange: DateSelectArg | null) => void;
+  dateRange: CalendarModalProps;
+  setDateRange: (dateRange: CalendarModalProps) => void;
   onSubmit: SubmitEventFn;
+};
+
+type FormData = {
+  id?: string;
+  description: string;
+  allDay: boolean;
+  start: string;
+  end: string;
 };
 
 type FormInputs = {
   name: string;
-  inputName: Path<CalendarFormData>;
+  inputName: Path<FormData>;
   label?: string;
   type: string;
   placeholder?: string;
   error?: FieldError;
   wrapperClass?: string;
+  inputClass?: string;
   required?: boolean;
 }[];
 
@@ -44,10 +54,13 @@ export const CreateEventForm: FC<Props> = (props) => {
       dateRange,
       setDateRange
     );
+    console.log(dateRange);
+
     useEffect(() => {
       reset({
-        start: formatDate(dateRange?.startStr),
-        end: formatDate(dateRange?.endStr),
+        ...dateRange,
+        start: formatDate(dateRange?.start),
+        end: formatDate(dateRange?.end),
       });
     }, [reset, dateRange]);
 
@@ -77,6 +90,17 @@ export const CreateEventForm: FC<Props> = (props) => {
         wrapperClass: "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1",
         ...register("end"),
       },
+      {
+        inputName: "allDay",
+        label: "All Day Event?",
+        type: "checkbox",
+        required: false,
+        error: errors?.allDay,
+        inputClass:
+          "mt-2.5 rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0",
+        wrapperClass: "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1",
+        ...register("allDay"),
+      },
     ];
     return (
       <form className="space-y-8 divide-y divide-gray-200" onSubmit={onSubmit}>
@@ -90,43 +114,49 @@ export const CreateEventForm: FC<Props> = (props) => {
             </Dialog.Title>
 
             <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-              {inputs.map(({ inputName, wrapperClass, ...inputProps }, i) => (
-                <div
-                  key={inputName}
-                  className={
-                    wrapperClass ??
-                    "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5"
-                  }
-                >
-                  {inputProps?.label && (
-                    <label
-                      htmlFor={inputName}
-                      className={`block text-sm font-medium sm:mt-px sm:pt-2 ${
-                        errors[inputName] ? "text-red-600" : "text-gray-700"
-                      }`}
-                    >
-                      {inputProps.label}
-                    </label>
-                  )}
-                  <div className="mt-1 sm:mt-0 sm:col-span-2">
-                    <div className="max-w-lg flex shadow-sm">
-                      <input
-                        {...inputProps}
-                        className="flex-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0 sm:text-sm border-gray-300"
-                      />
+              <input type="hidden" {...register("id")} />
+              {inputs.map(
+                ({ inputName, wrapperClass, inputClass, ...inputProps }, i) => (
+                  <div
+                    key={inputName}
+                    className={
+                      wrapperClass ??
+                      "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5"
+                    }
+                  >
+                    {inputProps?.label && (
+                      <label
+                        htmlFor={inputName}
+                        className={`block text-sm font-medium sm:mt-px sm:pt-2 ${
+                          errors[inputName] ? "text-red-600" : "text-gray-700"
+                        }`}
+                      >
+                        {inputProps.label}
+                      </label>
+                    )}
+                    <div className="mt-1 sm:mt-0 sm:col-span-2">
+                      <div className="max-w-lg flex shadow-sm">
+                        <input
+                          {...inputProps}
+                          className={
+                            inputClass ||
+                            "flex-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0 sm:text-sm border-gray-300"
+                          }
+                        />
+                      </div>
                     </div>
+                    {errors[inputName] && (
+                      <>
+                        <p></p>
+                        <p className="mt-2 text-sm text-red-600">
+                          {" "}
+                          {errors[inputName]?.message}{" "}
+                        </p>
+                      </>
+                    )}
                   </div>
-                  {errors[inputName] && (
-                    <>
-                      <p></p>
-                      <p className="mt-2 text-sm text-red-600">
-                        {" "}
-                        {errors[inputName]?.message}{" "}
-                      </p>
-                    </>
-                  )}
-                </div>
-              ))}
+                )
+              )}
             </div>
           </div>
         </div>

@@ -12,36 +12,54 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import useMobileDetect, { createEventId } from "../utils";
 import Modal from "./Modal";
-import { ExclamationIcon } from "@heroicons/react/solid";
-import { Dialog } from "@headlessui/react";
+import { TrashIcon, PencilIcon } from "@heroicons/react/solid";
 import { CreateEventForm } from "./CreateEventForm";
 import { CalendarFormData } from "../types";
+import {
+  Menu,
+  Item,
+  Separator,
+  Submenu,
+  useContextMenu,
+  ItemParams,
+  ItemProps,
+} from "react-contexify";
+import "react-contexify/dist/ReactContexify.css";
+
+const MENU_ID = "event-menu-id";
 
 export type CalendarProps = {
   initialEvents: EventInput[];
   onCreateEvent: (props: CalendarFormData) => void;
 };
 
+export type CalendarModalProps = CalendarFormData | null;
+
 export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
   const [currentEvents, setCurrentEvents] = React.useState<EventApi[]>([]);
   const [weekendsVisible, setWeekendsVisible] = React.useState(true);
+  const [menuVisible, setMenuVisible] = React.useState(false);
   const isMobile = useMobileDetect();
-  const [modalProps, setModalProps] = React.useState<DateSelectArg | null>(
-    null
-  );
+  const [modalProps, setModalProps] = React.useState<CalendarModalProps>(null);
+  const { show } = useContextMenu({ id: MENU_ID });
 
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
   };
 
-  const handleEventClick = (clickInfo: EventClickArg) => {
-    if (
-      confirm(
-        `Are you sure you want to delete the event '${clickInfo.event.title}'`
-      )
-    ) {
-      clickInfo.event.remove();
-    }
+  const handleEventClick = (clickProps: EventClickArg) => {
+    show(clickProps.jsEvent, { props: clickProps });
+  };
+
+  const handleSelect = ({ startStr, endStr, allDay }: DateSelectArg) => {
+    !menuVisible &&
+      setModalProps({
+        start: startStr,
+        end: endStr,
+        id: createEventId(),
+        allDay,
+        description: "",
+      });
   };
 
   const renderEventContent = (eventContent: EventContentArg) => (
@@ -51,7 +69,41 @@ export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
     </>
   );
 
-  const renderSidebarEvent = (event: EventApi, index: number) => (
+  function handleItemClick({ event, props }: ItemParams<EventClickArg>) {
+    switch (event.currentTarget.id) {
+      case "delete":
+        console.log(props);
+
+        props?.event.remove();
+        break;
+      case "edit":
+        if (props?.event) {
+          const {
+            id,
+            title,
+            start,
+            end,
+            startStr,
+            endStr,
+            allDay,
+          } = props.event;
+          console.log(allDay);
+
+          start &&
+            end &&
+            setModalProps({
+              id: id,
+              description: title,
+              start: startStr,
+              end: endStr,
+              allDay,
+            });
+        }
+        break;
+    }
+  }
+
+  const renderSidebarEvent = (event: EventApi) => (
     <li key={event.id}>
       <b>
         {formatDate(event.start!, {
@@ -95,6 +147,21 @@ export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
         </div>
       </div>
       <div className="demo-app-main">
+        <Menu
+          id={MENU_ID}
+          onShown={() => setMenuVisible(true)}
+          onHidden={() => setMenuVisible(false)}
+        >
+          <Item id="delete" onClick={handleItemClick}>
+            <TrashIcon className="max-h-8 pr-2 text-red-500" />
+            <span>Delete Event</span>
+          </Item>
+          <Separator />
+          <Item id="edit" onClick={handleItemClick}>
+            <PencilIcon className="max-h-8 pr-2 text-gray-500" />
+            Edit Event
+          </Item>
+        </Menu>
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           headerToolbar={{
@@ -110,15 +177,10 @@ export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
           dayMaxEvents={true}
           weekends={weekendsVisible}
           initialEvents={initialEvents}
-          select={setModalProps}
+          select={handleSelect}
           eventContent={renderEventContent} // custom render function
           eventClick={handleEventClick}
-          eventsSet={setCurrentEvents} // called after events are initialized/added/changed/removed
-          /* you can update a remote database when these fire:
-            eventAdd={function(){}}
-            eventChange={function(){}}
-            eventRemove={function(){}}
-            */
+          eventsSet={setCurrentEvents}
         />
       </div>
     </div>
