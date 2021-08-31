@@ -4,6 +4,7 @@ import { Meta, Story } from "@storybook/react";
 export default {
   title: "People/Calendar",
   component: BasicCalendar,
+  parameters: { actions: { argTypesRegex: "^on.*" } },
 } as Meta;
 
 const Template: Story<CalendarProps> = (args) => <BasicCalendar {...args} />;
@@ -25,9 +26,6 @@ Calendar.args = {
       id: "2",
     },
   ],
-  onCreateEvent: (event) => {
-    console.log("Event Created!", event);
-  },
 };
 
 export const CalendarNoEvents = Template.bind({});
