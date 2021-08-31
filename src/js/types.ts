@@ -40,7 +40,7 @@ export type PeopleProps = {
   user: User;
   profile: User;
   directory: Directory;
-  handleCreateEvent: (event: any) => void;
+  onUpdateEvent: (event: any) => void;
 };
 
 export type CalendarFormData = {

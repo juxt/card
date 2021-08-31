@@ -98,7 +98,12 @@ export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function People({ profile, directory, ...props }: PeopleProps) {
+export function People({
+  profile,
+  directory,
+  onUpdateEvent,
+  ...props
+}: PeopleProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(tabs[0].name);
   const fakeProps = {
@@ -163,7 +168,7 @@ export function People({ profile, directory, ...props }: PeopleProps) {
               {selectedTab === "Calendar" && (
                 <BasicCalendar
                   initialEvents={[]}
-                  onCreateEvent={props.handleCreateEvent}
+                  onUpdateEvent={onUpdateEvent}
                 />
               )}
             </article>

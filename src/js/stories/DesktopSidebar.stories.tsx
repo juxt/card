@@ -8,7 +8,7 @@ import {
   InboxIcon,
   UsersIcon,
 } from "@heroicons/react/outline";
-import { SidebarProps } from "./types";
+import { SidebarProps } from "../types";
 
 export default {
   title: "People/DesktopSidebar",

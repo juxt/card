@@ -54,7 +54,6 @@ export const CreateEventForm: FC<Props> = (props) => {
       dateRange,
       setDateRange
     );
-    console.log(dateRange);
 
     useEffect(() => {
       reset({

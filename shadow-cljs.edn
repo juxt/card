@@ -11,6 +11,7 @@
               :preloads [devtools.preload
                          day8.re-frame-10x.preload]}
    :js-options {:ignore-asset-requires true}
+   :compiler-options {:output-feature-set :es8} ;; needed to stop $jscomp errors with newer js libs
    :dev
    {:output-dir "public/js"
     :asset-path "/js"

@@ -12,7 +12,7 @@
    [juxt.home.card.people :as people]
    [re-frame.core :as rf]
    [tailwind-hiccup.core :refer [tw]]
-   ["/juxt/card/navbar" :refer (NavBar)]))
+   ["/juxt/card/stories/navbar" :refer (NavBar)]))
 
 (def menu-items [{:id "all-cards"
                   "label" "All Cards"

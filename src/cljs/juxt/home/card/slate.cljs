@@ -16,7 +16,7 @@
    ["react" :as react :refer [createElement useCallback useEffect useMemo useState]]
    ["slate" :as slate :refer [createEditor Editor Transforms Node]]
    ["slate-react" :refer [Editable Slate withReact ReactEditor]]
-   ["/juxt/card/card" :refer (Card)]
+   ["/juxt/card/stories/card" :refer (Card)]
    [clojure.string :as str]
    [juxt.home.card.navigation :as nav]
    [juxt.home.card.util :as u]

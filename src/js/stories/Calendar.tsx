@@ -30,18 +30,19 @@ const MENU_ID = "event-menu-id";
 
 export type CalendarProps = {
   initialEvents: EventInput[];
-  onCreateEvent: (props: CalendarFormData) => void;
+  onUpdateEvent: (props: CalendarFormData) => void;
 };
 
 export type CalendarModalProps = CalendarFormData | null;
 
-export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
+export function BasicCalendar({ initialEvents, onUpdateEvent }: CalendarProps) {
   const [currentEvents, setCurrentEvents] = React.useState<EventApi[]>([]);
   const [weekendsVisible, setWeekendsVisible] = React.useState(true);
   const [menuVisible, setMenuVisible] = React.useState(false);
   const isMobile = useMobileDetect();
   const [modalProps, setModalProps] = React.useState<CalendarModalProps>(null);
   const { show } = useContextMenu({ id: MENU_ID });
+  console.log("onudf", onUpdateEvent);
 
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
@@ -115,12 +116,13 @@ export function BasicCalendar({ initialEvents, onCreateEvent }: CalendarProps) {
       <i>{event.title}</i>
     </li>
   );
+
   return (
     <div className="demo-app">
       <CreateEventForm
         dateRange={modalProps}
         setDateRange={setModalProps}
-        onSubmit={onCreateEvent}
+        onSubmit={onUpdateEvent}
       />
       <div className="demo-app-sidebar">
         <div className="demo-app-sidebar-section">

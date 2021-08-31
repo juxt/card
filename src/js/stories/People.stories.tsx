@@ -8,7 +8,7 @@ import {
   UsersIcon,
 } from "@heroicons/react/outline";
 import { Meta, Story } from "@storybook/react";
-import { PeopleProps } from "./types";
+import { PeopleProps } from "../types";
 
 export default {
   title: "People/dashboard",
@@ -19,7 +19,7 @@ const Template: Story<PeopleProps> = (args) => <People {...args} />;
 
 export const PeoplePage = Template.bind({});
 PeoplePage.args = {
-  handleCreateEvent: (event) => console.log("event", event),
+  onUpdateEvent: (event) => console.log("event", event),
   profile: {
     name: "Mike Bruce",
     id: "mic",
