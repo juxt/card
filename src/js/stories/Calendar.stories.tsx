@@ -1,17 +1,17 @@
-import { CalendarProps, BasicCalendar } from "./Calendar";
+import { CalendarProps, EventCalendar } from "./Calendar";
 import { Meta, Story } from "@storybook/react";
 
 export default {
   title: "People/Calendar",
-  component: BasicCalendar,
+  component: EventCalendar,
   parameters: { actions: { argTypesRegex: "^on.*" } },
 } as Meta;
 
-const Template: Story<CalendarProps> = (args) => <BasicCalendar {...args} />;
+const Template: Story<CalendarProps> = (args) => <EventCalendar {...args} />;
 const now = new Date();
 export const Calendar = Template.bind({});
 Calendar.args = {
-  initialEvents: [
+  events: [
     {
       title: "All Day Event very long title",
       allDay: true,
@@ -30,5 +30,5 @@ Calendar.args = {
 
 export const CalendarNoEvents = Template.bind({});
 CalendarNoEvents.args = {
-  initialEvents: [],
+  events: [],
 };

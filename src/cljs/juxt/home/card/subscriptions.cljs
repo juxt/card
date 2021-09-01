@@ -133,7 +133,8 @@
 
 (rf/reg-sub
  ::holidays
- (fn [db] (:holidays db)))
+ (fn [db]
+   (:holidays db)))
 
 (rf/reg-sub
  ::raw-people
@@ -144,8 +145,6 @@
  :<- [::raw-people]
  :<- [::holidays]
  (fn [[people holidays]]
-   (def people people)
-   (def holidays holidays)
    (->> people
         (map process-db-user)
         (assoc-holidays holidays)

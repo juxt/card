@@ -40,6 +40,7 @@ export const CreateEventForm: FC<Props> = (props) => {
   const confirmButtonRef = useRef(null);
 
   const { dateRange, setDateRange } = props;
+
   const formatDate = (dateStr: string | undefined) => {
     if (!dateStr) return "";
     if (dateRange?.allDay && dateStr.length === 10) {
