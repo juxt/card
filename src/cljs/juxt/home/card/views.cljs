@@ -10,31 +10,25 @@
    [juxt.home.card.slate :as slate]
    [juxt.home.card.kanban :as kanban]
    [juxt.home.card.people :as people]
+   [juxt.home.card.calendar :as calendar]
    [re-frame.core :as rf]
    [tailwind-hiccup.core :refer [tw]]
    ["/juxt/card/stories/navbar" :refer (NavBar)]))
 
-(def menu-items [{:id "all-cards"
-                  "label" "All Cards"
-                  :target ::nav/cards}
-                 {:id "kanban"
-                  "label" "Kanban"
-                  :target  ::nav/kanban}
-                 {:id "people"
-                  "label" "People"
-                  :target  ::nav/people}])
-
 (defn menu []
-  (let [page @(rf/subscribe [::sub/page])]
-    [:> NavBar {:logo "https://home.juxt.site/x-on-dark.svg"
-                :navigation
-                (for [{:keys [target] :as item} menu-items]
-                  (assoc item
-                         :href (u/route->url target)
-                         :current (= page target)))
-                :user {:name "Jeremy Taylor"
-                       :email "jdt@juxt.pro"
-                       :imageUrl "https://home.juxt.site/_site/users/jdt/slack/jdt.jpg"}}]))
+  (let [page @(rf/subscribe [::sub/page])
+        user @(rf/subscribe [::sub/logged-in-user-profile])]
+    (when user
+      [:> NavBar {:logo "https://home.juxt.site/x-on-dark.svg"
+                  :navigation
+                  (for [{:keys [name label] :as item} nav/pages
+                        :when label]
+                    (assoc item
+                           :id name
+                           :href (u/route->url name)
+                           :name label
+                           :current (= page name)))
+                  :user user}])))
 
 (defn actions-kanban []
   (->>
@@ -66,6 +60,9 @@
 
        ::nav/people
        [people/people]
+
+       ::nav/calendar
+       [calendar/view]
 
        ;; else
        [:div [:h1 "Page not ready"]])]))

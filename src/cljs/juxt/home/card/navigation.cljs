@@ -40,22 +40,39 @@
   (when new-match
     (rf/dispatch [::navigated new-match])))
 
+(def pages
+  [{:path ""
+    :name ::home
+    :fx [[:dispatch [:get-people]]]}
+   {:path "kanban"
+    :name ::kanban
+    :label "Kanban"}
+   {:path "cards"
+    :label "All Cards"
+    :fx [[:dispatch [:get-cards]]]
+    :name ::cards}
+   {:path "card/:card"
+    :fx [[:dispatch [:set-current-card]]]
+    :name ::card}
+   {:path "calendar"
+    :name ::calendar
+    :fx [[:dispatch [:get-holidays]]]
+    :label "Calendar"}
+   {:path "people"
+    :name ::people
+    :fx [[:dispatch [:get-people]]
+         [:dispatch [:get-holidays]]]
+    :label "People"}])
+
+(defn routes
+  []
+  [config/application-context
+   (for [{:keys [path name fx]} pages]
+     [path {:name name
+            :fx fx}])])
+
 (def router
-  (reitit/router
-   [config/application-context
-    ["kanban" {:name ::kanban
-               :fx [[:dispatch [:get-actions]]]}]
-    ["cards"
-     ["" {:name ::cards
-          :fx [[:dispatch [:get-cards]]]}]
-     ["/:card" {:name ::card
-               :fx [[:dispatch [:set-current-card]]]}]]
-
-    ["people" {:name ::people
-               :fx [[:dispatch [:get-people]]
-                    [:dispatch [:get-holidays]]]}]]
-
-   {:data {:coercion rss/coercion}}))
+  (reitit/router (routes) {:data {:coercion rss/coercion}}))
 
 (defn init-routes! []
   (rfe/start!

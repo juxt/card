@@ -1,5 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import { useEffect, useState } from "react";
+import { User } from "./types";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -20,13 +21,24 @@ export const MOCK_EVENTS: EventInput[] = [
     id: createEventId(),
     title: "All-day event",
     start: todayStr,
+    allDay: true,
+    end: todayStr + "T23:00:00",
   },
   {
     id: createEventId(),
     title: "Timed event",
     start: todayStr + "T12:00:00",
+    end: todayStr + "T14:30:00",
   },
 ];
+
+export const MOCK_USER: User = {
+  id: "1",
+  email: "alx@juxt.pro",
+  fields: {},
+  name: "Alex Davis",
+  imageUrl: "https://ca.slack-edge.com/T02AJV0T3-U7KDWJTT6-500d11650fe2-512",
+};
 
 export function createEventId() {
   return uuidv4();

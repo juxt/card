@@ -26,8 +26,49 @@ export type NavBarProps = {
   logo: string;
   user: User;
 };
+const Nav = ({
+  currentStyle,
+  defaultStyle,
+  items,
+}: {
+  currentStyle?: string;
+  defaultStyle: string;
+  items: NavigationItem[];
+}) => {
+  return (
+    <>
+      {items.map(({ id, href, current, name }) => (
+        <a
+          key={id}
+          href={href}
+          className={current ? currentStyle : defaultStyle}
+        >
+          {name}
+        </a>
+      ))}
+    </>
+  );
+};
 
 function NavBar({ navigation, logo, user }: NavBarProps) {
+  //TODO Pass this in from cljs
+  const secondaryNav = [
+    {
+      id: "settings",
+      href: "#",
+      name: "Settings",
+    },
+    {
+      id: "profile",
+      href: "#",
+      name: "Profile",
+    },
+    {
+      id: "logout",
+      href: "#",
+      name: "Logout",
+    },
+  ];
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -36,34 +77,17 @@ function NavBar({ navigation, logo, user }: NavBarProps) {
             <div className="relative flex items-center justify-between h-16">
               <div className="flex items-center px-2 lg:px-0">
                 <div className="flex-shrink-0">
-                  <img
-                    className="block lg:hidden h-8 w-auto"
-                    src={logo}
-                    alt="JUXT"
-                  />
-                  <img
-                    className="hidden lg:block h-8 w-auto"
-                    src={logo}
-                    alt="JUXT"
-                  />
+                  <a href="/">
+                    <img className="block h-8 w-auto" src={logo} alt="JUXT" />
+                  </a>
                 </div>
                 <div className="hidden lg:block lg:ml-6">
                   <div className="flex space-x-4">
-                    {/* Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" */}
-
-                    {navigation.map((item) => (
-                      <a
-                        key={item.id}
-                        href={item.href}
-                        className={
-                          item.current
-                            ? "bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
-                            : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                        }
-                      >
-                        {item.label}
-                      </a>
-                    ))}
+                    <Nav
+                      defaultStyle="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                      items={navigation}
+                      currentStyle="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
+                    />
                   </div>
                 </div>
               </div>
@@ -133,47 +157,18 @@ function NavBar({ navigation, logo, user }: NavBarProps) {
                         >
                           <Menu.Items
                             static
-                            className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            className="origin-top-right absolute right-0 z-20 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                           >
-                            <Menu.Item>
-                              {({ active }) => (
+                            {secondaryNav.map(({ id, href, name }) => (
+                              <Menu.Item key={id}>
                                 <a
-                                  href="#"
-                                  className={classNames(
-                                    active ? "bg-gray-100" : "",
-                                    "block px-4 py-2 text-sm text-gray-700"
-                                  )}
+                                  href={href}
+                                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 >
-                                  Your Profile
+                                  {name}
                                 </a>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <a
-                                  href="#"
-                                  className={classNames(
-                                    active ? "bg-gray-100" : "",
-                                    "block px-4 py-2 text-sm text-gray-700"
-                                  )}
-                                >
-                                  Settings
-                                </a>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <a
-                                  href="#"
-                                  className={classNames(
-                                    active ? "bg-gray-100" : "",
-                                    "block px-4 py-2 text-sm text-gray-700"
-                                  )}
-                                >
-                                  Sign out
-                                </a>
-                              )}
-                            </Menu.Item>
+                              </Menu.Item>
+                            ))}
                           </Menu.Items>
                         </Transition>
                       </>
@@ -186,47 +181,27 @@ function NavBar({ navigation, logo, user }: NavBarProps) {
 
           <Disclosure.Panel className="lg:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {/* Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" */}
-              <a
-                href="#"
-                className="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Dashboard
-              </a>
-              <a
-                href="#"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Team
-              </a>
-              <a
-                href="#"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Projects
-              </a>
-              <a
-                href="#"
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Calendar
-              </a>
+              <Nav
+                items={navigation}
+                currentStyle="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
+                defaultStyle="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+              />
             </div>
             <div className="pt-4 pb-3 border-t border-gray-700">
               <div className="flex items-center px-5">
                 <div className="flex-shrink-0">
                   <img
                     className="h-10 w-10 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    src={user.imageUrl}
                     alt=""
                   />
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-medium text-white">
-                    Tom Cook
+                    {user.name}
                   </div>
                   <div className="text-sm font-medium text-gray-400">
-                    tom@example.com
+                    {user.email}
                   </div>
                 </div>
                 <button className="ml-auto flex-shrink-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
@@ -235,24 +210,10 @@ function NavBar({ navigation, logo, user }: NavBarProps) {
                 </button>
               </div>
               <div className="mt-3 px-2 space-y-1">
-                <a
-                  href="#"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
-                >
-                  Your Profile
-                </a>
-                <a
-                  href="#"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
-                >
-                  Settings
-                </a>
-                <a
-                  href="#"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
-                >
-                  Sign out
-                </a>
+                <Nav
+                  items={secondaryNav}
+                  defaultStyle="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
+                />
               </div>
             </div>
           </Disclosure.Panel>

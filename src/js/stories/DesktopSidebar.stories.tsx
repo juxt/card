@@ -9,6 +9,7 @@ import {
   UsersIcon,
 } from "@heroicons/react/outline";
 import { SidebarProps } from "../types";
+import { MOCK_USER } from "../utils";
 
 export default {
   title: "People/DesktopSidebar",
@@ -27,20 +28,11 @@ DesktopSidebar.args = {
     { name: "Documents", icon: InboxIcon, current: false },
     { name: "Reports", icon: ChartBarIcon, current: false },
   ],
-  user: {
-    id: "1",
-    fields: {},
-    name: "Alex Davis",
-    imageUrl: "https://ca.slack-edge.com/T02AJV0T3-U7KDWJTT6-500d11650fe2-512",
-  },
+  user: MOCK_USER,
 };
 
 export const DesktopSidebarNoAvatar = Template.bind({});
 DesktopSidebarNoAvatar.args = {
   ...DesktopSidebar.args,
-  user: {
-    id: "1",
-    fields: {},
-    name: "Alex Davis",
-  },
+  user: { ...MOCK_USER, imageUrl: undefined },
 };

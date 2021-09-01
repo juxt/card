@@ -11,10 +11,10 @@ export type NavigationItem = {
   name: string;
   href?: string;
   id?: string;
-  target?: string;
+  path?: string;
   label?: string;
   current?: boolean;
-  icon: React.ComponentType<any>;
+  icon?: React.ComponentType<any>;
 };
 
 export type Fields = {
@@ -23,6 +23,7 @@ export type Fields = {
 
 export type User = {
   name: string;
+  email?: string;
   id?: string;
   role?: string;
   handle?: string;
@@ -44,6 +45,7 @@ export type PeopleProps = {
   user: User;
   profile: User;
   directory: Directory;
+  isCurrentUser: boolean;
   onUpdateEvent: TonUpdateEvent;
   onDeleteEvent: TonDeleteEvent;
 };
