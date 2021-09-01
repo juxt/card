@@ -14,5 +14,6 @@
       [:> People {:profile profile
                   :directory directory
                   :onUpdateEvent #(rf/dispatch [:update-event %])
-                  :onDeleteEvent #(prn "delete event!" %)
+                  :onDeleteEvent #(rf/dispatch [:delete-entity
+                                                % [[:dispatch [:get-holidays]]]])
                   :user user}])))

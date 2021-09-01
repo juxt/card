@@ -256,6 +256,17 @@
    {:db (update-in db [:doc-store id] assoc :error true)}))
 
 (rf/reg-event-fx
+ :delete-entity
+ (fn [_ [_ id fx]]
+   {:fetch
+    {:method :delete
+     :url id
+     :timeout 5000
+     :mode :cors
+     :on-success [:mark-save-succeeded id (or fx [])]
+     :on-failure [:http-failure]}}))
+
+(rf/reg-event-fx
  :put-entity
  (fn [{:keys [db]} [_ entity fx]]
    (let [id (:crux.db/id entity)
@@ -347,23 +358,8 @@
           (= (:current-card db) id) (assoc :current-card nil))
     :fx [(when (= (:current-card db) id)
            [:dispatch [:navigate ::nav/cards]])
-         [:dispatch [:delete-entity id]]]}))
+         [:dispatch [:delete-entity id [[:dispatch [:get-cards]]]]]]}))
 
-
-(rf/reg-event-fx
- :delete-entity
- (fn [{:keys [db]} [_ id]]
-   {:fetch
-    {:method :delete
-     :url id
-     :timeout 5000
-     :mode :cors
-     :on-success [:delete-succeeded]
-     :on-failure [:http-failure]}}))
-
-(rf/reg-event-fx
- :delete-succeeded
- (fn [{:keys [db]} _]))
 
 (defn swap
   [items i j]

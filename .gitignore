@@ -12,3 +12,4 @@ gen/
 !.clj-kondo/.gitkeep
 !.clj-kondo/config.edn
 .lsp
+init
