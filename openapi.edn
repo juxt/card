@@ -169,8 +169,23 @@
 
       :content
       {"application/json"
-       {:schema {}}}}}}}}
+       {:schema {}}}}}}}
 
+  "/holidays/{id}"
+  {:parameters
+   [{:name "id"
+     :in "path"
+     :required true
+     :description "holiday uuid"
+     :schema {:type "string"}}]
+   :put
+   {:operationId "putHoliday"
+    :requestBody
+    {:required true
+     :content {"application/json" {:schema {}}}}
+    :responses
+    {201 {}}}}}
+ 
  :components
  {:schemas
   {"Card"
