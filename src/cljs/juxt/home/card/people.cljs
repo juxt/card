@@ -13,6 +13,7 @@
     (when (and (:id profile) (map? directory) (map? user))
       [:> People {:profile profile
                   :directory directory
-                  :onUpdateEvent #(prn "update event!" %)
-                  :onDeleteEvent #(prn "delete event!" %)
+                  :onUpdateEvent #(rf/dispatch [:update-event %])
+                  :onDeleteEvent #(rf/dispatch [:delete-entity
+                                                % [[:dispatch [:get-holidays]]]])
                   :user user}])))

@@ -91,8 +91,10 @@
 (defn process-db-user
   [{:keys [user slack]}]
   (let [{:keys [name email juxt.pass.alpha/username]} user
-        {:juxt.home/keys [slack-profile-pic]} slack]
+        {:juxt.home/keys [slack-profile-pic]
+         :juxt.pass.alpha/keys [user]} slack]
     {:name name
+     :user-id user
      :id username
      :imageUrl
      slack-profile-pic
@@ -110,17 +112,42 @@
               :Salary "$145,000",
               :Birthday "June 8, 1990"}}))
 
+(defn format-holiday
+  [{:keys [start-date end-date start end crux.db/id all-day? description] :as holiday}]
+  {:id id
+   :start (or start start-date)
+   :end (or end end-date)
+   :allDay (not (false? all-day?))
+   :title description})
+
+(defn- assoc-holidays
+  [holidays people]
+  (for [{:keys [user-id] :as user} people
+        :let [user-holidays (get holidays user-id)]]
+    (assoc user :holidays (map format-holiday user-holidays))))
+
 (rf/reg-sub
  ::route-params
  (fn [db _]
    (-> db :current-route :parameters)))
 
 (rf/reg-sub
+ ::holidays
+ (fn [db]
+   (:holidays db)))
+
+(rf/reg-sub
+ ::raw-people
+ (fn [db] (:people db)))
+
+(rf/reg-sub
  ::people
- (fn [db _]
-   (->> db
-        :people
+ :<- [::raw-people]
+ :<- [::holidays]
+ (fn [[people holidays]]
+   (->> people
         (map process-db-user)
+        (assoc-holidays holidays)
         (sort-by :name))))
 
 (rf/reg-sub

@@ -29,15 +29,15 @@ import "react-contexify/dist/ReactContexify.css";
 const MENU_ID = "event-menu-id";
 
 export type CalendarProps = {
-  initialEvents: EventInput[];
+  events: EventInput[];
   onUpdateEvent: TonUpdateEvent;
   onDeleteEvent: TonDeleteEvent;
 };
 
 export type CalendarModalProps = CalendarFormData | null;
 
-export function BasicCalendar({
-  initialEvents,
+export function EventCalendar({
+  events,
   onUpdateEvent,
   onDeleteEvent,
 }: CalendarProps) {
@@ -56,12 +56,24 @@ export function BasicCalendar({
     show(clickProps.jsEvent, { props: clickProps });
   };
 
+  const handleEventChange = (dropProps: EventClickArg) => {
+    const { event } = dropProps;
+    const { id, start, end, allDay, title } = event;
+    onUpdateEvent({
+      id,
+      start: start!,
+      end: end!,
+      allDay,
+      description: title,
+    });
+  };
+
   const handleSelect = ({ startStr, endStr, allDay }: DateSelectArg) => {
     !menuVisible &&
       setModalProps({
         start: startStr,
         end: endStr,
-        id: createEventId(),
+        id: "",
         allDay,
         description: "",
       });
@@ -75,34 +87,21 @@ export function BasicCalendar({
   );
 
   function handleItemClick({ event, props }: ItemParams<EventClickArg>) {
+    const calEvent = props!.event;
     switch (event.currentTarget.id) {
       case "delete":
-        if (props?.event) {
-          onDeleteEvent(props.event.id);
-        }
+        onDeleteEvent(calEvent.id);
         break;
       case "edit":
-        if (props?.event) {
-          const {
-            id,
-            title,
-            start,
-            end,
-            startStr,
-            endStr,
-            allDay,
-          } = props.event;
+        const { id, title, startStr, endStr, allDay } = calEvent;
 
-          start &&
-            end &&
-            setModalProps({
-              id: id,
-              description: title,
-              start: startStr,
-              end: endStr,
-              allDay,
-            });
-        }
+        setModalProps({
+          id: id,
+          description: title,
+          start: startStr,
+          end: endStr,
+          allDay,
+        });
         break;
     }
   }
@@ -177,15 +176,18 @@ export function BasicCalendar({
           initialView="dayGridMonth"
           contentHeight="auto"
           editable={true}
+          eventResizableFromStart={true}
           selectable={true}
           selectMirror={true}
           dayMaxEvents={true}
           weekends={weekendsVisible}
-          initialEvents={initialEvents}
+          events={events}
           select={handleSelect}
           eventContent={renderEventContent} // custom render function
           eventClick={handleEventClick}
           eventsSet={setCurrentEvents}
+          eventDrop={handleEventChange}
+          eventResize={handleEventChange}
         />
       </div>
     </div>

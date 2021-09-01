@@ -75,6 +75,18 @@
      :on-failure [:http-failure]}}))
 
 (rf/reg-event-fx
+ :get-holidays
+ (fn [{:keys [db]} _]
+   {:fetch
+    {:method :get
+     :url (str config/site-api-origin "/card/holidays")
+     :timeout 5000
+     :mode :cors
+     :response-content-types {#"application/.*json" :json}
+     :on-success [:received-holidays]
+     :on-failure [:http-failure]}}))
+
+(rf/reg-event-fx
  :get-self
  (fn [{:keys [db]} _]
    {:fetch
@@ -124,9 +136,42 @@
 (rf/reg-event-db
  :received-people
  (fn [db [_ response]]
-   (def response response)
-   (-> db
-       (assoc :people (:body response)))))
+   (assoc db :people (:body response))))
+
+(rf/reg-event-db
+ :received-holidays
+ (fn [db [_ response]]
+   (let [raw-holidays (:body response)
+         holidays (group-by :juxt.pass.alpha/user (flatten raw-holidays))]
+     (assoc db :holidays holidays))))
+
+(rf/reg-event-fx
+ :put-holiday
+ (fn [{db :db} [_ holiday]]
+   (let [user (get-in db [:user-info :id])
+         {:keys [allDay start end id description]} holiday
+         holiday {:crux.db/id (if (empty? id)
+                                  (str
+                                   config/site-api-origin
+                                   "/card/holidays/"
+                                   (str (random-uuid)))
+                                  id)
+                  :start start
+                  :end end
+                  :description description
+                  :all-day? allDay
+                  :juxt.site.alpha/type "Holiday"
+                  :juxt.pass.alpha/user user}]
+     {:fx [[:dispatch [:put-entity
+                       holiday
+                       [[:dispatch [:get-holidays]]]]]]})))
+
+(rf/reg-event-fx
+ :update-event
+ (fn [{db :db} [_ js-event]]
+   (let [event-type :holiday
+         event (js->clj js-event :keywordize-keys true)]
+     {:fx [[:dispatch [:put-holiday event]]]})))
 
 (rf/reg-fx
  :focus-to-element
@@ -201,8 +246,9 @@
 
 (rf/reg-event-fx
  :mark-save-succeeded
- (fn [{:keys [db]} [_ id]]
-   {:db (update-in db [:doc-store id] clear-optimistic)}))
+ (fn [{:keys [db]} [_ id fx]]
+   {:db (update-in db [:doc-store id] clear-optimistic)
+    :fx fx}))
 
 (rf/reg-event-fx
  :mark-save-failed
@@ -210,8 +256,19 @@
    {:db (update-in db [:doc-store id] assoc :error true)}))
 
 (rf/reg-event-fx
+ :delete-entity
+ (fn [_ [_ id fx]]
+   {:fetch
+    {:method :delete
+     :url id
+     :timeout 5000
+     :mode :cors
+     :on-success [:mark-save-succeeded id (or fx [])]
+     :on-failure [:http-failure]}}))
+
+(rf/reg-event-fx
  :put-entity
- (fn [{:keys [db]} [_ entity]]
+ (fn [{:keys [db]} [_ entity fx]]
    (let [id (:crux.db/id entity)
          ;; TODO: Let's avoid calling put-entity when there's already one in flight
          entity (dissoc entity :optimistic)
@@ -223,7 +280,7 @@
        :mode :cors
        :body body
        :headers {"content-type" "application/json"}
-       :on-success [:mark-save-succeeded id]
+       :on-success [:mark-save-succeeded id (or fx [])]
        :on-failure [:http-failure]}})))
 
 (rf/reg-event-fx
@@ -301,23 +358,8 @@
           (= (:current-card db) id) (assoc :current-card nil))
     :fx [(when (= (:current-card db) id)
            [:dispatch [:navigate ::nav/cards]])
-         [:dispatch [:delete-entity id]]]}))
+         [:dispatch [:delete-entity id [[:dispatch [:get-cards]]]]]]}))
 
-
-(rf/reg-event-fx
- :delete-entity
- (fn [{:keys [db]} [_ id]]
-   {:fetch
-    {:method :delete
-     :url id
-     :timeout 5000
-     :mode :cors
-     :on-success [:delete-succeeded]
-     :on-failure [:http-failure]}}))
-
-(rf/reg-event-fx
- :delete-succeeded
- (fn [{:keys [db]} _]))
 
 (defn swap
   [items i j]

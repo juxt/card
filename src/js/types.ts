@@ -1,4 +1,4 @@
-import { ViewApi } from "@fullcalendar/react";
+import { EventInput, ViewApi } from "@fullcalendar/react";
 import React from "react";
 
 export type SidebarProps = {
@@ -30,6 +30,7 @@ export type User = {
   imageUrl?: string;
   about?: string;
   fields?: Fields;
+  holidays?: EventInput[];
 };
 
 export type Directory = {
@@ -37,7 +38,7 @@ export type Directory = {
 };
 
 export type TonDeleteEvent = (id: string) => void;
-export type TonUpdateEvent = (props: CalendarFormData) => void;
+export type TonUpdateEvent = (props: any) => void;
 
 export type PeopleProps = {
   user: User;

@@ -52,7 +52,8 @@
                :fx [[:dispatch [:set-current-card]]]}]]
 
     ["people" {:name ::people
-                :fx [[:dispatch [:get-people]]]}]]
+               :fx [[:dispatch [:get-people]]
+                    [:dispatch [:get-holidays]]]}]]
 
    {:data {:coercion rss/coercion}}))
 

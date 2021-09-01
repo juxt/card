@@ -1,6 +1,6 @@
 {:openapi "3.0.2"
  :info
- {:version "1.0.3"
+ {:version "1.0.4"
   :title "Card"
   :description
   "Zettelkasten, Kanban"
@@ -27,13 +27,12 @@
     {200
      {:juxt.site.alpha/query
       #juxt.site.alpha/as-str
-      {:find [(pull e [*]) #_(pull r [*])]
-       :keys [card #_request]
-       :where [;;[e :juxt.card.alpha/title]
-               [e :juxt.card.alpha/children]
+       {:find [(pull e [*]) #_(pull r [*])]
+        :keys [card #_request]
+        :where [;;[e :juxt.card.alpha/title]
+                [e :juxt.card.alpha/children]
                ;;[e :juxt.site.alpha/request r]
-               #_[(identity {:juxt.site.alpha/ref [:juxt.pass.alpha/subject]}) subject]
-               ]}
+                #_[(identity {:juxt.site.alpha/ref [:juxt.pass.alpha/subject]}) subject]]}
       :content
       {"application/json" {}}}}}}
 
@@ -74,10 +73,10 @@
       ;; TODO: What if an action is contained by multiple parents? We should run
       ;; 'distinct' over the parents.
       #juxt.site.alpha/as-str
-      {:find [(pull action [*]) parent]
-       :keys [action parent]
-       :where [[parent :juxt.card.alpha/children action]
-               [action :juxt.card.alpha/status]]}
+       {:find [(pull action [*]) parent]
+        :keys [action parent]
+        :where [[parent :juxt.card.alpha/children action]
+                [action :juxt.card.alpha/status]]}
       :content
       {"application/json" {}}}}}}
 
@@ -98,61 +97,96 @@
          {200
           {:juxt.site.alpha/query
            #juxt.site.alpha/as-str
-           {:find [(pull component [*])]
-            :where [[root :crux.db/id root-uri]
+            {:find [(pull component [*])]
+             :where [[root :crux.db/id root-uri]
 
                     ;; We construct the card uri from the id
-                    [(str
-                      {:juxt.site.alpha/ref [:juxt.site.alpha/base-uri]}
-                      "/card/cards/"
-                      {:in "path" :name "id"}) root-uri]
+                     [(str
+                       {:juxt.site.alpha/ref [:juxt.site.alpha/base-uri]}
+                       "/card/cards/"
+                       {:in "path" :name "id"}) root-uri]
 
-                    [component :crux.db/id]
+                     [component :crux.db/id]
 
-                    (is-ancestor-of? root component)]
-            :rules [
-                    [(is-ancestor-of? ?ancestor ?child)
-                     [(= ?ancestor ?child)]]
-                    [(is-ancestor-of? ?parent ?child)
-                     [?parent :juxt.card.alpha/children ?child]]
-                    [(is-ancestor-of? ?ancestor ?child)
-                     [?parent :juxt.card.alpha/children ?child]
-                     (is-ancestor-of? ?ancestor ?parent)]
+                     (is-ancestor-of? root component)]
+             :rules [[(is-ancestor-of? ?ancestor ?child)
+                      [(= ?ancestor ?child)]]
+                     [(is-ancestor-of? ?parent ?child)
+                      [?parent :juxt.card.alpha/children ?child]]
+                     [(is-ancestor-of? ?ancestor ?child)
+                      [?parent :juxt.card.alpha/children ?child]
+                      (is-ancestor-of? ?ancestor ?parent)]
                     ;; Finally we consider all the content nodes
-                    [(is-ancestor-of? ?ancestor ?child)
-                     [?parent :juxt.card.alpha/content ?child]
-                     (is-ancestor-of? ?ancestor ?parent)]
-                    ]}
+                     [(is-ancestor-of? ?ancestor ?child)
+                      [?parent :juxt.card.alpha/content ?child]
+                      (is-ancestor-of? ?ancestor ?parent)]]}
            :juxt.site.alpha/extract-first-projection? true
 
            :content
            {"application/json"
             {:schema {"$ref" "#/components/schemas/Card"}}}}}}}
 
-
   "/users/"
   {:get
    {:summary "Returns a list of all the users you're allowed to view"
     :operationId "findUsers"
-    :tags ["Users"]
+    :tags ["People"]
 
     :responses
     {200
      {:juxt.site.alpha/query
       #juxt.site.alpha/as-str
-      {:find [(pull user [*])
-              (pull slack [*])
-              username]
-       :strs [user slack username]
-       :where [[user :juxt.site.alpha/type "User"]
-               [user :juxt.pass.alpha/username username]
-               [slack :juxt.site.alpha/type "SlackUserDetails"]
-               [slack :juxt.pass.alpha/user user]]
-       :order-by [[username :asc]]}
+       {:find [(pull user [*])
+               (pull slack [*])
+               username]
+        :strs [user slack username]
+        :where [[user :juxt.site.alpha/type "User"]
+                [user :juxt.pass.alpha/username username]
+                [slack :juxt.site.alpha/type "SlackUserDetails"]
+                [slack :juxt.pass.alpha/user user]]
+        :order-by [[username :asc]]}
 
       :content
       {"application/json"
-       {:schema {}}}}}}}}
+       {:schema {}}}}}}}
+
+  "/holidays"
+  {:get
+   {:summary "Returns a list of all holidays"
+    :operationId "getHoliday"
+    :tags ["People"]
+
+    :responses
+    {200
+     {:juxt.site.alpha/query
+      #juxt.site.alpha/as-str
+       {:find [(pull holiday [*])]
+        :where [[holiday :juxt.site.alpha/type "Holiday"]]}
+
+      :content
+      {"application/json"
+       {:schema {}}}}}}}
+
+  "/holidays/{id}"
+  {:parameters
+   [{:name "id"
+     :in "path"
+     :required true
+     :description "holiday uuid"
+     :schema {:type "string"}}]
+   :put
+   {:operationId "putHoliday"
+    :tags ["People"]
+    :requestBody
+    {:required true
+     :content {"application/json" {:schema {}}}}
+    :responses
+    {201 {}}}
+   :delete
+   {:operationId "deleteHoliday"
+    :tags ["People"]
+    :responses
+    {201 {}}}}}
 
  :components
  {:schemas

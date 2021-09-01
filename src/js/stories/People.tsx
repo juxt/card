@@ -36,7 +36,7 @@ import { TeamMemberList } from "./TeamMemberList";
 import { DirectoryList } from "./DirectoryList";
 import { PeopleProps } from "../types";
 import Breadcrumb from "./Breadcrumb";
-import { BasicCalendar } from "./Calendar";
+import { EventCalendar } from "./Calendar";
 
 const user = {
   name: "Tom Cook",
@@ -167,8 +167,8 @@ export function People({
                 </>
               )}
               {selectedTab === "Calendar" && (
-                <BasicCalendar
-                  initialEvents={[]}
+                <EventCalendar
+                  events={profile?.holidays || []}
                   onDeleteEvent={onDeleteEvent}
                   onUpdateEvent={onUpdateEvent}
                 />
