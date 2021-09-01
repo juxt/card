@@ -180,6 +180,7 @@
      :schema {:type "string"}}]
    :put
    {:operationId "putHoliday"
+    :tags ["People"]
     :requestBody
     {:required true
      :content {"application/json" {:schema {}}}}
