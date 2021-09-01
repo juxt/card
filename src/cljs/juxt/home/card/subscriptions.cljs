@@ -96,6 +96,7 @@
     {:name name
      :user-id user
      :id username
+     :email email
      :imageUrl
      slack-profile-pic
      :coverImageUrl
@@ -135,6 +136,19 @@
  ::holidays
  (fn [db]
    (:holidays db)))
+
+(rf/reg-sub
+ ::my-holidays
+ :<- [::user-info]
+ :<- [::holidays]
+ (fn [[{id :username} holidays]]
+   (get holidays id)))
+
+(rf/reg-sub
+ ::my-events
+ :<- [::my-holidays]
+ (fn [hols]
+   hols))
 
 (rf/reg-sub
  ::raw-people

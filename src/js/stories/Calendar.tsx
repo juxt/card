@@ -30,6 +30,7 @@ const MENU_ID = "event-menu-id";
 
 export type CalendarProps = {
   events: EventInput[];
+  isCurrentUser: boolean;
   onUpdateEvent: TonUpdateEvent;
   onDeleteEvent: TonDeleteEvent;
 };
@@ -38,6 +39,7 @@ export type CalendarModalProps = CalendarFormData | null;
 
 export function EventCalendar({
   events,
+  isCurrentUser,
   onUpdateEvent,
   onDeleteEvent,
 }: CalendarProps) {
@@ -151,21 +153,24 @@ export function EventCalendar({
         </div>
       </div>
       <div className="demo-app-main">
-        <Menu
-          id={MENU_ID}
-          onShown={() => setMenuVisible(true)}
-          onHidden={() => setMenuVisible(false)}
-        >
-          <Item id="delete" onClick={handleItemClick}>
-            <TrashIcon className="max-h-8 pr-2 text-red-500" />
-            <span>Delete Event</span>
-          </Item>
-          <Separator />
-          <Item id="edit" onClick={handleItemClick}>
-            <PencilIcon className="max-h-8 pr-2 text-gray-500" />
-            Edit Event
-          </Item>
-        </Menu>
+        {isCurrentUser && (
+          <Menu
+            id={MENU_ID}
+            onShown={() => setMenuVisible(true)}
+            onHidden={() => setMenuVisible(false)}
+          >
+            <Item id="delete" onClick={handleItemClick}>
+              <TrashIcon className="max-h-8 pr-2 text-red-500" />
+              <span>Delete Event</span>
+            </Item>
+            <Separator />
+            <Item id="edit" onClick={handleItemClick}>
+              <PencilIcon className="max-h-8 pr-2 text-gray-500" />
+              Edit Event
+            </Item>
+          </Menu>
+        )}
+
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           headerToolbar={{
@@ -175,10 +180,10 @@ export function EventCalendar({
           }}
           initialView="dayGridMonth"
           contentHeight="auto"
-          editable={true}
-          eventResizableFromStart={true}
-          selectable={true}
-          selectMirror={true}
+          editable={isCurrentUser}
+          eventResizableFromStart={isCurrentUser}
+          selectable={isCurrentUser}
+          selectMirror={isCurrentUser}
           dayMaxEvents={true}
           weekends={weekendsVisible}
           events={events}

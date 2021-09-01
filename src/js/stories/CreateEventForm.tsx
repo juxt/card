@@ -135,7 +135,7 @@ export const CreateEventForm: FC<Props> = (props) => {
                       </label>
                     )}
                     <div className="mt-1 sm:mt-0 sm:col-span-2">
-                      <div className="max-w-lg flex shadow-sm">
+                      <div className="max-w-lg flex">
                         <input
                           {...inputProps}
                           className={

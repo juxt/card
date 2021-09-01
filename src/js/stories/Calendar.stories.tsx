@@ -1,5 +1,6 @@
 import { CalendarProps, EventCalendar } from "./Calendar";
 import { Meta, Story } from "@storybook/react";
+import { MOCK_EVENTS } from "../utils";
 
 export default {
   title: "People/Calendar",
@@ -11,24 +12,16 @@ const Template: Story<CalendarProps> = (args) => <EventCalendar {...args} />;
 const now = new Date();
 export const Calendar = Template.bind({});
 Calendar.args = {
-  events: [
-    {
-      title: "All Day Event very long title",
-      allDay: true,
-      start: new Date(2021, 8, 0),
-      end: new Date(2021, 8, 1),
-      id: "1",
-    },
-    {
-      title: "Long Event",
-      start: new Date(2021, 8, 7),
-      end: new Date(2021, 8, 10),
-      id: "2",
-    },
-  ],
+  isCurrentUser: true,
+  events: MOCK_EVENTS,
 };
 
 export const CalendarNoEvents = Template.bind({});
 CalendarNoEvents.args = {
+  isCurrentUser: true,
   events: [],
+};
+export const CalendarNotCurrentUser = Template.bind({});
+CalendarNotCurrentUser.args = {
+  events: MOCK_EVENTS,
 };
