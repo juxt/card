@@ -13,3 +13,6 @@ gen/
 !.clj-kondo/config.edn
 .lsp
 init
+tmp/*
+.env
+.envrc
