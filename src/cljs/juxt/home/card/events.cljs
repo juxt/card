@@ -157,9 +157,9 @@
                   :all-day? allDay
                   :juxt.site.alpha/type "Holiday"
                   :juxt.pass.alpha/user user}]
-     ;; TODO - make sure we're always getting holidays AFTER
-     {:fx [[:dispatch [:put-entity holiday]]
-           [:dispatch [:get-holidays]]]})))
+     {:fx [[:dispatch [:put-entity
+                       holiday
+                       [[:dispatch [:get-holidays]]]]]]})))
 
 (rf/reg-event-fx
  :update-event
@@ -241,8 +241,9 @@
 
 (rf/reg-event-fx
  :mark-save-succeeded
- (fn [{:keys [db]} [_ id]]
-   {:db (update-in db [:doc-store id] clear-optimistic)}))
+ (fn [{:keys [db]} [_ id fx]]
+   {:db (update-in db [:doc-store id] clear-optimistic)
+    :fx fx}))
 
 (rf/reg-event-fx
  :mark-save-failed
@@ -251,7 +252,7 @@
 
 (rf/reg-event-fx
  :put-entity
- (fn [{:keys [db]} [_ entity]]
+ (fn [{:keys [db]} [_ entity fx]]
    (let [id (:crux.db/id entity)
          ;; TODO: Let's avoid calling put-entity when there's already one in flight
          entity (dissoc entity :optimistic)
@@ -263,7 +264,7 @@
        :mode :cors
        :body body
        :headers {"content-type" "application/json"}
-       :on-success [:mark-save-succeeded id]
+       :on-success [:mark-save-succeeded id (or fx [])]
        :on-failure [:http-failure]}})))
 
 (rf/reg-event-fx
