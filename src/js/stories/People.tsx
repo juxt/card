@@ -168,7 +168,7 @@ export function People({
               )}
               {selectedTab === "Calendar" && (
                 <BasicCalendar
-                  initialEvents={[]}
+                  initialEvents={profile?.holidays || []}
                   onDeleteEvent={onDeleteEvent}
                   onUpdateEvent={onUpdateEvent}
                 />

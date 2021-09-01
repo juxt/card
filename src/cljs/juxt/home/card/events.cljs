@@ -148,16 +148,25 @@
 (rf/reg-event-fx
  :put-holiday
  (fn [{db :db} [_ holiday]]
-   ;; todo make put endpoint for holidays
    (let [user (get-in db [:user-info :id])
-         {:keys [startDate endDate description]} holiday
-         holiday {:crux.db/id (str config/site-api-origin "/card/holidays/" (str (random-uuid)))
-                  :start-date startDate
-                  :end-date endDate
+         {:keys [allDay start end id description]} holiday
+         holiday {:crux.db/id (str config/site-api-origin "/card/holidays/" id)
+                  :start start
+                  :end end
                   :description description
+                  :all-day? allDay
                   :juxt.site.alpha/type "Holiday"
                   :juxt.pass.alpha/user user}]
-     {:fx [[:dispatch [:put-entity holiday]]]})))
+     ;; TODO - make sure we're always getting holidays AFTER
+     {:fx [[:dispatch [:put-entity holiday]]
+           [:dispatch [:get-holidays]]]})))
+
+(rf/reg-event-fx
+ :update-event
+ (fn [{db :db} [_ js-event]]
+   (let [event-type :holiday
+         event (js->clj js-event :keywordize-keys true)]
+     {:fx [[:dispatch [:put-holiday event]]]})))
 
 (rf/reg-fx
  :focus-to-element

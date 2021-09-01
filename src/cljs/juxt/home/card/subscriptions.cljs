@@ -112,11 +112,19 @@
               :Salary "$145,000",
               :Birthday "June 8, 1990"}}))
 
+(defn format-holiday
+  [{:keys [start-date end-date start end crux.db/id all-day? description] :as holiday}]
+  {:id (-> id (str/split "/") last)
+   :start (or start start-date)
+   :end (or end end-date)
+   :allDay (or all-day? true)
+   :title description})
+
 (defn- assoc-holidays
   [holidays people]
   (for [{:keys [user-id] :as user} people
         :let [user-holidays (get holidays user-id)]]
-    (assoc user :holidays user-holidays)))
+    (assoc user :holidays (map format-holiday user-holidays))))
 
 (rf/reg-sub
  ::route-params

@@ -9,10 +9,10 @@
 (defn people []
   (let [profile @(rf/subscribe [::sub/current-user-profile])
         directory @(rf/subscribe [::sub/user-directory])
-        user @(rf/subscribe [::sub/logged-in-user-profile])]
+        user @(rf/subscribe [::sub/logged-in-user-profile])
     (when (and (:id profile) (map? directory) (map? user))
       [:> People {:profile profile
                   :directory directory
-                  :onUpdateEvent #(prn "update event!" %)
+                  :onUpdateEvent #(rf/dispatch [:update-event %])
                   :onDeleteEvent #(prn "delete event!" %)
                   :user user}])))
