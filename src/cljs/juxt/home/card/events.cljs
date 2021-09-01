@@ -150,7 +150,12 @@
  (fn [{db :db} [_ holiday]]
    (let [user (get-in db [:user-info :id])
          {:keys [allDay start end id description]} holiday
-         holiday {:crux.db/id (str config/site-api-origin "/card/holidays/" id)
+         holiday {:crux.db/id (if (empty? id)
+                                  (str
+                                   config/site-api-origin
+                                   "/card/holidays/"
+                                   (str (random-uuid)))
+                                  id)
                   :start start
                   :end end
                   :description description

@@ -73,7 +73,7 @@ export function EventCalendar({
       setModalProps({
         start: startStr,
         end: endStr,
-        id: createEventId(),
+        id: "",
         allDay,
         description: "",
       });

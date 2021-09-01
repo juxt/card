@@ -114,10 +114,10 @@
 
 (defn format-holiday
   [{:keys [start-date end-date start end crux.db/id all-day? description] :as holiday}]
-  {:id (-> id (str/split "/") last)
+  {:id id
    :start (or start start-date)
    :end (or end end-date)
-   :allDay (or all-day? true)
+   :allDay (not (false? all-day?))
    :title description})
 
 (defn- assoc-holidays
