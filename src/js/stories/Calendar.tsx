@@ -14,7 +14,7 @@ import useMobileDetect, { createEventId } from "../utils";
 import Modal from "./Modal";
 import { TrashIcon, PencilIcon } from "@heroicons/react/solid";
 import { CreateEventForm } from "./CreateEventForm";
-import { CalendarFormData } from "../types";
+import { CalendarFormData, TonDeleteEvent, TonUpdateEvent } from "../types";
 import {
   Menu,
   Item,
@@ -30,19 +30,23 @@ const MENU_ID = "event-menu-id";
 
 export type CalendarProps = {
   initialEvents: EventInput[];
-  onUpdateEvent: (props: CalendarFormData) => void;
+  onUpdateEvent: TonUpdateEvent;
+  onDeleteEvent: TonDeleteEvent;
 };
 
 export type CalendarModalProps = CalendarFormData | null;
 
-export function BasicCalendar({ initialEvents, onUpdateEvent }: CalendarProps) {
+export function BasicCalendar({
+  initialEvents,
+  onUpdateEvent,
+  onDeleteEvent,
+}: CalendarProps) {
   const [currentEvents, setCurrentEvents] = React.useState<EventApi[]>([]);
   const [weekendsVisible, setWeekendsVisible] = React.useState(true);
   const [menuVisible, setMenuVisible] = React.useState(false);
   const isMobile = useMobileDetect();
   const [modalProps, setModalProps] = React.useState<CalendarModalProps>(null);
   const { show } = useContextMenu({ id: MENU_ID });
-  console.log("onudf", onUpdateEvent);
 
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
@@ -73,9 +77,9 @@ export function BasicCalendar({ initialEvents, onUpdateEvent }: CalendarProps) {
   function handleItemClick({ event, props }: ItemParams<EventClickArg>) {
     switch (event.currentTarget.id) {
       case "delete":
-        console.log(props);
-
-        props?.event.remove();
+        if (props?.event) {
+          onDeleteEvent(props.event.id);
+        }
         break;
       case "edit":
         if (props?.event) {
@@ -88,7 +92,6 @@ export function BasicCalendar({ initialEvents, onUpdateEvent }: CalendarProps) {
             endStr,
             allDay,
           } = props.event;
-          console.log(allDay);
 
           start &&
             end &&

@@ -36,11 +36,15 @@ export type Directory = {
   [index: string]: User[];
 };
 
+export type TonDeleteEvent = (id: string) => void;
+export type TonUpdateEvent = (props: CalendarFormData) => void;
+
 export type PeopleProps = {
   user: User;
   profile: User;
   directory: Directory;
-  onUpdateEvent: (event: any) => void;
+  onUpdateEvent: TonUpdateEvent;
+  onDeleteEvent: TonDeleteEvent;
 };
 
 export type CalendarFormData = {

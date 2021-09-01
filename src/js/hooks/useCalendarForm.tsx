@@ -37,8 +37,6 @@ export function useCalendarForm(
 
   const onSubmit: SubmitHandler<CalendarFormData> = (formValues) => {
     if (dateRange?.start && dateRange?.end) {
-      console.log(submitFn);
-      
       // fn passed from cljs, calling it updates events in reframe which rerenders calendar
       submitFn(formValues);
       reset();

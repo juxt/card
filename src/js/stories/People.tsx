@@ -102,6 +102,7 @@ export function People({
   profile,
   directory,
   onUpdateEvent,
+  onDeleteEvent,
   ...props
 }: PeopleProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -168,6 +169,7 @@ export function People({
               {selectedTab === "Calendar" && (
                 <BasicCalendar
                   initialEvents={[]}
+                  onDeleteEvent={onDeleteEvent}
                   onUpdateEvent={onUpdateEvent}
                 />
               )}
