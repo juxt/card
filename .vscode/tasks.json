@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: dev",
+			"detail": "Run all tasks needed for dev. Postcss + shadow + babel"
+		},
+		{
+			"type": "npm",
+			"script": "storybook",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: storybook-dev",
+			"detail": "storybook dev"
+		}
+	]
+}

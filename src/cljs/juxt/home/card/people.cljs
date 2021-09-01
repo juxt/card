@@ -2,7 +2,7 @@
 
 (ns juxt.home.card.people
   (:require
-   ["/juxt/card/people" :refer (People)]
+   ["/juxt/card/stories/People" :refer [People]]
    [juxt.home.card.subscriptions :as sub]
    [re-frame.core :as rf]))
 
@@ -10,7 +10,9 @@
   (let [profile @(rf/subscribe [::sub/current-user-profile])
         directory @(rf/subscribe [::sub/user-directory])
         user @(rf/subscribe [::sub/logged-in-user-profile])]
-    (when (and (:id profile) (map? directory))
+    (when (and (:id profile) (map? directory) (map? user))
       [:> People {:profile profile
                   :directory directory
+                  :onUpdateEvent #(prn "update event!" %)
+                  :onDeleteEvent #(prn "delete event!" %)
                   :user user}])))

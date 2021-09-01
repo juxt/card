@@ -1,21 +1,20 @@
 {:deps {:aliases [:dev]}
 
- :dev-http {8000 {:roots ["public" "target/dev/app"]}}
-
  :builds
  {:app
   {:target :browser
-   ;; This entry-keys option were found to be needed prior to the upgrade to
-   ;;   shadow-cljs 2.14.2. Left in in-case the fix regresses.  :js-options
-   ;;   {:entry-keys ["umd" "browser" "main" "module"]}
-   :modules {:main {:entries [juxt.home.card.main #_juxt.home.card.slate]}}
+   :modules {:app {:entries [juxt.home.card.main]}}
 
-   :devtools
-   {:preloads [day8.re-frame-10x.preload]}
-
+   :devtools {:http-root "public/"
+              :http-port 8000
+              :reload-strategy :full
+              :preloads [devtools.preload
+                         day8.re-frame-10x.preload]}
+   :js-options {:ignore-asset-requires true}
+   :compiler-options {:output-feature-set :es8} ;; needed to stop $jscomp errors with newer js libs
    :dev
-   {:compiler-options #_{:output-feature-set :es8} {}
-    :output-dir "target/dev/app/js"
+   {:output-dir "public/js"
+    :asset-path "/js"
     :closure-defines
     {goog.DEBUG true
      juxt.home.card.config/dev? true
@@ -26,7 +25,8 @@
 
    :release
    {:compiler-options {:optimizations :advanced}
-    :output-dir "target/release/app/js"
+    :output-dir "public/js"
+    :asset-path "/js"
     :closure-defines
     {juxt.home.card.config/dev? true
      ;; We need the full origin because we currently use it to construct card
