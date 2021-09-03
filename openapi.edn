@@ -1,6 +1,6 @@
 {:openapi "3.0.2"
  :info
- {:version "1.0.4"
+ {:version "1.0.5"
   :title "Card"
   :description
   "Zettelkasten, Kanban"
@@ -149,6 +149,27 @@
       :content
       {"application/json"
        {:schema {}}}}}}}
+
+  "/users/{userId}/timesheet/{id}"
+  {:parameters
+   [{:name "userId"
+     :in "path"
+     :required true
+     :description "users three letter code"
+     :schema {:type "string"}}
+    {:name "id"
+     :in "path"
+     :required true
+     :description "timesheet uuid"
+     :schema {:type "string"}}]
+   :put
+   {:operationId "putTimesheet"
+    :tags ["People"]
+    :requestBody
+    {:required true
+     :content {"application/json" {:schema {}}}}
+    :responses
+    {201 {}}}}
 
   "/holidays"
   {:get

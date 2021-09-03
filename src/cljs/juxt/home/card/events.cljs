@@ -151,11 +151,11 @@
    (let [user (get-in db [:user-info :id])
          {:keys [allDay start end id description]} holiday
          holiday {:crux.db/id (if (empty? id)
-                                  (str
-                                   config/site-api-origin
-                                   "/card/holidays/"
-                                   (str (random-uuid)))
-                                  id)
+                                (str
+                                 config/site-api-origin
+                                 "/card/holidays/"
+                                 (random-uuid))
+                                id)
                   :start start
                   :end end
                   :description description
@@ -165,6 +165,29 @@
      {:fx [[:dispatch [:put-entity
                        holiday
                        [[:dispatch [:get-holidays]]]]]]})))
+
+(rf/reg-event-fx
+ :put-timesheet
+ (fn [{db :db} [_ timesheet]]
+   (let [user (get-in db [:user-info :id])
+         username (get-in db [:user-info :username])
+         {:keys [allDay start end id description code]} timesheet
+         timesheet {:crux.db/id (if (empty? id)
+                                  (str
+                                   config/site-api-origin
+                                   "/card/users/"
+                                   username
+                                   "/timesheet/"
+                                   (random-uuid))
+                                  id)
+                    :start start
+                    :end end
+                    :description description
+                    :all-day? allDay
+                    :code code
+                    :juxt.site.alpha/type "Timesheet"
+                    :juxt.pass.alpha/user user}]
+     {:fx [[:dispatch [:put-entity timesheet]]]})))
 
 (rf/reg-event-fx
  :update-event
