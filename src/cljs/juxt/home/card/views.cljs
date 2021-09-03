@@ -13,12 +13,12 @@
    [juxt.home.card.calendar :as calendar]
    [re-frame.core :as rf]
    [tailwind-hiccup.core :refer [tw]]
-   ["/juxt/card/stories/navbar" :refer (NavBar)]))
+   ["/juxt/card/stories/Navbar" :refer (NavBar)]))
 
 (defn menu []
   (let [page @(rf/subscribe [::sub/page])
         user @(rf/subscribe [::sub/logged-in-user-profile])]
-    (when user
+    (if user
       [:> NavBar {:logo "https://home.juxt.site/x-on-dark.svg"
                   :navigation
                   (for [{:keys [name label] :as item} nav/pages
@@ -28,7 +28,8 @@
                            :href (u/route->url name)
                            :name label
                            :current (= page name)))
-                  :user user}])))
+                  :user user}]
+      [:div "waiting for user..."])))
 
 (defn actions-kanban []
   (->>
@@ -65,4 +66,6 @@
        [calendar/view]
 
        ;; else
-       [:div [:h1 "Page not ready"]])]))
+       (do
+         (prn page menu)
+         [:div [:h1 "Page nainr ready"]]))]))

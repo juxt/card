@@ -16,15 +16,16 @@
 (rf/reg-event-fx
  :initialize
  (fn [{:keys [db]} _]
-   {:dispatch [:get-self]}))
+   {:fx [[:dispatch [:get-people]]
+         [:dispatch [:get-holidays]]
+         [:dispatch [:get-self]]]}))
 
 (rf/reg-event-fx
  :set-current-card
  (fn [{:keys [db]} _]
    (let [card-id (get-in db [:current-route :path-params :card])]
      {:db (assoc db :current-card (str config/site-api-origin "/card/cards/" card-id))
-      :fx [[:dispatch
-            [:get-card card-id]]]})))
+      :fx [[:dispatch [:get-card card-id]]]})))
 
 (rf/reg-event-fx
  :get-card

@@ -61,3 +61,32 @@ export default function useMobileDetect(): boolean {
 
   return isMobile;
 }
+
+export const MOCK_LOGO = "https://home.juxt.site/x-on-dark.svg";
+
+export const MOCK_NAVIGATION = [
+  {
+    id: "1",
+    name: "Home",
+    href: "",
+    current: false,
+  },
+  {
+    id: "2",
+    name: "About",
+    href: "",
+    current: false,
+  },
+  {
+    id: "3",
+    name: "People",
+    href: "",
+    current: true,
+  },
+];
+
+export const MOCK_NAV_PROPS = {
+  user: MOCK_USER,
+  navigation: MOCK_NAVIGATION,
+  logo: MOCK_LOGO,
+};

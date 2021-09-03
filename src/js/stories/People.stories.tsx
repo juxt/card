@@ -1,6 +1,8 @@
 import { People } from "./People";
 import { Meta, Story } from "@storybook/react";
 import { PeopleProps } from "../types";
+import { NavBar } from "./Navbar";
+import { MOCK_NAV_PROPS } from "../utils";
 
 export default {
   title: "People/dashboard",
@@ -8,7 +10,12 @@ export default {
   parameters: { actions: { argTypesRegex: "^on.*" } },
 } as Meta;
 
-const Template: Story<PeopleProps> = (args) => <People {...args} />;
+const Template: Story<PeopleProps> = (args) => (
+  <div>
+    <NavBar {...MOCK_NAV_PROPS} />
+    <People {...args} />
+  </div>
+);
 
 export const PeoplePage = Template.bind({});
 PeoplePage.args = {
