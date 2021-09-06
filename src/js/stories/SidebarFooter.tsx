@@ -9,7 +9,7 @@ export function SidebarFooter(props: { user: User }) {
             <img
               className="inline-block h-9 w-9 rounded-full"
               src={
-                props.user?.imageUrl ||
+                props.user?.imageUrl ??
                 "https://eu.ui-avatars.com/api/?name=" + props.user?.name
               }
               alt={props.user?.name + "'s imageUrl"}

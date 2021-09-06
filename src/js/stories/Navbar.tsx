@@ -19,7 +19,6 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { SearchIcon } from "@heroicons/react/solid";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { NavigationItem, User } from "../types";
-import { classNames } from "../utils";
 
 export type NavBarProps = {
   navigation: NavigationItem[];

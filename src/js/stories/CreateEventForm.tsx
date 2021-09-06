@@ -16,17 +16,9 @@ export type Props = {
   onSubmit: SubmitEventFn;
 };
 
-type FormData = {
-  id?: string;
-  description: string;
-  allDay: boolean;
-  start: string;
-  end: string;
-};
-
 type FormInputs = {
   name: string;
-  inputName: Path<FormData>;
+  inputName: Path<CalendarFormData>;
   label?: string;
   type: string;
   placeholder?: string;
@@ -147,10 +139,8 @@ export const CreateEventForm: FC<Props> = (props) => {
                     </div>
                     {errors[inputName] && (
                       <>
-                        <p></p>
                         <p className="mt-2 text-sm text-red-600">
-                          {" "}
-                          {errors[inputName]?.message}{" "}
+                          {errors[inputName]?.message}
                         </p>
                       </>
                     )}
