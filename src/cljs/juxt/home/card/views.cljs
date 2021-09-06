@@ -68,4 +68,4 @@
        ;; else
        (do
          (prn page menu)
-         [:div [:h1 "Page nainr ready"]]))]))
+         [:div [:h1 "Page not ready"]]))]))
