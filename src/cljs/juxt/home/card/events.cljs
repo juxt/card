@@ -88,6 +88,19 @@
      :on-failure [:http-failure]}}))
 
 (rf/reg-event-fx
+ :get-my-timesheets
+ (fn [{:keys [db]}]
+   (let [username (get-in db [:user-info :username])]
+     {:fetch
+      {:method :get
+       :url (str config/site-api-origin "/card/users/" username "/timesheets")
+       :timeout 5000
+       :mode :cors
+       :response-content-types {#"application/.*json" :json}
+       :on-success [:received-my-timesheets]
+       :on-failure [:http-failure]}})))
+
+(rf/reg-event-fx
  :get-self
  (fn [{:keys [db]} _]
    {:fetch
@@ -102,7 +115,8 @@
 (rf/reg-event-fx
  :received-self
  (fn [{:keys [db]} [_ {self :body}]]
-   {:db (assoc db :user-info self)}))
+   {:db (assoc db :user-info self)
+    :fx [[:dispatch [:get-my-timesheets]]]}))
 
 (rf/reg-event-fx
  :http-failure
@@ -145,6 +159,12 @@
    (let [raw-holidays (:body response)
          holidays (group-by :juxt.pass.alpha/user (flatten raw-holidays))]
      (assoc db :holidays holidays))))
+
+(rf/reg-event-db
+ :received-my-timesheets
+ (fn [db [_ response]]
+   (def response response)
+   (assoc db :my-timesheets (-> response :body flatten))))
 
 (rf/reg-event-fx
  :put-holiday

@@ -141,14 +141,20 @@
  ::my-holidays
  :<- [::user-info]
  :<- [::holidays]
- (fn [[{id :username} holidays]]
+ (fn [[{id :id} holidays]]
    (get holidays id)))
+
+(rf/reg-sub
+ ::my-timesheets
+ (fn [db]
+   (:my-timesheets db)))
 
 (rf/reg-sub
  ::my-events
  :<- [::my-holidays]
- (fn [hols]
-   hols))
+ :<- [::my-timesheets]
+ (fn [[hols timesheets]]
+   (into hols timesheets)))
 
 (rf/reg-sub
  ::raw-people

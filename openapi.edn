@@ -171,6 +171,33 @@
     :responses
     {201 {}}}}
 
+  "/users/{userId}/timesheets"
+  {:parameters
+   [{:name "userId"
+     :in "path"
+     :required true
+     :description "users three letter code"
+     :schema {:type "string"}}]
+   :get
+   {:summary "Returns a users timesheet entries"
+    :operationId "getTimesheets"
+    :tags ["People"]
+    :responses
+    {200
+     {:juxt.site.alpha/query
+      #juxt.site.alpha/as-str
+      {:find [(pull timesheet [*])]
+       :where
+       [[(str {:juxt.site.alpha/ref [:juxt.site.alpha/base-uri]}
+              "/_site/users/"
+              {:in "path" :name "userId"})
+         user]
+        [timesheet :juxt.site.alpha/type "Timesheet"]
+        [timesheet :juxt.pass.alpha/user user]]}
+      :content
+      {"application/json"
+       {:schema {}}}}}}}
+
   "/holidays"
   {:get
    {:summary "Returns a list of all holidays"
