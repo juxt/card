@@ -10,8 +10,7 @@ import FullCalendar, {
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import useMobileDetect, { createEventId } from "../utils";
-import Modal from "./Modal";
+import useMobileDetect from "../utils";
 import { TrashIcon, PencilIcon } from "@heroicons/react/solid";
 import { CreateEventForm } from "./CreateEventForm";
 import { CalendarFormData, TonDeleteEvent, TonUpdateEvent } from "../types";
@@ -19,10 +18,8 @@ import {
   Menu,
   Item,
   Separator,
-  Submenu,
   useContextMenu,
   ItemParams,
-  ItemProps,
 } from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
 
@@ -49,7 +46,6 @@ export function EventCalendar({
   const isMobile = useMobileDetect();
   const [modalProps, setModalProps] = React.useState<CalendarModalProps>(null);
   const { show } = useContextMenu({ id: MENU_ID });
-
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
   };
@@ -63,8 +59,8 @@ export function EventCalendar({
     const { id, start, end, allDay, title } = event;
     onUpdateEvent({
       id,
-      start: start!,
-      end: end!,
+      start: start,
+      end: end,
       allDay,
       description: title,
     });

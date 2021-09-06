@@ -9,7 +9,6 @@ export default {
 } as Meta;
 
 const Template: Story<CalendarProps> = (args) => <EventCalendar {...args} />;
-const now = new Date();
 export const Calendar = Template.bind({});
 Calendar.args = {
   isCurrentUser: true,

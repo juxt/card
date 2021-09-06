@@ -1,11 +1,9 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import { CalendarFormData } from "../types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { SubmitEventFn } from "../stories/CreateEventForm";
-import { DateSelectArg } from "@fullcalendar/react";
-import { createEventId } from "../utils";
 import { CalendarModalProps } from "../stories/Calendar";
 
 export function useCalendarForm(

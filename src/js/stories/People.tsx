@@ -15,7 +15,6 @@ import { Sidebar } from "./DesktopSidebar";
 import { ProfileHeader } from "./ProfileHeader";
 import { Tabs } from "./Tabs";
 import { DescriptionList } from "./DescriptionList";
-import { TeamMemberList } from "./TeamMemberList";
 import { DirectoryList } from "./DirectoryList";
 import { PeopleProps } from "../types";
 import Breadcrumb from "./Breadcrumb";
@@ -52,10 +51,9 @@ export function classNames(...classes: string[]) {
 export function People({
   profile,
   directory,
-  isCurrentUser,
+  user,
   onUpdateEvent,
   onDeleteEvent,
-  ...props
 }: PeopleProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(tabs[0].name);
@@ -68,14 +66,14 @@ export function People({
     <div className="relative h-screen flex overflow-hidden bg-white">
       <MobileSidebar
         {...fakeProps}
-        {...props}
+        user={user}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
       {/* Static sidebar for desktop */}
       <div className="hidden lg:flex lg:flex-shrink-0">
         <div className="flex flex-col w-64">
-          <Sidebar {...fakeProps} {...props} />
+          <Sidebar {...fakeProps} user={user} />
         </div>
       </div>
 
@@ -113,7 +111,7 @@ export function People({
               {selectedTab === "Calendar" && (
                 <EventCalendar
                   events={profile?.holidays || []}
-                  isCurrentUser={isCurrentUser}
+                  isCurrentUser={user?.id === profile?.id}
                   onDeleteEvent={onDeleteEvent}
                   onUpdateEvent={onUpdateEvent}
                 />
