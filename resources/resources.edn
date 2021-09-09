@@ -24,7 +24,7 @@
 
 {:crux.db/id "{{base-uri}}/card/index.html"
  :description "Deliver the application JS payload"
- :juxt.http.alpha/methods #{:get :head :options}
+ :juxt.http.alpha/methods #{:get :head :options :put}
  :juxt.site.alpha/type "TemplatedRepresentation"
  :juxt.site.alpha/template "{{base-uri}}/templates/card/index.html"
  :juxt.site.alpha/template-engine :selmer
