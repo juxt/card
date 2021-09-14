@@ -17,12 +17,10 @@ export type Props = {
 };
 
 type FormInputs = {
-  name: string;
   inputName: Path<CalendarFormData>;
   label?: string;
   type: string;
   placeholder?: string;
-  error?: FieldError;
   wrapperClass?: string;
   inputClass?: string;
   required?: boolean;
@@ -56,42 +54,48 @@ export const CreateEventForm: FC<Props> = (props) => {
       });
     }, [reset, dateRange]);
 
+    const checkboxClass =
+      "mt-2.5 rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0";
+    const noDivider = "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1";
+
     const inputs: FormInputs = [
       {
-        inputName: "description",
+        inputName: "title",
         label: "Description",
         type: "text",
         placeholder: "Going anywhere nice?",
-        error: errors?.description,
-        ...register("description"),
       },
       {
         inputName: "start",
         label: "Start Date",
         type: dateRange?.allDay ? "date" : "datetime-local",
         required: true,
-        error: errors?.start,
-        ...register("start"),
+      },
+      {
+        inputName: "isStartHalfDay",
+        label: "Half Day?",
+        type: "checkbox",
+        inputClass: checkboxClass,
+        wrapperClass: noDivider,
       },
       {
         inputName: "end",
         label: "End Date",
         type: dateRange?.allDay ? "date" : "datetime-local",
         required: true,
-        error: errors?.end,
-        wrapperClass: "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1",
-        ...register("end"),
+      },
+      {
+        inputName: "isEndHalfDay",
+        label: "Half Day?",
+        type: "checkbox",
+        inputClass: checkboxClass,
+        wrapperClass: noDivider,
       },
       {
         inputName: "allDay",
-        label: "All Day Event?",
-        type: "checkbox",
+        type: "hidden",
         required: false,
-        error: errors?.allDay,
-        inputClass:
-          "mt-2.5 rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0",
-        wrapperClass: "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1",
-        ...register("allDay"),
+        wrapperClass: noDivider,
       },
     ];
     return (
@@ -107,6 +111,7 @@ export const CreateEventForm: FC<Props> = (props) => {
 
             <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
               <input type="hidden" {...register("id")} />
+
               {inputs.map(
                 ({ inputName, wrapperClass, inputClass, ...inputProps }, i) => (
                   <div
@@ -130,6 +135,7 @@ export const CreateEventForm: FC<Props> = (props) => {
                       <div className="max-w-lg flex">
                         <input
                           {...inputProps}
+                          {...register(inputName)}
                           className={
                             inputClass ||
                             "flex-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0 sm:text-sm border-gray-300"

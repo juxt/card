@@ -14,7 +14,7 @@ export function useCalendarForm(
   const validationSchema = useMemo(
     () =>
       yup.object().shape({
-        description: yup.string().required("Please provide a description"),
+        title: yup.string().required("Please provide a description"),
         start: yup.date().required("Start date is requred"),
         end: yup
           .date()

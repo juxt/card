@@ -13,8 +13,10 @@ function uuidv4() {
     return v.toString(16);
   });
 }
-
-let todayStr = new Date().toISOString().replace(/T.*$/, ""); // YYYY-MM-DD of today
+const today = new Date();
+const dateStr = (date: Date) => date.toISOString().replace(/T.*$/, ""); // YYYY-MM-DD of today
+const daysPlus = (n: number) =>
+  new Date(today.getTime() + n * 24 * 60 * 60 * 1000);
 
 export const MOCK_DIRECTORY: Directory = {
   T: [
@@ -646,15 +648,30 @@ export const MOCK_EVENTS: EventInput[] = [
   {
     id: createEventId(),
     title: "All-day event",
-    start: todayStr,
+    start: dateStr(today),
     allDay: true,
-    end: todayStr + "T23:00:00",
+    end: dateStr(daysPlus(1)),
+  },
+  {
+    id: createEventId(),
+    title: "Really long name timed event to test truncation",
+    start: dateStr(today) + "T10:00:00",
+    end: dateStr(today) + "T11:30:00",
+  },
+  {
+    id: createEventId(),
+    allDay: true,
+    title: "Half day test",
+    start: dateStr(daysPlus(1)),
+    isStartHalfDay: true,
+    end: dateStr(daysPlus(4)),
+    isEndHalfDay: true,
   },
   {
     id: createEventId(),
     title: "Timed event",
-    start: todayStr + "T12:00:00",
-    end: todayStr + "T14:30:00",
+    start: dateStr(today) + "T12:00:00",
+    end: dateStr(today) + "T14:30:00",
   },
 ];
 

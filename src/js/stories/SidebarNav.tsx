@@ -4,8 +4,8 @@ import { NavigationItem } from "../types";
 export interface SidebarNavProps {
   navigation: NavigationItem[];
   secondaryNavigation: NavigationItem[];
- // selectedIndex: number;
- // onSelect: (index: number) => void;
+  // selectedIndex: number;
+  // onSelect: (index: number) => void;
 }
 
 export function SidebarNav(props: SidebarNavProps) {
@@ -24,14 +24,17 @@ export function SidebarNav(props: SidebarNavProps) {
             )}
             aria-current={item.current ? "page" : undefined}
           >
-            <item.icon
-              className={classNames(
-                item.current
-                  ? "text-gray-500"
-                  : "text-gray-400 group-hover:text-gray-500",
-                "mr-4 h-6 w-6"
-              )}
-              aria-hidden="true" />
+            {item.icon && (
+              <item.icon
+                className={classNames(
+                  item.current
+                    ? "text-gray-500"
+                    : "text-gray-400 group-hover:text-gray-500",
+                  "mr-4 h-6 w-6"
+                )}
+                aria-hidden="true"
+              />
+            )}
             {item.name}
           </a>
         ))}
@@ -46,9 +49,12 @@ export function SidebarNav(props: SidebarNavProps) {
                 href={item.href}
                 className="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-base font-medium rounded-md"
               >
-                <item.icon
-                  className="text-gray-400 group-hover:text-gray-500 mr-4 flex-shrink-0 h-6 w-6"
-                  aria-hidden="true" />
+                {item.icon && (
+                  <item.icon
+                    className="text-gray-400 group-hover:text-gray-500 mr-4 flex-shrink-0 h-6 w-6"
+                    aria-hidden="true"
+                  />
+                )}
                 {item.name}
               </a>
             ))}

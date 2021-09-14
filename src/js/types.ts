@@ -52,8 +52,10 @@ export type PeopleProps = {
 
 export type CalendarFormData = {
   id?: string;
-  description: string;
+  title: string;
   start: string;
+  isStartHalfDay?: boolean;
   end: string;
+  isEndHalfDay?: boolean;
   allDay?: boolean;
 };

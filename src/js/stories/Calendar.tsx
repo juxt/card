@@ -26,13 +26,13 @@ import "react-contexify/dist/ReactContexify.css";
 const MENU_ID = "event-menu-id";
 
 export type CalendarProps = {
-  events: EventInput[];
+  events: CalendarFormData[];
   isCurrentUser: boolean;
   onUpdateEvent: TonUpdateEvent;
   onDeleteEvent: TonDeleteEvent;
 };
 
-export type CalendarModalProps = CalendarFormData | null;
+export type CalendarModalProps = CalendarFormData | null | undefined;
 
 export function EventCalendar({
   events,
@@ -46,24 +46,28 @@ export function EventCalendar({
   const isMobile = useMobileDetect();
   const [modalProps, setModalProps] = React.useState<CalendarModalProps>(null);
   const { show } = useContextMenu({ id: MENU_ID });
+  const [selectedEvent, setSelectedEvent] = React.useState<CalendarModalProps>(
+    null
+  );
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
   };
 
+  function convertEvent(event: EventApi) {
+    const id = event.id;
+    const calEvent = events.find((e) => e.id === id);
+    return calEvent;
+  }
+
   const handleEventClick = (clickProps: EventClickArg) => {
     show(clickProps.jsEvent, { props: clickProps });
+    console.log(clickProps);
+    setSelectedEvent(convertEvent(clickProps.event));
   };
 
   const handleEventChange = (dropProps: EventClickArg) => {
     const { event } = dropProps;
-    const { id, start, end, allDay, title } = event;
-    onUpdateEvent({
-      id,
-      start: start,
-      end: end,
-      allDay,
-      description: title,
-    });
+    onUpdateEvent(event);
   };
 
   const handleSelect = ({ startStr, endStr, allDay }: DateSelectArg) => {
@@ -73,16 +77,9 @@ export function EventCalendar({
         end: endStr,
         id: "",
         allDay,
-        description: "",
+        title: "",
       });
   };
-
-  const renderEventContent = (eventContent: EventContentArg) => (
-    <>
-      <b>{eventContent.timeText}</b>
-      <i>{eventContent.event.title}</i>
-    </>
-  );
 
   function handleItemClick({ event, props }: ItemParams<EventClickArg>) {
     const calEvent = props!.event;
@@ -94,11 +91,10 @@ export function EventCalendar({
         const { id, title, startStr, endStr, allDay } = calEvent;
 
         setModalProps({
-          id: id,
-          description: title,
+          ...selectedEvent,
+          title,
           start: startStr,
           end: endStr,
-          allDay,
         });
         break;
     }
@@ -126,14 +122,6 @@ export function EventCalendar({
       />
       <div className="demo-app-sidebar">
         <div className="demo-app-sidebar-section">
-          <h2>Instructions</h2>
-          <ul>
-            <li>Select dates and you will be prompted to create a new event</li>
-            <li>Drag, drop, and resize events</li>
-            <li>Click an event to delete it</li>
-          </ul>
-        </div>
-        <div className="demo-app-sidebar-section">
           <label>
             <input
               type="checkbox"
@@ -155,6 +143,26 @@ export function EventCalendar({
             onShown={() => setMenuVisible(true)}
             onHidden={() => setMenuVisible(false)}
           >
+            <Item disabled>
+              <h1 className="font-bold">{selectedEvent?.title}</h1>
+            </Item>
+            {selectedEvent?.start && (
+              <>
+                <Item disabled>
+                  <p>
+                    From: {selectedEvent?.start}
+                    {selectedEvent?.isStartHalfDay && " (Half Day)"}
+                  </p>
+                </Item>
+                <Item disabled>
+                  <p>
+                    To: {selectedEvent?.end}
+                    {selectedEvent?.isEndHalfDay && " (Half Day)"}
+                  </p>
+                </Item>
+              </>
+            )}
+            <Separator />
             <Item id="delete" onClick={handleItemClick}>
               <TrashIcon className="max-h-8 pr-2 text-red-500" />
               <span>Delete Event</span>
@@ -184,7 +192,6 @@ export function EventCalendar({
           weekends={weekendsVisible}
           events={events}
           select={handleSelect}
-          eventContent={renderEventContent} // custom render function
           eventClick={handleEventClick}
           eventsSet={setCurrentEvents}
           eventDrop={handleEventChange}
