@@ -12,7 +12,8 @@
     "release": "run-s clean *:release",
     "debug": "shadow-cljs release app --debug",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "chromatic": "npx chromatic --project-token=f1f7695ce98b"
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.15.0",
@@ -58,6 +59,7 @@
     "@types/react-big-calendar": "^0.33.1",
     "autoprefixer": "10.3.1",
     "babel-loader": "^8.2.2",
+    "chromatic": "^5.9.2",
     "cross-env": "^7.0.3",
     "postcss": "8.3.6",
     "shadow-cljs": "^2.14.4",
