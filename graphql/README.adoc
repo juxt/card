@@ -1,0 +1,70 @@
+= GraphQL
+
+Site is getting GraphQL support. This feature is experimental and not feature
+complete.
+
+There is also a lot of missing functionality right now, especially in the area
+of binding field argument values to XTDB query vars. This will come soon.
+
+== Status
+
+GraphQL support is currently lacking interfaces, unions, enums and
+variables. These are being worked on and the plan is to support all of the
+current GraphQL specification (June 2018 version).
+
+== Initialisation
+
+Any Site URL can be a GraphQL endpoint. However, the resource providing this
+support must first be initialized by a Site superuser:
+
+----
+site post-resources --file resources.edn
+----
+
+The `resources.edn` file contains a resource with a URL path of `/graphql`. This is customary but there is no restriction as to where GraphQL endpoints can be created or how many you can have.
+
+== Schema deployment
+
+Once a URL is initialized, a GraphQL schema can be upserted. A GraphQL endpoint
+must have a schema for GraphQL queries to work, and there can only be one schema
+per endpoint at any given time.
+
+A GraphQL schema is written in GraphQL's Schema Definition Language. See
+<<graphql>> for more details.
+
+A `schema.graphql` file is provided as a demonstration. This queries for
+holidays and their users.
+
+Site defines a special directive, `@xtdb`, which is used to _bind_ the GraphQL
+types and object fields to the database. The directive is alpha status and may change based on dev feedback. It's a good idea to check the current code implementation at <<site-graphql>.
+
+----
+site put-asset --file schema.graphql --type application/graphql --path /graphql
+----
+
+== GraphQL queries
+
+Once you have upserted your schema, you can query it.
+
+----
+site post --file query.graphql --path "/graphql" --type "application/graphql"
+----
+
+Currently, GraphQL resources provide `application/json` content but more content
+types are possible in the future.
+
+[TIP]
+--
+If you have `jq` installed, use the `-s` option to restrict the output to the response body, allowing you to pipe through `jq`.
+
+----
+site -s post --file query.graphql --path "/graphql" --type "application/graphql" | jq
+----
+--
+
+[bibliography]
+== References
+
+* [[[graphql]]] https://spec.graphql.org/June2018/[GraphQL Specification (June 2018)]
+* [[[site-graphql]]] https://github.com/juxt/site/blob/master/src/juxt/site/alpha/graphql.clj[Site's code for the @xtdb directive]
+* [[[grab]]] https://github.com/juxt/grab[Grab] is used as the GraphQL implementation, designed especially for use by Site and XTDB.

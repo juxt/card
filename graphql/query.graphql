@@ -1,0 +1,8 @@
+{ holidays
+  { id
+    user { id username name email }
+    startDate
+    endDate
+    description
+  }
+}
