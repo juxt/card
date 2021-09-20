@@ -1,13 +1,62 @@
 = Card
 
+== Prerequisites
+
+* Node.JS
+* Yarn
+* A login to https://home.juxt.site[home.juxt.site] or a https://github.com/juxt/site[Site] server on localhost for local development
+* The <site>/bin/site executable available on the path.
+* install dependencies with:
+[source,bash]
+----
+yarn
+----
+
+==== If you have a https://home.juxt.site[home.juxt.site] login:
+
+* set SITE_BASE_URI to https://home.juxt.site (you can use something like https://direnv.net/[direnv] to automate this, by putting `export SITE_BASE_URI=https://home.juxt.site` into an `.envrc` file)
+
+==== If you wish to run Site locally or you don't yet have a login:
+
+* Be sure that either SITE_BASE_URI or `juxt.home.card.config/site-api-origin` is pointing at `http://localhost:2021` in `shadow-cljs.edn`. This would be your running `site` server on localhost. Then seed the data with:
+
+[source,clojure]
+----
+./deploy.sh
+./deploy-seeds.sh
+./deploy-test-pages.sh
+----
+
 == Development
 
+To run the full ClojureScript app, execute:
+[source,bash]
 ----
-$ npm run dev
+yarn dev
 ----
+
+Currently the main parts of the application that are working should be visible at localhost:8000/people
+
+If you wish to change only the visual UI components, you can run the storybook process with:
+[source,bash]
+----
+yarn storybook
+----
+
+StoryBook will have faster hot reload and startup times than the full CLJS app, but you will not be able to modify or test logic (outside of local component state such as forms/modals).
+
+== Project Setup
+
+The project has two main parts. The CLJS files contain the entry point, routing setup, 'business logic' (which includes communication with Site), response data processing, definition of handler functions and top-level layout of view functions. However, most of the view code, including local state logic such as form validation, is defined in .tsx files in the `src/js/` directory. Handler functions and data objects pass to the top level .tsx component files (e.g `people.tsx`) from  the corresponding .cljs file (e.g `people.cljs`). When the cljs app runs, the .tsx files are transpilled into plain .js files in the `gen` directory so that shadow-cljs can import them.
+
+If you plan to edit the .tsx files, please ensure you have https://prettier.io/[prettier] setup.
 
 == Release
 
+To release to production run:
+[source,bash]
 ----
-$ npm run release
+./deploy-app.sh
 ----
+
+This will build production bundles and deploy them to Site, where they will be available immediately.
