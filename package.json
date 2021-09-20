@@ -14,7 +14,13 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "chromatic": "npx chromatic --project-token=f1f7695ce98b",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "eslint:lint": "eslint src/js --fix --ext .js,.jsx,.ts,.tsx",
+    "eslint:watch": "eslint src/js --watch --ext .js,.jsx,.ts,.tsx",
+    "prettier:lint": "prettier --ignore-unknown --write src/js",
+    "typecheck:lint": "tsc",
+    "typecheck:watch": "tsc --watch",
+    "lint": "run-p -l *:lint"
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.15.0",
@@ -75,7 +81,8 @@
     "tailwindcss": "2.2.7"
   },
   "lint-staged": {
-    "*.{tsx,ts}": "eslint --cache --fix",
-    "*.{js,css,md,adoc}": "prettier --write"
+    "*.{js,ts,jsx,tsx}": "eslint --fix",
+    "*.{js,ts,jsx,tsx,css}": "prettier --write",
+    "*.{ts,tsx}": "tsc --noEmit --jsx 'preserve'"
   }
 }

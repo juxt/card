@@ -1,6 +1,3 @@
-import { EventInput, ViewApi } from "@fullcalendar/react";
-import React from "react";
-
 export type SidebarProps = {
   user: User;
   navigation: NavigationItem[];
@@ -14,6 +11,7 @@ export type NavigationItem = {
   path?: string;
   label?: string;
   current?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon?: React.ComponentType<any>;
 };
 
@@ -31,7 +29,7 @@ export type User = {
   imageUrl?: string;
   about?: string;
   fields?: Fields;
-  holidays?: EventInput[];
+  holidays?: CalendarFormData[];
 };
 
 export type Directory = {
@@ -39,7 +37,7 @@ export type Directory = {
 };
 
 export type TonDeleteEvent = (id: string) => void;
-export type TonUpdateEvent = (props: any) => void;
+export type TonUpdateEvent = (props: unknown) => void;
 
 export type PeopleProps = {
   user: User;

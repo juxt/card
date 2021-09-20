@@ -1,6 +1,5 @@
-import { EventInput } from "@fullcalendar/react";
 import { useEffect, useState } from "react";
-import { Directory, User } from "./types";
+import { CalendarFormData, Directory, User } from "./types";
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -8,7 +7,7 @@ export function classNames(...classes: string[]) {
 
 function uuidv4() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
+    const r = (Math.random() * 16) | 0,
       v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
@@ -644,7 +643,7 @@ export const MOCK_DIRECTORY: Directory = {
   ],
 };
 
-export const MOCK_EVENTS: EventInput[] = [
+export const MOCK_EVENTS: CalendarFormData[] = [
   {
     id: createEventId(),
     title: "All-day event",

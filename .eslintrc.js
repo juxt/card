@@ -4,6 +4,11 @@ module.exports = {
     browser: true,
     es2021: true,
   },
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -21,5 +26,6 @@ module.exports = {
   plugins: ["react", "@typescript-eslint"],
   rules: {
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
   },
 };
