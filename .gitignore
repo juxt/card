@@ -8,6 +8,7 @@ gen/
 /public/js
 /public/css
 
+.eslintcache
 .clj-kondo/*
 !.clj-kondo/.gitkeep
 !.clj-kondo/config.edn
