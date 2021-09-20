@@ -1,8 +1,6 @@
-import { DateSelectArg } from "@fullcalendar/react";
 import { Dialog } from "@headlessui/react";
 import { FC, useEffect, useRef } from "react";
 import { Path } from "react-hook-form";
-import { DeepMap, FieldError } from "react-hook-form";
 import { useCalendarForm } from "../hooks/useCalendarForm";
 import { CalendarFormData } from "../types";
 import { CalendarModalProps } from "./Calendar";
@@ -113,7 +111,7 @@ export const CreateEventForm: FC<Props> = (props) => {
               <input type="hidden" {...register("id")} />
 
               {inputs.map(
-                ({ inputName, wrapperClass, inputClass, ...inputProps }, i) => (
+                ({ inputName, wrapperClass, inputClass, ...inputProps }) => (
                   <div
                     key={inputName}
                     className={
@@ -184,7 +182,7 @@ export const CreateEventForm: FC<Props> = (props) => {
     <Modal
       setOpen={setDateRange}
       initialRef={confirmButtonRef}
-      open={!!dateRange}
+      open={dateRange}
     >
       <div className="p-4">
         <Form {...props} />

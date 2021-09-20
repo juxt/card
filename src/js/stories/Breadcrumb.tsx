@@ -1,7 +1,7 @@
 import { ChevronLeftIcon } from "@heroicons/react/solid";
 import { NavigationItem } from "../types";
 
-export default function ({ page }: { page: NavigationItem }) {
+export default function Breadcrumb({ page }: { page: NavigationItem }) {
   const { name, href } = page;
   return (
     <nav

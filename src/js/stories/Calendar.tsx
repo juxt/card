@@ -2,9 +2,7 @@ import React from "react";
 import FullCalendar, {
   DateSelectArg,
   EventClickArg,
-  EventContentArg,
   formatDate,
-  EventInput,
   EventApi,
 } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -46,9 +44,8 @@ export function EventCalendar({
   const isMobile = useMobileDetect();
   const [modalProps, setModalProps] = React.useState<CalendarModalProps>(null);
   const { show } = useContextMenu({ id: MENU_ID });
-  const [selectedEvent, setSelectedEvent] = React.useState<CalendarModalProps>(
-    null
-  );
+  const [selectedEvent, setSelectedEvent] =
+    React.useState<CalendarModalProps>(null);
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
   };
@@ -83,13 +80,12 @@ export function EventCalendar({
 
   function handleItemClick({ event, props }: ItemParams<EventClickArg>) {
     const calEvent = props!.event;
+    const { title, startStr, endStr } = calEvent;
     switch (event.currentTarget.id) {
       case "delete":
         onDeleteEvent(calEvent.id);
         break;
       case "edit":
-        const { id, title, startStr, endStr, allDay } = calEvent;
-
         setModalProps({
           ...selectedEvent,
           title,
@@ -102,13 +98,15 @@ export function EventCalendar({
 
   const renderSidebarEvent = (event: EventApi) => (
     <li key={event.id}>
-      <b>
-        {formatDate(event.start!, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })}
-      </b>
+      {event?.start && (
+        <b>
+          {formatDate(event.start, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}
+        </b>
+      )}
       <i>{event.title}</i>
     </li>
   );

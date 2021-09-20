@@ -1,13 +1,9 @@
-import {
-  MailIcon,
-  PhoneIcon
-} from "@heroicons/react/solid";
+import { MailIcon, PhoneIcon } from "@heroicons/react/solid";
 import { User } from "../types";
 
 export type ProfileHeaderProps = {
   profile: User;
 };
-
 
 export function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
@@ -16,7 +12,8 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
         <img
           className="h-32 w-full object-cover lg:h-48"
           src={profile.coverImageUrl}
-          alt={profile.name + "'s Cover Image"} />
+          alt={profile.name + "'s Cover Image"}
+        />
       </div>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
@@ -24,7 +21,8 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
             <img
               className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
               src={profile.imageUrl}
-              alt="" />
+              alt=""
+            />
           </div>
           <div className="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
             <div className="sm:hidden 2xl:block mt-6 min-w-0 flex-1">
@@ -39,7 +37,8 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
               >
                 <MailIcon
                   className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                  aria-hidden="true" />
+                  aria-hidden="true"
+                />
                 <span>Message</span>
               </button>
               <button
@@ -48,7 +47,8 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
               >
                 <PhoneIcon
                   className="-ml-1 mr-2 h-5 w-5 text-gray-400"
-                  aria-hidden="true" />
+                  aria-hidden="true"
+                />
                 <span>Call</span>
               </button>
             </div>

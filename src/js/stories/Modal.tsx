@@ -1,13 +1,14 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { ExclamationIcon } from "@heroicons/react/outline";
 import { ReactElement } from "react";
+import { MutableRefObject } from "react";
+import { CalendarModalProps } from "./Calendar";
 
 export type ModalProps = {
-  open: any;
-  setOpen: (event: any) => void;
+  open: CalendarModalProps;
+  setOpen: (event: CalendarModalProps) => void;
   onClose?: VoidFunction;
-  initialRef: any;
+  initialRef: MutableRefObject<HTMLElement | null>;
   children: ReactElement;
 };
 
@@ -27,7 +28,7 @@ export default function Modal({
         initialFocus={initialRef}
         onClose={() => {
           onClose && onClose();
-          setOpen(false);
+          setOpen(null);
         }}
       >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
