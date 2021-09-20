@@ -1,18 +1,27 @@
 # .github/workflows/chromatic.yml
 
 # Workflow name
-name: 'Chromatic'
+name: "Chromatic"
 
 # Event for the workflow
 on: push
 
 # List of jobs
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Lint
+        run: yarn add npm-run-all && yarn lint
   chromatic-deployment:
     # Operating System
     runs-on: ubuntu-latest
     steps:
-        # 👇 Version 2 of the action
+      # 👇 Version 2 of the action
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
