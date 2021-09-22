@@ -1,8 +1,9 @@
 import { Dialog } from "@headlessui/react";
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Path } from "react-hook-form";
 import { useCalendarForm } from "../hooks/useCalendarForm";
-import { CalendarFormData } from "../types";
+import { CalendarFormData, Option } from "../types";
+import { classNames } from "../utils";
 import { CalendarModalProps } from "./Calendar";
 import Modal from "./Modal";
 
@@ -10,14 +11,16 @@ export type SubmitEventFn = (props: CalendarFormData) => void;
 
 export type Props = {
   dateRange: CalendarModalProps;
+  projectOptions: Option[];
   setDateRange: (dateRange: CalendarModalProps) => void;
   onSubmit: SubmitEventFn;
 };
 
-type FormInputs = {
+type Inputs = {
   inputName: Path<CalendarFormData>;
   label?: string;
   type: string;
+  options?: Option[];
   placeholder?: string;
   wrapperClass?: string;
   inputClass?: string;
@@ -37,7 +40,7 @@ export const CreateEventForm: FC<Props> = (props) => {
     return dateStr.length === 10 ? `${dateStr}T00:00:00` : dateStr.slice(0, 19);
   };
 
-  const Form: FC<Props> = ({ setDateRange }) => {
+  const Form: FC<Props> = ({ setDateRange, projectOptions }) => {
     const { register, onSubmit, errors, reset } = useCalendarForm(
       props.onSubmit,
       dateRange,
@@ -56,7 +59,7 @@ export const CreateEventForm: FC<Props> = (props) => {
       "mt-2.5 rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0";
     const noDivider = "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1";
 
-    const inputs: FormInputs = [
+    const holidayInputs: Inputs = [
       {
         inputName: "title",
         label: "Description",
@@ -96,6 +99,38 @@ export const CreateEventForm: FC<Props> = (props) => {
         wrapperClass: noDivider,
       },
     ];
+    const timesheetInputs: Inputs = [
+      {
+        inputName: "project",
+        label: "Project",
+        type: "dropdown",
+        options: projectOptions,
+        placeholder: "Project",
+      },
+      {
+        inputName: "title",
+        label: "Short description of the work",
+        type: "text",
+        placeholder: "",
+      },
+      {
+        inputName: "start",
+        label: "Start Date",
+        type: "datetime-local",
+        required: true,
+      },
+      {
+        inputName: "end",
+        label: "End Date",
+        type: "datetime-local",
+        required: true,
+      },
+    ];
+    const [isHoliday, setIsHoliday] = useState(false);
+    const inputs = isHoliday ? holidayInputs : timesheetInputs;
+    const formWrapperClass =
+      "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5";
+    const labelClass = "block text-sm font-medium sm:mt-px sm:pt-2";
     return (
       <form className="space-y-8 divide-y divide-gray-200" onSubmit={onSubmit}>
         <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
@@ -104,25 +139,53 @@ export const CreateEventForm: FC<Props> = (props) => {
               as="h3"
               className="text-lg leading-6 font-medium text-gray-900"
             >
-              Create new event
+              Add new {isHoliday ? "holiday" : "timesheet entry"}
             </Dialog.Title>
 
             <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
               <input type="hidden" {...register("id")} />
 
+              <div className={formWrapperClass}>
+                <label
+                  htmlFor="event-type"
+                  className={classNames(labelClass, "text-gray-700")}
+                >
+                  Event Type
+                </label>
+                <div className="flex">
+                  <button
+                    className={classNames(
+                      "mr-2",
+                      "btn",
+                      isHoliday ? "btn--secondary" : "btn--white"
+                    )}
+                    type="button"
+                    onClick={() => setIsHoliday(true)}
+                  >
+                    Holiday
+                  </button>
+                  <button
+                    className={classNames(
+                      "btn",
+                      isHoliday ? "btn--white" : "btn--secondary"
+                    )}
+                    type="button"
+                    onClick={() => setIsHoliday(false)}
+                  >
+                    Timesheet
+                  </button>
+                </div>
+              </div>
               {inputs.map(
                 ({ inputName, wrapperClass, inputClass, ...inputProps }) => (
                   <div
                     key={inputName}
-                    className={
-                      wrapperClass ??
-                      "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5"
-                    }
+                    className={wrapperClass ?? formWrapperClass}
                   >
                     {inputProps?.label && (
                       <label
                         htmlFor={inputName}
-                        className={`block text-sm font-medium sm:mt-px sm:pt-2 ${
+                        className={`${labelClass} ${
                           errors[inputName] ? "text-red-600" : "text-gray-700"
                         }`}
                       >
@@ -131,14 +194,35 @@ export const CreateEventForm: FC<Props> = (props) => {
                     )}
                     <div className="mt-1 sm:mt-0 sm:col-span-2">
                       <div className="max-w-lg flex">
-                        <input
-                          {...inputProps}
-                          {...register(inputName)}
-                          className={
-                            inputClass ||
-                            "flex-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0 sm:text-sm border-gray-300"
-                          }
-                        />
+                        {inputProps?.type === "dropdown" ? (
+                          <select
+                            id={inputName}
+                            className={classNames(
+                              "form-select block w-full py-2 px-3 leading-tight text-gray-700",
+                              inputClass,
+                              errors[inputName]
+                                ? "border-red-600"
+                                : "border-gray-300"
+                            )}
+                            {...register(inputName)}
+                            {...inputProps}
+                          >
+                            {inputProps?.options?.map(({ label, value }) => (
+                              <option key={value} value={value}>
+                                {label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            {...inputProps}
+                            {...register(inputName)}
+                            className={
+                              inputClass ||
+                              "flex-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0 sm:text-sm border-gray-300"
+                            }
+                          />
+                        )}
                       </div>
                     </div>
                     {errors[inputName] && (

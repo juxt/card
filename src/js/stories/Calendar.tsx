@@ -11,7 +11,12 @@ import interactionPlugin from "@fullcalendar/interaction";
 import useMobileDetect from "../utils";
 import { TrashIcon, PencilIcon } from "@heroicons/react/solid";
 import { CreateEventForm } from "./CreateEventForm";
-import { CalendarFormData, TonDeleteEvent, TonUpdateEvent } from "../types";
+import {
+  CalendarFormData,
+  TonDeleteEvent,
+  TonUpdateEvent,
+  Option,
+} from "../types";
 import {
   Menu,
   Item,
@@ -25,6 +30,7 @@ const MENU_ID = "event-menu-id";
 
 export type CalendarProps = {
   events: CalendarFormData[];
+  projectOptions: Option[];
   isCurrentUser: boolean;
   onUpdateEvent: TonUpdateEvent;
   onDeleteEvent: TonDeleteEvent;
@@ -35,6 +41,7 @@ export type CalendarModalProps = CalendarFormData | null | undefined;
 export function EventCalendar({
   events,
   isCurrentUser,
+  projectOptions,
   onUpdateEvent,
   onDeleteEvent,
 }: CalendarProps) {
@@ -115,6 +122,7 @@ export function EventCalendar({
     <div className="demo-app">
       <CreateEventForm
         dateRange={modalProps}
+        projectOptions={projectOptions}
         setDateRange={setModalProps}
         onSubmit={onUpdateEvent}
       />

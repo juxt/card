@@ -39,10 +39,6 @@ const tabs = [
   { name: "Calendar", href: "#", current: false },
 ];
 
-export function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 export function People({
   profile,
   directory,
@@ -106,6 +102,7 @@ export function People({
               {selectedTab === "Calendar" && (
                 <EventCalendar
                   events={profile?.holidays || []}
+                  projectOptions={profile?.projects || []}
                   isCurrentUser={user?.id === profile?.id}
                   onDeleteEvent={onDeleteEvent}
                   onUpdateEvent={onUpdateEvent}

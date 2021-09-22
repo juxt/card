@@ -1,6 +1,6 @@
 import { CalendarProps, EventCalendar } from "./Calendar";
 import { Meta, Story } from "@storybook/react";
-import { MOCK_EVENTS } from "../utils";
+import { MOCK_EVENTS, MOCK_PROJECTS } from "../utils";
 
 export default {
   title: "People/Calendar",
@@ -13,6 +13,7 @@ export const Calendar = Template.bind({});
 Calendar.args = {
   isCurrentUser: true,
   events: MOCK_EVENTS,
+  projectOptions: MOCK_PROJECTS,
 };
 
 export const CalendarNoEvents = Template.bind({});

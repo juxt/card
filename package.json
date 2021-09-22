@@ -18,8 +18,8 @@
     "eslint:lint": "eslint src/js --fix --ext .js,.jsx,.ts,.tsx",
     "eslint:watch": "eslint src/js --watch --ext .js,.jsx,.ts,.tsx",
     "prettier:lint": "prettier --ignore-unknown --write src/js",
-    "typecheck:lint": "tsc",
-    "typecheck:watch": "tsc --watch",
+    "typecheck:lint": "tsc src/js",
+    "typecheck:watch": "tsc src/js --watch",
     "lint": "run-p -l *:lint"
   },
   "dependencies": {
@@ -82,7 +82,6 @@
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "eslint --fix",
-    "*.{js,ts,jsx,tsx,css}": "prettier --write",
-    "*.{ts,tsx}": "tsc --noEmit --jsx 'preserve'"
+    "*.{js,ts,jsx,tsx,css}": "prettier --write"
   }
 }

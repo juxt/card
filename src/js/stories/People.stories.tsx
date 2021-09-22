@@ -1,7 +1,7 @@
 import { People } from "./People";
 import { Meta, Story } from "@storybook/react";
 import { PeopleProps } from "../types";
-import { MOCK_DIRECTORY, MOCK_NAV_PROPS } from "../utils";
+import { MOCK_DIRECTORY, MOCK_NAV_PROPS, MOCK_PROJECTS } from "../utils";
 import { NavBar } from "./Navbar";
 
 export default {
@@ -21,6 +21,7 @@ export const PeoplePage = Template.bind({});
 PeoplePage.args = {
   profile: {
     name: "Mike Bruce",
+    projects: MOCK_PROJECTS,
     id: "mic",
     imageUrl: "https://home.juxt.site/_site/users/mic/slack/mic.png",
     coverImageUrl:
@@ -40,6 +41,7 @@ PeoplePage.args = {
   },
   user: {
     name: "Mike Bruce",
+    projects: MOCK_PROJECTS,
     id: "mic",
     imageUrl: "https://home.juxt.site/_site/users/mic/slack/mic.png",
     coverImageUrl:
