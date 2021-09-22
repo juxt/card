@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CalendarFormData, Directory, User } from "./types";
 
-export function classNames(...classes: string[]) {
+export function classNames(...classes: Array<string | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -17,11 +17,36 @@ const dateStr = (date: Date) => date.toISOString().replace(/T.*$/, ""); // YYYY-
 const daysPlus = (n: number) =>
   new Date(today.getTime() + n * 24 * 60 * 60 * 1000);
 
+export const MOCK_PROJECTS = [
+  {
+    label: "Project 1",
+    value: "p1",
+  },
+  {
+    label: "Project 2",
+    value: "p2",
+  },
+  {
+    label: "Project 3",
+    value: "p3",
+  },
+];
+
 export const MOCK_DIRECTORY: Directory = {
   T: [
     {
       name: "Jack Tolley",
       id: "jck",
+      projects: [
+        {
+          label: "Project 1",
+          value: "p1",
+        },
+        {
+          label: "Project 2",
+          value: "p2",
+        },
+      ],
       imageUrl: "https://home.juxt.site/_site/users/jck/slack/jck.jpg",
       coverImageUrl:
         "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
@@ -40,6 +65,7 @@ export const MOCK_DIRECTORY: Directory = {
     },
     {
       name: "Jeremy Taylor",
+      projects: MOCK_PROJECTS,
       id: "jdt",
       imageUrl: "https://home.juxt.site/_site/users/jdt/slack/jdt.jpg",
       coverImageUrl:
@@ -49,589 +75,6 @@ export const MOCK_DIRECTORY: Directory = {
       fields: {
         Phone: "(555) 123-4567",
         Email: "jdt@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  K: [
-    {
-      name: "Asel Kitulagoda",
-      id: "asl",
-      imageUrl: "https://home.juxt.site/_site/users/asl/slack/asl.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "asl@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  L: [
-    {
-      name: "Joe Littlejohn",
-      id: "joe",
-      imageUrl: "https://home.juxt.site/_site/users/joe/slack/joe.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "joe@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  G: [
-    {
-      name: "Maxwell Grant-Walker",
-      id: "max",
-      imageUrl: "https://home.juxt.site/_site/users/max/slack/max.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "max@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Tim Greene",
-      id: "tim",
-      imageUrl: "https://home.juxt.site/_site/users/tim/slack/tim.png",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "tim@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  J: [
-    {
-      name: "Zyxmn Daley Jes",
-      id: "zyx",
-      imageUrl: "https://home.juxt.site/_site/users/zyx/slack/zyx.png",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "zyx@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  M: [
-    {
-      name: "Daniel Mason",
-      id: "dan",
-      imageUrl: "https://home.juxt.site/_site/users/dan/slack/dan.png",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "dan@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "John Mone",
-      id: "jmo",
-      imageUrl: "https://home.juxt.site/_site/users/jmo/slack/jmo.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "jmo@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  S: [
-    {
-      name: "James Simpson",
-      id: "jss",
-      imageUrl: "https://home.juxt.site/_site/users/jss/slack/jss.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "jss@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Malcolm Sparks",
-      id: "mal",
-      imageUrl: "https://home.juxt.site/_site/users/mal/slack/mal.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "mal@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  H: [
-    {
-      name: "James Henderson",
-      id: "jms",
-      imageUrl: "https://home.juxt.site/_site/users/jms/slack/jms.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "jms@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Steve Harris",
-      id: "sdh",
-      imageUrl: "https://home.juxt.site/_site/users/sdh/slack/sdh.png",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "sdh@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  R: [
-    {
-      name: "Kath Read",
-      id: "kth",
-      imageUrl: "https://home.juxt.site/_site/users/kth/slack/kth.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "kth@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  C: [
-    {
-      name: "Andrea Crotti",
-      id: "anc",
-      imageUrl: "https://home.juxt.site/_site/users/anc/slack/anc.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "anc@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Catharine Channing",
-      id: "cth",
-      imageUrl: "https://home.juxt.site/_site/users/cth/slack/cth.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "cth@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  F: [
-    {
-      name: "Matthew Ford",
-      id: "mtf",
-      imageUrl: "https://home.juxt.site/_site/users/mtf/slack/mtf.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "mtf@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  B: [
-    {
-      name: "Matthew Butler-Williams",
-      id: "mat",
-      imageUrl: "https://home.juxt.site/_site/users/mat/slack/mat.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "mat@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Mike Bruce",
-      id: "mic",
-      imageUrl: "https://home.juxt.site/_site/users/mic/slack/mic.png",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "mic@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Peter Baker",
-      id: "pbk",
-      imageUrl: "https://home.juxt.site/_site/users/pbk/slack/pbk.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "pbk@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  P: [
-    {
-      name: "Andrea Pavan",
-      id: "anp",
-      imageUrl: "https://home.juxt.site/_site/users/anp/slack/anp.png",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "anp@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Jason Paterson",
-      id: "jsn",
-      imageUrl: "https://home.juxt.site/_site/users/jsn/slack/jsn.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "jsn@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Jon Pither",
-      id: "jon",
-      imageUrl: "https://home.juxt.site/_site/users/jon/slack/jon.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "jon@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Nikolas Pafitis",
-      id: "nik",
-      imageUrl: "https://home.juxt.site/_site/users/nik/slack/nik.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "nik@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  O: [
-    {
-      name: "Alistair O'Neill",
-      id: "aon",
-      imageUrl: "https://home.juxt.site/_site/users/aon/slack/aon.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "aon@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Connor O'Rourke",
-      id: "cor",
-      imageUrl: "https://home.juxt.site/_site/users/cor/slack/cor.png",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "cor@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  X: [
-    {
-      name: "Yufei Xie",
-      id: "yfx",
-      imageUrl: "https://home.juxt.site/_site/users/yfx/slack/yfx.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "yfx@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  A: [
-    {
-      name: "Johanna Antonelli",
-      id: "joa",
-      imageUrl: "https://home.juxt.site/_site/users/joa/slack/joa.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "joa@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-  ],
-  D: [
-    {
-      name: "Alex Davis",
-      id: "alx",
-      imageUrl: "https://home.juxt.site/_site/users/alx/slack/alx.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "alx@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Lucio D'Alessandro",
-      id: "lda",
-      imageUrl: "https://home.juxt.site/_site/users/lda/slack/lda.png",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "lda@juxt.pro",
-        Title: "Senior Front-End Developer",
-        Team: "Product Development",
-        Location: "San Francisco",
-        Sits: "Oasis, 4th floor",
-        Salary: "$145,000",
-        Birthday: "June 8, 1990",
-      },
-    },
-    {
-      name: "Thomas Dalziel",
-      id: "tom",
-      imageUrl: "https://home.juxt.site/_site/users/tom/slack/tom.jpg",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-      about:
-        "<p>Tincidunt quam neque in cursus viverra orci, dapibus nec tristique. Nullam ut sit dolor consectetur urna, dui cras nec sed. Cursus risus congue arcu aenean posuere aliquam.</p>\n   <p>Et vivamus lorem pulvinar nascetur non. Pulvinar a sed platea rhoncus ac mauris amet. Urna, sem pretium sit pretium urna, senectus vitae. Scelerisque fermentum, cursus felis dui suspendisse velit pharetra. Augue et duis cursus maecenas eget quam lectus. Accumsan vitae nascetur pharetra rhoncus praesent dictum risus suspendisse.</p>",
-      fields: {
-        Phone: "(555) 123-4567",
-        Email: "tom@juxt.pro",
         Title: "Senior Front-End Developer",
         Team: "Product Development",
         Location: "San Francisco",
@@ -678,6 +121,7 @@ export const MOCK_USER: User = {
   id: "1",
   email: "alx@juxt.pro",
   fields: {},
+  projects: MOCK_PROJECTS,
   name: "Alex Davis",
   imageUrl: "https://ca.slack-edge.com/T02AJV0T3-U7KDWJTT6-500d11650fe2-512",
 };

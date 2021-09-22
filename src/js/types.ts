@@ -22,6 +22,7 @@ export type Fields = {
 export type User = {
   name: string;
   email?: string;
+  projects: Option[];
   id?: string;
   role?: string;
   handle?: string;
@@ -51,9 +52,15 @@ export type PeopleProps = {
 export type CalendarFormData = {
   id?: string;
   title: string;
+  project?: string;
   start: string;
   isStartHalfDay?: boolean;
   end: string;
   isEndHalfDay?: boolean;
   allDay?: boolean;
+};
+
+export type Option = {
+  label?: string;
+  value: string;
 };
