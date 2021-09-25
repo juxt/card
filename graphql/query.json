@@ -1,0 +1,4 @@
+{
+  "operationName": "GetHolidays",
+  "query": "query GetHolidays { holidays { id user { id username name email } startDate endDate description}}"
+}
