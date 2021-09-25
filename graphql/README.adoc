@@ -47,7 +47,7 @@ site put-asset --file schema.graphql --type application/graphql --path /graphql
 Once you have upserted your schema, you can query it.
 
 ----
-site post --file query.graphql --path "/graphql" --type "application/graphql"
+site post --file query.graphql --path /graphql --type application/graphql
 ----
 
 Currently, GraphQL resources provide `application/json` content but more content
@@ -58,7 +58,7 @@ types are possible in the future.
 If you have `jq` installed, use the `-s` option to restrict the output to the response body, allowing you to pipe through `jq`.
 
 ----
-site -s post --file query.graphql --path "/graphql" --type "application/graphql" | jq
+site -s post --file query.graphql --path /graphql --type application/graphql | jq
 ----
 --
 
