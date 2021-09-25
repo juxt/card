@@ -1,4 +1,4 @@
-{ holidays
+{ allHolidays
   { id
     user { id username name email }
     startDate
