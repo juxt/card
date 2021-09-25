@@ -2,19 +2,37 @@ schema {
   query: Query
 }
 
+"""
+Root query object
+"""
 type Query {
-  holidays: [Holiday] @xtdb(q: """
+"""
+Holidays are fun.
+  """
+  allUsers: [User]
+@xtdb(q: """
+{:find [e] :where [[e :juxt.site.alpha/type "User"]]}
+""")
+  allHolidays: [Holiday]
+@xtdb(q: """
 {:find [e] :where [[e :juxt.site.alpha/type "Holiday"]]}
-    """)
+""")
 }
 
+"""
+An object representing a Site user. Anyone who needs to log in to the system must have a user record.
+"""
 type User {
   id: ID @xtdb(a: "crux.db/id")
   username: String @xtdb(a: "juxt.pass.alpha/username")
   name: String @xtdb(a: "name")
   email: String @xtdb(a: "email")
+  holidays: [Holiday]
 }
 
+"""
+The holiday object
+"""
 type Holiday {
   id: ID @xtdb(a: "crux.db/id")
   user: User @xtdb(a: "juxt.pass.alpha/user")
