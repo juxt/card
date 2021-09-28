@@ -6,17 +6,22 @@ schema {
 Root query object
 """
 type Query {
-"""
-Holidays are fun.
+  """
+  Holidays are fun.
   """
   allUsers: [User]
-@xtdb(q: """
-{:find [e] :where [[e :juxt.site.alpha/type "User"]]}
-""")
+  @xtdb(q: """
+    {:find [e] :where [[e :juxt.site.alpha/type "User"]]}
+    """)
   allHolidays: [Holiday]
-@xtdb(q: """
-{:find [e] :where [[e :juxt.site.alpha/type "Holiday"]]}
-""")
+  @xtdb(q: """
+    {:find [e] :where [[e :juxt.site.alpha/type "Holiday"]]}
+    """)
+  allSlackProfiles: [SlackProfile]
+  @xtdb(q: """
+    {:find [e] :where [[e :juxt.site.alpha/type "SlackUserDetails"]]}
+    """)
+  
 }
 
 """
@@ -28,6 +33,7 @@ type User {
   name: String @xtdb(a: "name")
   email: String @xtdb(a: "email")
   holidays: [Holiday]
+  slackProfile: [SlackProfile]
 }
 
 """
@@ -39,4 +45,13 @@ type Holiday {
   startDate: String @xtdb(a: "start-date")
   endDate: String @xtdb(a: "end-date")
   description: String @xtdb(a: "description")
+}
+
+"""
+The slack profile object
+"""
+type SlackProfile {
+  id: ID @xtdb(a: "crux.db/id")
+  profilePic: String @xtdb(a: "juxt.home/slack-profile-pic")
+  user: User @xtdb(a: "juxt.pass.alpha/user")
 }
