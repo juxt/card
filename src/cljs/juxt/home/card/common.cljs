@@ -1,10 +1,14 @@
 (ns juxt.home.card.common
   (:require
    [helix.dom :as d]
-   [juxt.lib.helix :refer [defnc]]))
+   ;;TODO figure out whats wrong with my defnc macro...
+   [helix.core :refer [defnc]]))
 
-(defnc render-errors
-  [data]
-  (when (:isError data)
-    (js/console.log (:error data))
-    (d/div "Error fetching")))
+(defnc hook-info
+  [{:keys [hook]}]
+  (d/div
+   (when (:isLoading hook)
+     (d/p "Loading..."))
+   (when (:isError hook)
+     (js/console.log (:error hook))
+     (d/p "Error fetching"))))

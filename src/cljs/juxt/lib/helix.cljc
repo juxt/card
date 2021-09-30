@@ -4,7 +4,10 @@
 
 #?(:clj
    (defmacro defnc [type params & body]
-     (let [opts? (map? (first body)) ;; whether an opts map was passed in
+     (let [[docstring params body] (if (string? params)
+                                     [params (first body) (rest body)]
+                                     [nil params body])
+           opts? (map? (first body)) ;; whether an opts map was passed in
            opts (if opts?
                   (first body)
                   {})
@@ -15,7 +18,7 @@
            default-opts {:helix/features {:fast-refresh true
                                           :define-factory true
                                           :check-invalid-hooks-usage true}}]
-       `(helix.core/defnc ~type ~params
+       `(helix.core/defnc ~type ~@(when docstring [docstring]) ~params
           ;; we use `merge` here to allow individual consumers to override feature
           ;; flags in special cases
           ~(merge default-opts opts)
