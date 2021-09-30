@@ -8,8 +8,7 @@
    :devtools {:http-root "public/"
               :http-port 8000
               :reload-strategy :full
-              :preloads [devtools.preload
-                         day8.re-frame-10x.preload]}
+              :preloads [devtools.preload]}
    :js-options {:ignore-asset-requires true}
    :compiler-options {:output-feature-set :es8} ;; needed to stop $jscomp errors with newer js libs
    :dev
@@ -19,9 +18,7 @@
     {goog.DEBUG true
      juxt.home.card.config/dev? true
      juxt.home.card.config/site-api-origin "https://home.juxt.site" #_"http://localhost:2021"
-     juxt.home.card.config/application-context "/"
-     day8.re-frame.tracing.trace-enabled? true
-     re-frame.trace.trace-enabled? true}}
+     juxt.home.card.config/application-context "/"}}
 
    :release
    {:compiler-options {:optimizations :advanced}
@@ -35,7 +32,4 @@
      juxt.home.card.config/application-context "/card/"}
     :build-hooks
     [(shadow.cljs.build-report/hook
-      {:output-to "tmp/report.html"})]
-    :build-options
-    {:ns-aliases
-     {day8.re-frame.tracing day8.re-frame.tracing-stubs}}}}}}
+      {:output-to "tmp/report.html"})]}}}}

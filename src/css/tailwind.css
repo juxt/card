@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+.app-container {
+  @apply flex-grow block overflow-x-hidden bg-base-100 text-base-content drawer-content;
+}
+
+.page-section {
+  @apply p-8;
+}
+
 .btn {
   @apply inline-flex items-center px-2.5 py-1.5 border text-xs font-medium rounded  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
 }

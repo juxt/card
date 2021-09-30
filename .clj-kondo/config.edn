@@ -1,0 +1,2 @@
+{:config-paths ["lilactown/helix"]
+ :lint-as {juxt.lib.helix/defnc clojure.core/defn}}

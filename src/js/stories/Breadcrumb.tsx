@@ -1,15 +1,16 @@
 import { ChevronLeftIcon } from "@heroicons/react/solid";
+import { Link } from "react-router-dom";
 import { NavigationItem } from "../types";
 
 export default function Breadcrumb({ page }: { page: NavigationItem }) {
-  const { name, href } = page;
+  const { name, path } = page;
   return (
     <nav
       className="flex items-start px-4 py-3 sm:px-6 lg:px-8 xl:hidden"
       aria-label="Breadcrumb"
     >
-      <a
-        href={href}
+      <Link
+        to={path}
         className="inline-flex items-center space-x-3 text-sm font-medium text-gray-900"
       >
         <ChevronLeftIcon
@@ -17,7 +18,7 @@ export default function Breadcrumb({ page }: { page: NavigationItem }) {
           aria-hidden="true"
         />
         <span>{name}</span>
-      </a>
+      </Link>
     </nav>
   );
 }

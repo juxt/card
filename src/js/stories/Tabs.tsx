@@ -2,7 +2,7 @@ import { classNames } from "../utils";
 
 type Tab = {
   name: string;
-  href: string;
+  path: string;
   current: boolean;
 };
 
