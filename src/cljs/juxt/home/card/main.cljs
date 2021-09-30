@@ -49,23 +49,20 @@
 
 (defnc app
   []
-  (let [{:keys [data isLoading isError] :as self} (use-self)]
-    (prn self)
-    ($ BrowserRouter
-       (d/main
-        {:class "app-container"}
-        ($ NavBar {:navigation (->js navbar-pages)
-                   :logo "https://home.juxt.site/x-on-dark.svg"
-                   :user (->js data)})
-        (cond
-          isLoading
-          (d/div "Loading user...")
-          isError
-          (d/div "Error loading user... Are you logged into site?")
-          :else
-          ($ pages))
-        (d/div {:class "p-4 lg:p-10"}
-               ($ ReactQueryDevtools {:initialIsOpen true}))))))
+  (let [{:keys [data isError] :as self} (use-self)]
+    (cond
+      isError
+      (d/p {:class "text-red-500"} "Error loading user... Are you logged into site?")
+      :else
+      ($ BrowserRouter
+         (d/main
+          {:class "app-container"}
+          ($ NavBar {:navigation (->js navbar-pages)
+                     :logo "https://home.juxt.site/x-on-dark.svg"
+                     :user (->js data)})
+          ($ pages)
+          (d/div {:class "p-4 lg:p-10"}
+                 ($ ReactQueryDevtools {:initialIsOpen true})))))))
 
 (rdom/render
  ($ QueryClientProvider
