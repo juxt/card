@@ -1,16 +1,17 @@
-;; Copyright © 2021, JUXT LTD.
+(ns juxt.home.card.calendar
+  (:require [helix.core :as helix :refer [$]]
+            [juxt.lib.helix :refer [defnc]]
+            [juxt.home.card.query-hooks :as query-hooks]
+            [juxt.home.card.common :as common]
+            ["/juxt/card/stories/Calendar" :refer [EventCalendar]]
+            [helix.dom :as d]))
 
- (ns juxt.home.card.calendar
-  (:require
-   ["/juxt/card/stories/Calendar" :refer [EventCalendar]]
-   [juxt.home.card.subscriptions :as sub]
-   [re-frame.core :as rf]))
-
- (defn view []
-  (let [events @(rf/subscribe [::sub/my-events])]
-    [:> EventCalendar
-     {:events events
-      :isCurrentUser true
-      :onUpdateEvent #(rf/dispatch [:update-event %])
-      :onDeleteEvent #(rf/dispatch [:delete-entity
-                                    % [[:dispatch [:get-holidays]]]])}]))
+(defnc view
+  []
+  (let [self (query-hooks/use-self)]
+    (d/section
+     {:class "page-section"}
+     (common/render-errors self)
+     ($ EventCalendar {:isCurrentUser true
+                       :events []
+                       :projectOptions []}))))

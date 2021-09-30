@@ -154,19 +154,19 @@ export const MOCK_NAVIGATION = [
   {
     id: "1",
     name: "Home",
-    href: "",
+    path: "",
     current: false,
   },
   {
     id: "2",
     name: "About",
-    href: "",
+    path: "",
     current: false,
   },
   {
     id: "3",
     name: "People",
-    href: "",
+    path: "",
     current: true,
   },
 ];

@@ -6,10 +6,8 @@ export type SidebarProps = {
 
 export type NavigationItem = {
   name: string;
-  href?: string;
+  path: string;
   id?: string;
-  path?: string;
-  label?: string;
   current?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon?: React.ComponentType<any>;

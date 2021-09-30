@@ -1,5 +1,6 @@
 import { classNames } from "../utils";
 import { NavigationItem } from "../types";
+import { Link } from "react-router-dom";
 
 export interface SidebarNavProps {
   navigation: NavigationItem[];
@@ -13,9 +14,9 @@ export function SidebarNav(props: SidebarNavProps) {
     <nav aria-label="Sidebar" className="mt-5">
       <div className="px-2 space-y-1">
         {props.navigation.map((item) => (
-          <a
+          <Link
             key={item.name}
-            href={item.href}
+            to={item.path}
             className={classNames(
               item.current
                 ? "bg-gray-100 text-gray-900"
@@ -36,7 +37,7 @@ export function SidebarNav(props: SidebarNavProps) {
               />
             )}
             {item.name}
-          </a>
+          </Link>
         ))}
       </div>
       {props.secondaryNavigation && (
@@ -44,9 +45,9 @@ export function SidebarNav(props: SidebarNavProps) {
           <hr className="border-t border-gray-200 my-5" aria-hidden="true" />
           <div className="px-2 space-y-1">
             {props.secondaryNavigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.path}
                 className="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-base font-medium rounded-md"
               >
                 {item.icon && (
@@ -56,7 +57,7 @@ export function SidebarNav(props: SidebarNavProps) {
                   />
                 )}
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
         </>

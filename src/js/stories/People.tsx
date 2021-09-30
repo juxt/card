@@ -21,22 +21,22 @@ import Breadcrumb from "./Breadcrumb";
 import { EventCalendar } from "./Calendar";
 
 const navigation = [
-  { name: "Dashboard", href: "#", icon: HomeIcon, current: false },
-  { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
-  { name: "Teams", href: "#", icon: UserGroupIcon, current: false },
-  { name: "Directory", href: "#", icon: SearchCircleIcon, current: true },
-  { name: "Announcements", href: "#", icon: SpeakerphoneIcon, current: false },
-  { name: "Office Map", href: "#", icon: MapIcon, current: false },
+  { name: "Dashboard", path: "#", icon: HomeIcon, current: false },
+  { name: "Calendar", path: "#", icon: CalendarIcon, current: false },
+  { name: "Teams", path: "#", icon: UserGroupIcon, current: false },
+  { name: "Directory", path: "#", icon: SearchCircleIcon, current: true },
+  { name: "Announcements", path: "#", icon: SpeakerphoneIcon, current: false },
+  { name: "Office Map", path: "#", icon: MapIcon, current: false },
 ];
 
 const secondaryNavigation = [
-  { name: "Apps", href: "#", icon: ViewGridAddIcon },
-  { name: "Settings", href: "#", icon: CogIcon },
+  { name: "Apps", path: "#", icon: ViewGridAddIcon },
+  { name: "Settings", path: "#", icon: CogIcon },
 ];
 
 const tabs = [
-  { name: "Profile", href: "#", current: true },
-  { name: "Calendar", href: "#", current: false },
+  { name: "Profile", path: "#", current: true },
+  { name: "Calendar", path: "#", current: false },
 ];
 
 export function People({

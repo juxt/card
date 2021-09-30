@@ -19,6 +19,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { SearchIcon } from "@heroicons/react/solid";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { NavigationItem, User } from "../types";
+import { Link } from "react-router-dom";
 
 export type NavBarProps = {
   navigation: NavigationItem[];
@@ -36,14 +37,14 @@ const Nav = ({
 }) => {
   return (
     <>
-      {items.map(({ id, href, current, name }) => (
-        <a
-          key={id}
-          href={href}
+      {items.map(({ path, current, name }) => (
+        <Link
+          key={name}
+          to={path}
           className={current ? currentStyle : defaultStyle}
         >
           {name}
-        </a>
+        </Link>
       ))}
     </>
   );
@@ -54,17 +55,17 @@ function NavBar({ navigation, logo, user }: NavBarProps) {
   const secondaryNav = [
     {
       id: "settings",
-      href: "#",
+      path: "#",
       name: "Settings",
     },
     {
       id: "profile",
-      href: "#",
+      path: "#",
       name: "Profile",
     },
     {
       id: "logout",
-      href: "#",
+      path: "#",
       name: "Logout",
     },
   ];
@@ -158,7 +159,7 @@ function NavBar({ navigation, logo, user }: NavBarProps) {
                             static
                             className="origin-top-right absolute right-0 z-20 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                           >
-                            {secondaryNav.map(({ id, href, name }) => (
+                            {secondaryNav.map(({ id, path: href, name }) => (
                               <Menu.Item key={id}>
                                 <a
                                   href={href}
