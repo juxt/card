@@ -35,7 +35,7 @@ To run the full ClojureScript app, execute:
 yarn dev
 ----
 
-Currently the main parts of the application that are working should be visible at localhost:8000/people
+Currently the main parts of the application that are working should be visible at localhost:8000/people, make sure you have a valid site token first! (if you have set home.juxt.site as your SITE_BASE_URI as above, visit home.juxt.site and sign in to obtain the token)
 
 If you wish to change only the visual UI components, you can run the storybook process with:
 [source,bash]

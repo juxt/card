@@ -16,7 +16,6 @@
     "chromatic": "npx chromatic --project-token=f1f7695ce98b",
     "prepare": "husky install",
     "eslint:lint": "eslint src/js --fix --ext .js,.jsx,.ts,.tsx",
-    "eslint:watch": "eslint src/js --watch --ext .js,.jsx,.ts,.tsx",
     "prettier:lint": "prettier --ignore-unknown --write src/js",
     "typecheck:lint": "tsc --project tsconfig.json --pretty --noEmit",
     "typecheck:watch": "tsc --project tsconfig.json --pretty --noEmit --watch",
