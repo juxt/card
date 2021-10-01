@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .app-container {
-  @apply flex-grow block overflow-x-hidden bg-base-100 text-base-content drawer-content;
+  @apply flex-grow block overflow-x-hidden;
 }
 
 .page-section {
