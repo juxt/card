@@ -16,7 +16,6 @@
                   body)
            ;; feature flags to enable by default
            default-opts {:helix/features {:fast-refresh true
-                                          :define-factory true
                                           :check-invalid-hooks-usage true}}]
        `(helix.core/defnc ~type ~@(when docstring [docstring]) ~params
           ;; we use `merge` here to allow individual consumers to override feature

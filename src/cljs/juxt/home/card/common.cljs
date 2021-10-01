@@ -1,8 +1,7 @@
 (ns juxt.home.card.common
   (:require
    [helix.dom :as d]
-   ;;TODO figure out whats wrong with my defnc macro...
-   [helix.core :refer [defnc]]))
+   [juxt.lib.helix :refer [defnc]]))
 
 (defnc hook-info
   [{:keys [hook]}]
