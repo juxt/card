@@ -27,7 +27,10 @@ type User {
   username: String @xtdb(a: "juxt.pass.alpha/username")
   name: String @xtdb(a: "name")
   email: String @xtdb(a: "email")
-  holidays: [Holiday]
+  holidays: [Holiday] @xtdb(q: """
+{:find [e] :where [[e :juxt.site.alpha/type "Holiday"]
+                   [e :juxt.pass.alpha/user object]]}
+""")
 }
 
 """
