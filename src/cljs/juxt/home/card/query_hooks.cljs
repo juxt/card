@@ -1,7 +1,9 @@
 (ns juxt.home.card.query-hooks
   (:require
+   [clojure.string :as string]
    [juxt.home.card.config :as config]
    [juxt.home.card.graphql :as graphql]
+   [juxt.home.card.people.model :as people-model]
    [cljs-bean.core :refer [->clj ->js]]
    [react-query :refer [useQuery]]))
 
@@ -117,3 +119,19 @@
                                  ;; when a mutation happens)
                                  :staleTime js/Infinity}})]
     holidays))
+
+(defn use-people
+  ([] (use-people nil))
+  ([opts]
+   (let [received-people (fn process-people
+                           [people]
+                           (->> (map people-model/process-user (->clj people))
+                                (group-by (fn last-initial [{full-name :name}]
+                                            (first (last (string/split full-name " ")))))))]
+     (use-query "people"
+                #(-> (fetch (str config/site-api-origin "/card/users/"))
+                     (.then received-people))
+                (merge
+                 {:query-opts {:placeholderData []
+                               :staleTime (* 1000 60 60 24)}}
+                 opts)))))
