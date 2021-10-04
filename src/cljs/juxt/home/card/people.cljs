@@ -9,12 +9,13 @@
 
 (defnc view []
   (let [people (query-hooks/use-people)
+        {:keys [selected]} (common/use-query-params)
         directory (:data people)
         profile (->js (or (first (first (vals directory))) {})) ;; todo - this should be a hook?
         ]
+    (def selected selected)
     (def directory directory)
     (d/section
-     {:class "page-section"}
      ($ common/hook-info {:hook directory})
      ($ People {:profile profile
                 :directory (->js directory)
