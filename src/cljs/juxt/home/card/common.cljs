@@ -1,7 +1,15 @@
 (ns juxt.home.card.common
   (:require
    [helix.dom :as d]
+   [react-router-dom :refer  [useLocation]]
+   [cljs-bean.core :refer [->clj]]
    [juxt.lib.helix :refer [defnc]]))
+
+(defn use-query-params
+  []
+  (->clj
+   (js/Object.fromEntries
+    (js/URLSearchParams. (.-search (useLocation))))))
 
 (defnc hook-info
   [{:keys [hook]}]
