@@ -8,7 +8,8 @@
    :devtools {:http-root "public/"
               :http-port 8000
               :reload-strategy :full
-              :preloads [devtools.preload]}
+              :preloads [devtools.preload
+                         juxt.dev]}
    :js-options {:ignore-asset-requires true}
    :compiler-options {:output-feature-set :es8} ;; needed to stop $jscomp errors with newer js libs
    :dev
