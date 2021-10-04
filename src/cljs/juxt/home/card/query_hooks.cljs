@@ -1,11 +1,13 @@
 (ns juxt.home.card.query-hooks
+  "Treated as a sort of library of domain agnostic hooks and react-query wrapper
+  functions. No card specific logic pls (but site specific is ok)"
   (:require
    [clojure.string :as string]
-   [juxt.home.card.config :as config]
-   [juxt.home.card.graphql :as graphql]
-   [juxt.home.card.people.model :as people-model]
    [cljs-bean.core :refer [->clj ->js]]
-   [react-query :refer [useQuery]]))
+   [kitchen-async.promise :as p]
+   [react-query :refer [useQuery useMutation useQueryClient]]
+   [juxt.home.card.config :as config]
+   [juxt.home.card.common :as common]))
 
 (defn fetch
   ([url] (fetch url {}))
@@ -20,8 +22,19 @@
                                    :timeout 5000
                                    :credentials "include"}
                                   opts)))]
+     (when-let [{:keys [pending success error]}
+                (:toast opts)]
+       (common/toast! promise
+                      (or pending
+                          "Waiting for server...")
+                      (or success
+                          "Success!")
+                      (or error
+                          "Error... Try again later")))
      (set! (.-cancel promise) (fn cancelFetch [] (.abort controller)))
-     (.then promise #(.json %)))))
+     (.then promise #(if (= 204 (.-status %))
+                       ""
+                       (.json %))))))
 
 (defn graphql-q
   [query-string variables]
@@ -36,8 +49,55 @@
   Pass {clj: false} in the options if using this from JS land"
   ([id fetcher] (use-query id fetcher nil))
   ([id fetcher {:keys [query-opts clj] :or {clj true}}]
-   (let [hook (useQuery id fetcher (if clj (->js query-opts) query-opts))]
+   (let [hook (useQuery (->js id) fetcher (if clj (->js query-opts) query-opts))]
      (if clj (->clj hook) (->js hook)))))
+
+(defn delete-req!
+  ([id] (delete-req! id {}))
+  ([id opts]
+   (fetch id (merge opts {:method "DELETE"}))))
+
+(defn handle-delete
+  [client key id]
+  (p/try
+    (.cancelQueries client key)
+    (let [previous-vals (.getQueryData client key)
+          new-vals (remove #(= id (:crux.db/id %))
+                           previous-vals)]
+      (js/console.log "del" key id previous-vals new-vals)
+      (.setQueryData client key new-vals)
+      {:previous previous-vals
+       :key key
+       :client client
+       :new new-vals})
+    (p/catch :default e
+      (js/console.error
+       "error deleting item" {:key key
+                              :id id}))))
+
+(defn handle-error
+  [err new-item context]
+  (p/let [previous (:previous context)
+          client (:client context)]
+    (.setQueryData client (:key context) (:previous context))))
+
+(defn use-mutation
+  [mutation-fn opts]
+  (let [client (useQueryClient)]
+    (useMutation
+     #(mutation-fn % (merge {:toast true} (:mutation-fn-props opts)))
+     (clj->js
+      (merge
+       {:onMutate #(handle-delete client key %)
+        :onError handle-error
+        :onSettled (fn [_ err] (when-not err (.invalidateQueries client key)))}
+       opts)))))
+
+(defn use-delete-mutation
+  "Returns a mutation object. When you call 'mutate' on that mutation object with
+  an id as its only argument, it will send a DELETE request for the given id"
+  [opts]
+  (use-mutation delete-req! opts))
 
 (def initialUser {:id "loading"
                   :email "Loading..."
@@ -51,87 +111,20 @@
    (let [assoc-image
          (fn assoc-image
            [user]
-  ;;todo can I not convert to clj in the fetch wrapper function?
+           ;;todo can I not convert to clj in the fetch wrapper function?
            (let [user (->clj user)]
              (assoc user
                     :imageUrl (str (:id user)
                                    "/slack/"
                                    (:username user)
                                    ".jpg"))))]
-     (use-query "self"
-                #(-> (fetch (str config/site-api-origin "/_site/user"))
-                     (.then assoc-image))
-                (merge
-                 {:query-opts {:placeholderData initialUser
-                               :retry false
-                           ;; user data is cached until page is refreshed
-                               :staleTime js/Infinity}}
-                 opts)))))
-
-;; showing example of graphql query, can't use it for hols until we fix the cors
-;; issue on home.juxt.site/graphql
-(defn use-events
-  []
-  (use-query "my-events"
-             #(-> (graphql-q graphql/gql-test {:now (.toISOString (new js/Date))}))))
-
-(defn use-holidays
-  ([] (use-holidays nil))
-  ([opts]
-   (let [received-holidays (fn process-hols
-                             [hols]
-                             (let [hols (->clj hols)]
-                               (->> hols
-                                    flatten
-                                    (remove #(nil? (:juxt.pass.alpha/user %)))
-                                    (group-by :juxt.pass.alpha/user)
-                                    ->js)))]
-     (use-query "holidays"
-                #(-> (fetch (str config/site-api-origin "/card/holidays"))
-                     (.then received-holidays))
-                (merge
-                 {:query-opts {:placeholderData []
-                               :staleTime (* 1000 60 60 24)}}
-                 opts)))))
-
-(defn format-holiday
-  [{:keys [start-date end-date start end crux.db/id all-day? description]}]
-  {:id id
-   :start (or start start-date)
-   :end (or end end-date)
-   :allDay (not (false? all-day?))
-   :title description})
-
-(defn use-my-holidays
-  []
-  (let [{:keys [data]} (use-self)
-        user-id (keyword (:id data))
-        holidays (use-holidays {:query-opts
-                                ;; doing the processing in this select opt means
-                                ;; this hook won't cause a rerender when other
-                                ;; holiday items are changed
-                                {:select #(->js
-                                           (map format-holiday
-                                                ;; fetch just my holidays
-                                                (get (->clj %) user-id)))
-                                 ;; my holidays will only be modified by me, so
-                                 ;; no need to refetch (we invalidate manually
-                                 ;; when a mutation happens)
-                                 :staleTime js/Infinity}})]
-    holidays))
-
-(defn use-people
-  ([] (use-people nil))
-  ([opts]
-   (let [received-people (fn process-people
-                           [people]
-                           (->> (map people-model/process-user (->clj people))
-                                (group-by (fn last-initial [{full-name :name}]
-                                            (first (last (string/split full-name " ")))))))]
-     (use-query "people"
-                #(-> (fetch (str config/site-api-origin "/card/users/"))
-                     (.then received-people))
-                (merge
-                 {:query-opts {:placeholderData []
-                               :staleTime (* 1000 60 60 24)}}
-                 opts)))))
+     (use-query
+      "self"
+      #(-> (fetch (str config/site-api-origin "/_site/user"))
+           (.then assoc-image))
+      (merge
+       {:query-opts {:placeholderData initialUser
+                     :retry false
+                     ;; user data is cached until page is refreshed
+                     :staleTime js/Infinity}}
+       opts)))))

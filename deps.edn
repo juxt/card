@@ -3,6 +3,7 @@
 {:paths ["src/cljs" "gen"]
  :deps {org.clojure/clojurescript {:mvn/version "1.10.879"}
         cljs-bean/cljs-bean {:mvn/version "1.7.0"}
+        kitchen-async/kitchen-async {:mvn/version "0.1.0-SNAPSHOT"}
         lilactown/helix {:mvn/version "0.1.3"}
         metosin/potpuri {:mvn/version "0.5.3"}}
 

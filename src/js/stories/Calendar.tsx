@@ -56,6 +56,7 @@ export function EventCalendar({
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
   };
+  console.log(events);
 
   function convertEvent(event: EventApi) {
     const id = event.id;
@@ -88,6 +89,7 @@ export function EventCalendar({
   function handleItemClick({ event, props }: ItemParams<EventClickArg>) {
     const calEvent = props!.event;
     const { title, startStr, endStr } = calEvent;
+
     switch (event.currentTarget.id) {
       case "delete":
         onDeleteEvent(calEvent.id);
