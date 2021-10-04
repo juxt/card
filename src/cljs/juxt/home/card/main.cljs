@@ -4,6 +4,7 @@
   (:require [helix.core :as helix :refer [$]]
             [juxt.lib.helix :refer [defnc]]
             [juxt.home.card.calendar :as calendar]
+            [juxt.home.card.people :as people]
             [helix.hooks :as hooks]
             [helix.dom :as d]
             [cljs-bean.core :refer [->clj ->js]]
@@ -22,10 +23,6 @@
   []
   (d/div "home screen"))
 
-(defnc people
-  []
-  (d/div "people screen"))
-
 (def navbar-pages
   "Top level pages that will appear in the navbar. Other pages are defined
   directly in the 'pages' component"
@@ -37,7 +34,7 @@
     :element ($ calendar/view)}
    {:path "people"
     :name "People"
-    :element ($ people)}])
+    :element ($ people/view)}])
 
 (defnc pages
   []
