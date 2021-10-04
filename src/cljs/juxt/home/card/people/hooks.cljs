@@ -1,5 +1,8 @@
-(ns juxt.home.card.people.model
-  (:require [cljs-bean.core :refer [->js]]))
+(ns juxt.home.card.people.hooks
+  (:require [cljs-bean.core :refer [->clj ->js]]
+            [juxt.home.card.query-hooks :as query-hooks]
+            [juxt.home.card.config :as config]
+            [clojure.string :as str]))
 
 (defn process-user
   [{:keys [user slack]}]
@@ -25,3 +28,21 @@
               :Sits "Oasis, 4th floor",
               :Salary "$145,000",
               :Birthday "June 8, 1990"}}))
+
+(defn use-people
+  ([] (use-people nil))
+  ([opts]
+   (let [received-people
+         (fn process-people
+           [people]
+           (->> (map process-user (->clj people))
+                (group-by (fn last-initial [{full-name :name}]
+                            (first (last (str/split full-name " ")))))))]
+     (query-hooks/use-query
+      ["people"]
+      #(-> (query-hooks/fetch (str config/site-api-origin "/card/users/"))
+           (.then received-people))
+      (merge
+       {:query-opts {:placeholderData []
+                     :staleTime (* 1000 60 10)}}
+       opts)))))

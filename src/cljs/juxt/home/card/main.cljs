@@ -1,19 +1,21 @@
 ;; Copyright © 2021, JUXT LTD.
 
 (ns juxt.home.card.main
-  (:require [helix.core :as helix :refer [$]]
-            [juxt.lib.helix :refer [defnc]]
-            [juxt.home.card.calendar :as calendar]
-            [juxt.home.card.people :as people]
-            [helix.hooks :as hooks]
-            [helix.dom :as d]
-            [cljs-bean.core :refer [->clj ->js]]
-            [react-query :refer [QueryClient QueryClientProvider]]
-            [react-router-dom :refer [BrowserRouter Routes Route]]
-            ["react-query/devtools" :refer [ReactQueryDevtools]]
-            ["/juxt/card/stories/Navbar" :refer [NavBar]]
-            [juxt.home.card.query-hooks :refer [use-self]]
-            [react-dom :as rdom]))
+  (:require
+   [helix.core :as helix :refer [$]]
+   [juxt.lib.helix :refer [defnc]]
+   [juxt.home.card.events.views :as events]
+   [juxt.home.card.people.views :as people]
+   [helix.hooks :as hooks]
+   [helix.dom :as d]
+   [cljs-bean.core :refer [->clj ->js]]
+   [react-toastify :refer [ToastContainer]]
+   [react-query :refer [QueryClient QueryClientProvider]]
+   [react-router-dom :refer [BrowserRouter Routes Route]]
+   ["react-query/devtools" :refer [ReactQueryDevtools]]
+   ["/juxt/card/stories/Navbar" :refer [NavBar]]
+   [juxt.home.card.query-hooks :refer [use-self]]
+   [react-dom :as rdom]))
 
 (def query-client (QueryClient. {:defaultOptions
                                  {:queries
@@ -29,9 +31,9 @@
   [{:path "/"
     :name "Home"
     :element ($ home)}
-   {:path "calendar"
-    :name "Calendar"
-    :element ($ calendar/view)}
+   {:path "events"
+    :name "Events"
+    :element ($ events/view)}
    {:path "people"
     :name "People"
     :element ($ people/view)}])
@@ -40,8 +42,8 @@
   []
   ($ Routes
      (for [page-props navbar-pages]
-       ^{:key page-props}
-       ($ Route {:& page-props}))
+       ($ Route {:& page-props
+                 :key (:path page-props)}))
      ($ Route {:path "*" :element (d/h1 "Page not found")})))
 
 (defnc app
@@ -64,5 +66,8 @@
 (rdom/render
  ($ QueryClientProvider
     {:client query-client}
-    ($ app))
+    ($ app)
+    ($ ToastContainer {:position "bottom-center"
+                       :pauseOnFocusLoss false
+                       :autoClose 1500}))
  (js/document.getElementById "app"))
