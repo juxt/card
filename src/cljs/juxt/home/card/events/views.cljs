@@ -11,10 +11,16 @@
 (defnc view
   []
   (let [{:keys [data] :as events} (hooks/use-my-holidays)
-        delete-mutation (hooks/use-delete-event)]
+        delete-mutation (hooks/use-delete-event)
+        update-mutation (hooks/use-update-event)]
     (d/section
      {:class "page-section"}
      ($ common/hook-info {:hook events})
      ($ EventCalendar {:isCurrentUser true
-                       :onDeleteEvent #(.mutate delete-mutation %)
+                       :onDeleteEvent #(do
+                                         (prn "del" %)
+                                         (.mutate delete-mutation %))
+                       :onUpdateEvent #(do
+                                         (prn "up" %)
+                                         (.mutate update-mutation %))
                        :events (->js data)}))))

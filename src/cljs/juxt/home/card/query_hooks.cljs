@@ -3,7 +3,7 @@
   functions. No card specific logic pls (but site specific is ok)"
   (:require
    [cljs-bean.core :refer [->clj ->js]]
-   [potpuri.core :refer [deep-merge]]
+   [potpuri.core :refer [deep-merge find-index]]
    [kitchen-async.promise :as p]
    [react-query :refer [useQuery useMutation useQueryClient]]
    [juxt.home.card.config :as config]
@@ -22,19 +22,27 @@
                                         :timeout 5000
                                         :credentials "include"}
                                        opts)))]
-     (when-let [{:keys [pending success error]}
-                (:toast opts)]
-       (common/toast! promise
-                      (or pending
-                          "Waiting for server...")
-                      (or success
-                          "Success!")
-                      (or error
-                          "Error... Try again later")))
+     (let [{:keys [pending success error] :as toast}
+           (:toast opts)]
+       (when toast
+         (common/toast! promise
+                        (or pending
+                            "Waiting for server...")
+                        (or success
+                            "Success!")
+                        (or error
+                            "Error... Try again later"))))
      (set! (.-cancel promise) (fn cancelFetch [] (.abort controller)))
-     (.then promise #(if (= 204 (.-status %))
+     (.then promise #(if (or (= 204 (.-status %))
+                             (= 201 (.-status %)))
+                       ;; this seems dumb...
                        ""
                        (.json %))))))
+
+(defn prepare-body
+  "Takes a clj map and converts it to be used as a fetch body"
+  [m]
+  (js/JSON.stringify (clj->js m :keyword-fn #(subs (str %) 1))))
 
 (defn graphql-q
   [query-string variables]
@@ -57,40 +65,41 @@
   ([id opts]
    (fetch id (merge opts {:method "DELETE"}))))
 
-(defn handle-delete
-  [client key id]
-  (p/try
-    (.cancelQueries client key)
-    (let [previous-vals (.getQueryData client key)
-          new-vals (remove #(= id (:crux.db/id %))
-                           previous-vals)]
-      (js/console.log "del" key id previous-vals new-vals)
-      (.setQueryData client key new-vals)
-      {:previous previous-vals
-       :key key
-       :client client
-       :new new-vals})
-    (p/catch :default e
-      (js/console.error
-       "error deleting item" {:key key
-                              :e e
-                              :id id}))))
+(defn update-req!
+  [id opts]
+  (fetch id (merge opts {:method "PATCH"})))
+
+(defn create-req!
+  [id opts]
+  (fetch id (merge opts {:method "PUT"})))
 
 (defn handle-error
-  [err new-item context]
+  [err _new-item context]
   (p/let [previous (:previous context)
           client (:client context)]
-    (.setQueryData client (:key context) (:previous context))))
+    (prn "Error, rolling back..." err)
+    (.setQueryData client (:key context) previous)))
 
 (defn use-mutation
-  [mutation-fn opts]
-  (let [client (useQueryClient)
-        key (:key opts)]
+  [mutation-fn {:keys [key new-data-fn on-mutate-fn mutation-fn-props]
+                :as opts}]
+  (let [client (useQueryClient)]
     (useMutation
-     #(mutation-fn % (merge {:toast true} (:mutation-fn-props opts)))
+     #(mutation-fn % (merge {:toast true} mutation-fn-props))
      (clj->js
       (merge
-       {:onMutate #(handle-delete client key %)
+       {:onMutate
+        #(p/let [_ (.cancelQueries client key)
+                 previous-vals (.getQueryData client key)
+                 new-vals (new-data-fn % previous-vals)]
+           (when (and previous-vals new-vals)
+             (.setQueryData client key new-vals))
+           (when on-mutate-fn
+             (on-mutate-fn client key %))
+           {:previous previous-vals
+            :key key
+            :client client
+            :new new-vals})
         :onError handle-error
         :onSettled (fn [_ err] (when-not err (.invalidateQueries client key)))}
        opts)))))
@@ -99,7 +108,29 @@
   "Returns a mutation object. When you call 'mutate' on that mutation object with
   an id as its only argument, it will send a DELETE request for the given id"
   [opts]
-  (use-mutation delete-req! opts))
+  (use-mutation
+   delete-req!
+   (merge
+    {:new-data-fn (fn [id previous-vals]
+                    (remove #(= id (:crux.db/id %))
+                            previous-vals))}
+    opts)))
+
+(defn use-create-mutation
+  [{:keys [url-fn] :as opts}]
+  (use-mutation
+   (or
+    url-fn
+    (fn [{:keys [crux.db/id] :as body}]
+      (create-req! id {:body (prepare-body body)})))
+   (merge
+    {:new-data-fn (fn [{:keys [crux.db/id] :as new-item} previous-vals]
+                    (if-let [idx (and id
+                                      (find-index previous-vals
+                                                  {:crux.db/id id}))]
+                      (assoc previous-vals idx new-item)
+                      (conj previous-vals new-item)))}
+    opts)))
 
 (def initialUser {:id "loading"
                   :email "Loading..."
