@@ -1,7 +1,7 @@
 (ns juxt.home.card.events.hooks
   (:require
-   [react-query :refer [useMutation useQueryClient]]
-   [cljs-bean.core :refer [->clj ->js]]
+   [potpuri.core :refer [deep-merge]]
+   [cljs-bean.core :refer [->clj]]
    [juxt.home.card.config :as config]
    [juxt.home.card.graphql :as graphql]
    [juxt.home.card.query-hooks :as query-hooks]))
@@ -13,7 +13,7 @@
    #(query-hooks/graphql-q graphql/all-holidays {})))
 
 (defn use-holidays
-  ([] (use-holidays nil))
+  ([] (use-holidays {}))
   ([{:keys [user-id] :as opts}]
    (let [received-holidays (fn process-hols
                              [hols]
@@ -34,7 +34,7 @@
       #(-> (query-hooks/fetch (str config/site-api-origin "/card/holidays"))
            (.then received-holidays))
 
-      (merge
+      (deep-merge
        {:query-opts {:placeholderData []
                      :staleTime (* 1000 60 60 24)}}
        opts)))))
@@ -71,7 +71,8 @@
         ;; make some js changes so we store type in the event data
         key #js ["holidays" user-id]]
     (query-hooks/use-delete-mutation
-     {:mutation-fn-props
+     {:key key
+      :mutation-fn-props
       {:toast
        {:pending "Deleting event..."
         :success "Event deleted! 💥"

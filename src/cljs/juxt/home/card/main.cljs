@@ -48,7 +48,7 @@
 
 (defnc app
   []
-  (let [{:keys [data isError] :as self} (use-self)]
+  (let [{:keys [data isError]} (use-self)]
     (cond
       isError
       (d/p {:class "text-red-500"} "Error loading user... Are you logged into site?")

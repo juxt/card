@@ -2,8 +2,8 @@
   "Treated as a sort of library of domain agnostic hooks and react-query wrapper
   functions. No card specific logic pls (but site specific is ok)"
   (:require
-   [clojure.string :as string]
    [cljs-bean.core :refer [->clj ->js]]
+   [potpuri.core :refer [deep-merge]]
    [kitchen-async.promise :as p]
    [react-query :refer [useQuery useMutation useQueryClient]]
    [juxt.home.card.config :as config]
@@ -16,12 +16,12 @@
          signal (.-signal controller)
          promise (.fetch
                   js/window url
-                  (clj->js (merge {:method "GET"
-                                   :signal signal
-                                   :headers {"Content-Type" "application/json"}
-                                   :timeout 5000
-                                   :credentials "include"}
-                                  opts)))]
+                  (clj->js (deep-merge {:method "GET"
+                                        :signal signal
+                                        :headers {"Content-Type" "application/json"}
+                                        :timeout 5000
+                                        :credentials "include"}
+                                       opts)))]
      (when-let [{:keys [pending success error]}
                 (:toast opts)]
        (common/toast! promise
@@ -73,6 +73,7 @@
     (p/catch :default e
       (js/console.error
        "error deleting item" {:key key
+                              :e e
                               :id id}))))
 
 (defn handle-error
@@ -83,7 +84,8 @@
 
 (defn use-mutation
   [mutation-fn opts]
-  (let [client (useQueryClient)]
+  (let [client (useQueryClient)
+        key (:key opts)]
     (useMutation
      #(mutation-fn % (merge {:toast true} (:mutation-fn-props opts)))
      (clj->js
@@ -106,7 +108,7 @@
                   :imageUrl "https://www.gravatar.com/avatar?d=mp"})
 
 (defn use-self
-  ([] (use-self nil))
+  ([] (use-self {}))
   ([opts]
    (let [assoc-image
          (fn assoc-image
@@ -122,7 +124,7 @@
       "self"
       #(-> (fetch (str config/site-api-origin "/_site/user"))
            (.then assoc-image))
-      (merge
+      (deep-merge
        {:query-opts {:placeholderData initialUser
                      :retry false
                      ;; user data is cached until page is refreshed
