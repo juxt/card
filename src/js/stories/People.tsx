@@ -41,7 +41,9 @@ const tabs = [
 
 export function People({
   profile,
+  isProfileLoading,
   directory,
+  isDirectoryLoading,
   user,
   onUpdateEvent,
   onDeleteEvent,
@@ -88,7 +90,10 @@ export function People({
             <Breadcrumb page={navigation.find((el) => el.current)!} />
 
             <article>
-              <ProfileHeader profile={profile}></ProfileHeader>
+              <ProfileHeader
+                profile={profile}
+                isLoading={isProfileLoading}
+              ></ProfileHeader>
               <Tabs
                 tabs={tabs}
                 selectedTab={selectedTab}
@@ -96,7 +101,10 @@ export function People({
               />
               {selectedTab === "Profile" && (
                 <>
-                  <DescriptionList profile={profile}></DescriptionList>
+                  <DescriptionList
+                    profile={profile}
+                    isLoading={isProfileLoading}
+                  ></DescriptionList>
                 </>
               )}
               {selectedTab === "Calendar" && (
@@ -110,7 +118,7 @@ export function People({
               )}
             </article>
           </main>
-          <DirectoryList directory={directory} />
+          <DirectoryList directory={directory} isLoading={isDirectoryLoading} />
         </div>
       </div>
     </div>

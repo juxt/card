@@ -1,6 +1,6 @@
 import { User } from "../types";
 
-export function SidebarFooter(props: { user: User }) {
+export function SidebarFooter(props: { user?: User }) {
   return (
     <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
       <a href="#" className="flex-shrink-0 w-full group block">

@@ -1,26 +1,101 @@
 import { FilterIcon, SearchIcon } from "@heroicons/react/solid";
 import { useState } from "react";
-import { Directory } from "../types";
+import { Directory as TDirectory } from "../types";
 import { Link } from "react-router-dom";
+import { MOCK_USER } from "../utils";
 export type DirectoryListProps = {
-  directory: Directory;
+  directory?: TDirectory;
+  isLoading: boolean;
 };
 
-export function DirectoryList({ directory }: DirectoryListProps) {
+type DirectoryProps = {
+  letter: string;
+  directory?: TDirectory;
+  isLoading?: boolean;
+  searchText?: string;
+};
+
+const groupedPeople = ({
+  letter,
+  directory,
+  searchText = "",
+}: DirectoryProps) => {
+  return directory![letter].filter(
+    (person) =>
+      // Filter people in search results
+      person.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+  );
+};
+
+const Directory = (props: DirectoryProps) => {
+  const { letter } = props;
+  const directoryItemClass =
+    "relative px-6 py-5 flex items-center space-x-3 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-pink-500";
+  return (
+    <div key={letter} className="relative">
+      <div className="z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 px-6 py-1 text-sm font-medium text-gray-500">
+        <h3>{letter}</h3>
+      </div>
+      <ul className="relative z-0 divide-y divide-gray-200">
+        {props.isLoading ? (
+          <div className={`animate-pulse ${directoryItemClass}`}>
+            <div className="flex-shrink-0">
+              <div className="h-10 w-10 bg-gray-700 rounded-full" />
+            </div>
+            <div className="flex-1 space-y-2 min-w-0">
+              <div className="h-4 bg-gray-700 rounded"></div>
+              <div className="h-4 bg-gray-700 rounded w-5/6"></div>
+            </div>
+          </div>
+        ) : (
+          groupedPeople(props).map((person) => (
+            <li key={person.id}>
+              <div className={directoryItemClass}>
+                <div className="flex-shrink-0">
+                  <img
+                    className="h-10 w-10 rounded-full"
+                    src={person.imageUrl}
+                    alt=""
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Link
+                    to={`/people?selected=${person.id}`}
+                    className="focus:outline-none"
+                  >
+                    {/* Extend touch target to entire panel */}
+                    <span className="absolute inset-0" aria-hidden="true" />
+                    <p className="text-sm font-medium text-gray-900">
+                      {person.name}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {person.role}
+                    </p>
+                  </Link>
+                </div>
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
+  );
+};
+
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+export function DirectoryList({ directory, isLoading }: DirectoryListProps) {
   const [searchText, setSearchText] = useState("");
-  const groupedPeople = (letter: string) => {
-    return directory[letter].filter(
-      (person) =>
-        // Filter people in search results
-        person.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
-    );
-  };
   return (
     <aside className="hidden xl:order-first xl:flex xl:flex-col flex-shrink-0 w-96 border-r border-gray-200">
       <div className="px-6 pt-6 pb-4">
         <h2 className="text-lg font-medium text-gray-900">Directory</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Search directory of {Object.values(directory).length} employees
+          {isLoading
+            ? "Loading..."
+            : `Search directory of ${
+                Object.values(directory!).length
+              } employees`}
         </p>
         <form className="mt-6 flex space-x-4">
           <div className="flex-1 min-w-0">
@@ -54,51 +129,24 @@ export function DirectoryList({ directory }: DirectoryListProps) {
         </form>
       </div>
       <nav className="flex-1 min-h-0 overflow-y-auto" aria-label="Directory">
-        {directory &&
-          Object.keys(directory)
-            .sort()
-            .filter((letter) => groupedPeople(letter)?.length > 0)
-            .map((letter) => (
-              <div key={letter} className="relative">
-                <div className="z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 px-6 py-1 text-sm font-medium text-gray-500">
-                  <h3>{letter}</h3>
-                </div>
-                <ul className="relative z-0 divide-y divide-gray-200">
-                  {letter &&
-                    groupedPeople(letter).map((person) => (
-                      <li key={person.id}>
-                        <div className="relative px-6 py-5 flex items-center space-x-3 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-pink-500">
-                          <div className="flex-shrink-0">
-                            <img
-                              className="h-10 w-10 rounded-full"
-                              src={person.imageUrl}
-                              alt=""
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <Link
-                              to={`/people?selected=${person.id}`}
-                              className="focus:outline-none"
-                            >
-                              {/* Extend touch target to entire panel */}
-                              <span
-                                className="absolute inset-0"
-                                aria-hidden="true"
-                              />
-                              <p className="text-sm font-medium text-gray-900">
-                                {person.name}
-                              </p>
-                              <p className="text-sm text-gray-500 truncate">
-                                {person.role}
-                              </p>
-                            </Link>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            ))}
+        {isLoading
+          ? alphabet.map((letter) => (
+              <Directory key={letter} letter={letter} isLoading />
+            ))
+          : Object.keys(directory!)
+              .sort()
+              .filter(
+                (letter) =>
+                  groupedPeople({ letter, searchText, directory })?.length > 0
+              )
+              .map((letter) => (
+                <Directory
+                  key={letter}
+                  letter={letter}
+                  directory={directory!}
+                  searchText={searchText}
+                />
+              ))}
       </nav>
     </aside>
   );

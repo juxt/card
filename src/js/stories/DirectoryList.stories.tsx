@@ -15,3 +15,8 @@ export const DirectoryListStory = Template.bind({});
 DirectoryListStory.args = {
   directory: MOCK_DIRECTORY,
 };
+
+export const Loading = Template.bind({});
+Loading.args = {
+  isLoading: true,
+};

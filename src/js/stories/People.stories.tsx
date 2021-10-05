@@ -19,6 +19,8 @@ const Template: Story<PeopleProps> = (args) => (
 
 export const PeoplePage = Template.bind({});
 PeoplePage.args = {
+  isProfileLoading: false,
+  isDirectoryLoading: false,
   profile: {
     name: "Mike Bruce",
     projects: MOCK_PROJECTS,
@@ -60,4 +62,10 @@ PeoplePage.args = {
     },
   },
   directory: MOCK_DIRECTORY,
+};
+
+export const Loading = Template.bind({});
+Loading.args = {
+  isProfileLoading: true,
+  isDirectoryLoading: true,
 };
