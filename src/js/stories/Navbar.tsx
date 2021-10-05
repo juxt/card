@@ -22,10 +22,12 @@ import { NavigationItem, User } from "../types";
 import { Link } from "react-router-dom";
 
 export type NavBarProps = {
+  isFetching?: boolean;
   navigation: NavigationItem[];
   logo: string;
   user: User;
 };
+
 const Nav = ({
   currentStyle,
   defaultStyle,
@@ -50,7 +52,7 @@ const Nav = ({
   );
 };
 
-function NavBar({ navigation, logo, user }: NavBarProps) {
+function NavBar({ navigation, logo, user, isFetching }: NavBarProps) {
   //TODO Pass this in from cljs
   const secondaryNav = [
     {
@@ -70,9 +72,12 @@ function NavBar({ navigation, logo, user }: NavBarProps) {
     },
   ];
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure as="nav" className="bg-gray-800 relative">
       {({ open }) => (
         <>
+          {isFetching && (
+            <span className="animate-pulse absolute z-10 w-full h-1 bg-gray-600 bottom-0"></span>
+          )}
           <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
             <div className="relative flex items-center justify-between h-16">
               <div className="flex items-center px-2 lg:px-0">
