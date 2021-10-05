@@ -6,20 +6,19 @@
    [juxt.lib.helix :refer [defnc]]
    [juxt.home.card.events.views :as events]
    [juxt.home.card.people.views :as people]
-   [helix.hooks :as hooks]
    [helix.dom :as d]
-   [cljs-bean.core :refer [->clj ->js]]
+   [cljs-bean.core :refer [->js]]
    [react-toastify :refer [ToastContainer]]
-   [react-query :refer [QueryClient QueryClientProvider]]
+   [react-query :refer [QueryClient QueryClientProvider useIsFetching]]
    [react-router-dom :refer [BrowserRouter Routes Route]]
    ["react-query/devtools" :refer [ReactQueryDevtools]]
    ["/juxt/card/stories/Navbar" :refer [NavBar]]
    [juxt.home.card.query-hooks :refer [use-self]]
    [react-dom :as rdom]))
 
-(def query-client (QueryClient. {:defaultOptions
-                                 {:queries
-                                  {:staleTime 5000}}}))
+(def query-client (QueryClient. (->js {:defaultOptions
+                                       {:queries
+                                        {:staleTime 5000}}})))
 
 (defnc home
   []
@@ -48,7 +47,8 @@
 
 (defnc app
   []
-  (let [{:keys [data isError]} (use-self)]
+  (let [{:keys [data isError]} (use-self)
+        isFetching (pos? (useIsFetching))]
     (cond
       isError
       (d/p {:class "text-red-500"} "Error loading user... Are you logged into site?")
@@ -57,6 +57,7 @@
          (d/main
           {:class "app-container"}
           ($ NavBar {:navigation (->js navbar-pages)
+                     :isFetching isFetching
                      :logo "https://home.juxt.site/x-on-dark.svg"
                      :user (->js data)})
           ($ pages)
