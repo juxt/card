@@ -24,6 +24,9 @@
                                        opts)))]
      (let [{:keys [pending success error] :as toast}
            (:toast opts)]
+       (when (seq opts)
+         (def opts opts))
+       (prn "t" toast)
        (when toast
          (common/toast! promise
                         (or pending
@@ -117,19 +120,21 @@
     opts)))
 
 (defn use-create-mutation
-  [{:keys [url-fn] :as opts}]
+  [{:keys [fetch-fn process-item-fn] :as opts}]
   (use-mutation
    (or
-    url-fn
+    fetch-fn
     (fn [{:keys [crux.db/id] :as body}]
       (create-req! id {:body (prepare-body body)})))
    (merge
-    {:new-data-fn (fn [{:keys [crux.db/id] :as new-item} previous-vals]
-                    (if-let [idx (and id
-                                      (find-index previous-vals
-                                                  {:crux.db/id id}))]
-                      (assoc previous-vals idx new-item)
-                      (conj previous-vals new-item)))}
+    {:new-data-fn (fn [new-item previous-vals]
+                    (let [{:keys [crux.db/id]
+                           :as new-item} (process-item-fn (->clj new-item))]
+                      (if-let [idx (and id
+                                        (find-index previous-vals
+                                                    {:crux.db/id id}))]
+                        (assoc previous-vals idx new-item)
+                        (conj previous-vals new-item))))}
     opts)))
 
 (def initialUser {:id "loading"
