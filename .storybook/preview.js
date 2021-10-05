@@ -1,4 +1,5 @@
-import "../src/css/tailwind.css"
+import { BrowserRouter } from "react-router-dom";
+import "../src/css/tailwind.css";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -8,4 +9,12 @@ export const parameters = {
       date: /Date$/,
     },
   },
-}
+};
+
+export const decorators = [
+  (Story) => (
+    <BrowserRouter>
+      <Story />
+    </BrowserRouter>
+  ),
+];
