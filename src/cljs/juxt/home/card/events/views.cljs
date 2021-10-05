@@ -10,13 +10,14 @@
 
 (defnc view
   []
-  (let [{:keys [data] :as events} (hooks/use-my-holidays)
+  (let [{:keys [data isLoading isPlaceholderData] :as events} (hooks/use-my-holidays)
         delete-mutation (hooks/use-delete-event)
         update-mutation (hooks/use-update-event)]
     (d/section
      {:class "page-section"}
      ($ common/hook-info {:hook events})
      ($ EventCalendar {:isCurrentUser true
+                       :isLoading (or isLoading isPlaceholderData)
                        :onDeleteEvent #(.mutate delete-mutation %)
                        :onUpdateEvent #(do
                                          (js/console.log "up" %)
