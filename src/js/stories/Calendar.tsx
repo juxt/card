@@ -157,13 +157,13 @@ export function EventCalendar({
               <>
                 <Item disabled>
                   <p>
-                    From: {selectedEvent?.start}
+                    From: {selectedEvent?.start.toString()}
                     {selectedEvent?.isStartHalfDay && " (Half Day)"}
                   </p>
                 </Item>
                 <Item disabled>
                   <p>
-                    To: {selectedEvent?.end}
+                    To: {selectedEvent?.end.toString()}
                     {selectedEvent?.isEndHalfDay && " (Half Day)"}
                   </p>
                 </Item>
