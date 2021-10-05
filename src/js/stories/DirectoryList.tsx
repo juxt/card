@@ -1,7 +1,7 @@
 import { FilterIcon, SearchIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 import { Directory } from "../types";
-
+import { Link } from "react-router-dom";
 export type DirectoryListProps = {
   directory: Directory;
 };
@@ -76,8 +76,8 @@ export function DirectoryList({ directory }: DirectoryListProps) {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <a
-                              href={`/people?selected=${person.id}`}
+                            <Link
+                              to={`/people?selected=${person.id}`}
                               className="focus:outline-none"
                             >
                               {/* Extend touch target to entire panel */}
@@ -91,7 +91,7 @@ export function DirectoryList({ directory }: DirectoryListProps) {
                               <p className="text-sm text-gray-500 truncate">
                                 {person.role}
                               </p>
-                            </a>
+                            </Link>
                           </div>
                         </div>
                       </li>
