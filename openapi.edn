@@ -150,6 +150,36 @@
       {"application/json"
        {:schema {}}}}}}}
 
+  "/users/{userId}"
+  {:parameters
+   [{:name "userId"
+     :in "path"
+     :required true
+     :description "users three letter code"
+     :schema {:type "string"}}]
+   :get
+   {:summary "Returns a single user given their username"
+    :operationId "getUser"
+    :tags ["People"]
+    :responses
+    {200
+     {:juxt.site.alpha/query
+      #juxt.site.alpha/as-str
+       {:find [(pull user [*])
+               (pull slack [*])
+               username]
+        :strs [user slack username]
+        :where [[(str {:juxt.site.alpha/ref [:juxt.site.alpha/base-uri]}
+                      "/_site/users/"
+                      {:in "path" :name "userId"})
+                 user]
+                [user :juxt.pass.alpha/username username]
+                [slack :juxt.site.alpha/type "SlackUserDetails"]
+                [slack :juxt.pass.alpha/user user]]}
+      :content
+      {"application/json"
+       {:schema {}}}}}}}
+
   "/users/{userId}/timesheet/{id}"
   {:parameters
    [{:name "userId"
@@ -186,14 +216,14 @@
     {200
      {:juxt.site.alpha/query
       #juxt.site.alpha/as-str
-      {:find [(pull timesheet [*])]
-       :where
-       [[(str {:juxt.site.alpha/ref [:juxt.site.alpha/base-uri]}
-              "/_site/users/"
-              {:in "path" :name "userId"})
-         user]
-        [timesheet :juxt.site.alpha/type "Timesheet"]
-        [timesheet :juxt.pass.alpha/user user]]}
+       {:find [(pull timesheet [*])]
+        :where
+        [[(str {:juxt.site.alpha/ref [:juxt.site.alpha/base-uri]}
+               "/_site/users/"
+               {:in "path" :name "userId"})
+          user]
+         [timesheet :juxt.site.alpha/type "Timesheet"]
+         [timesheet :juxt.pass.alpha/user user]]}
       :content
       {"application/json"
        {:schema {}}}}}}}
