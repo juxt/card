@@ -10,9 +10,7 @@
             [juxt.home.card.query-hooks :as query-hooks]))
 
 (defnc view []
-  (let [self (:data (query-hooks/use-self
-                     {:query-opts
-                      {:select #(:username %)}}))
+  (let [self (:data (query-hooks/use-self {:query-opts {:select #(:username %)}}))
         {:keys [selected]} (common/use-query-params)
         directory (hooks/use-directory)
         profile (hooks/use-people {:user-id (or selected self)})]
