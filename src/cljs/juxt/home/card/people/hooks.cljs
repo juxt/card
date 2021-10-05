@@ -1,6 +1,7 @@
 (ns juxt.home.card.people.hooks
   (:require [cljs-bean.core :refer [->clj ->js]]
-            [potpuri.core :refer [deep-merge find-first]]
+            [potpuri.core :refer [find-first]]
+            [react-query :refer [useQueryClient]]
             [juxt.home.card.query-hooks :as query-hooks]
             [juxt.home.card.config :as config]
             [clojure.string :as str]))
@@ -53,17 +54,29 @@
 (defn use-directory
   ([] (use-directory {}))
   ([opts]
-   (let [people->directory
+   (let [client (useQueryClient)
+         people->directory
          (fn [people]
            (let [people (->clj people)]
              (group-by
               (fn last-initial [{full-name :name}]
                 (first (last (str/split full-name " "))))
               (map process-user people))))
+         populate-cache
+         (fn [people]
+           ;; because we are loading every person here, we can give some data
+           ;; to ["people" {username}] without doing additional requests.
+           (doseq [person (->clj people)]
+             (.setQueryData
+              client
+              #js ["people" (:username person)]
+              (process-user person)))
+           people)
          directory
          (query-hooks/use-query
           ["people"]
           #(-> (query-hooks/fetch people-url)
+               (.then populate-cache)
                (.then people->directory))
           opts)]
      directory)))
