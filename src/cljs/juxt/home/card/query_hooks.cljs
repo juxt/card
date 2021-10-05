@@ -12,21 +12,18 @@
 (defn fetch
   ([url] (fetch url {}))
   ([url opts]
-   (let [controller ^js (new js/window.AbortController)
-         signal (.-signal controller)
-         promise (.fetch
+   (let [promise (.fetch
                   js/window url
-                  (clj->js (deep-merge {:method "GET"
-                                        :signal signal
-                                        :headers {"Content-Type" "application/json"}
-                                        :timeout 5000
-                                        :credentials "include"}
-                                       opts)))]
+                  (clj->js
+                   (deep-merge
+                    {:method "GET"
+                     :headers {"Content-Type"
+                               "application/json"}
+                     :timeout 5000
+                     :credentials "include"}
+                    opts)))]
      (let [{:keys [pending success error] :as toast}
            (:toast opts)]
-       (when (seq opts)
-         (def opts opts))
-       (prn "t" toast)
        (when toast
          (common/toast! promise
                         (or pending
@@ -35,10 +32,10 @@
                             "Success!")
                         (or error
                             "Error... Try again later"))))
-     (set! (.-cancel promise) (fn cancelFetch [] (.abort controller)))
      (.then promise #(if (or (= 204 (.-status %))
                              (= 201 (.-status %)))
-                       ;; this seems dumb...
+                       ;; don't try and .json nil bodies, is there a better way
+                       ;; to do this?
                        ""
                        (.json %))))))
 
@@ -149,8 +146,7 @@
    (let [assoc-image
          (fn assoc-image
            [user]
-           ;;todo can I not convert to clj in the fetch wrapper function?
-           (let [user (->clj user)]
+           (when-let [user (->clj user)]
              (assoc user
                     :imageUrl (str (:id user)
                                    "/slack/"
