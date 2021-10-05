@@ -38,16 +38,10 @@
   ([{:keys [user-id] :as opts}]
    (let [received-people
          (fn process-people [people]
-           (let [people (->clj people)]
-             (if user-id
-               (process-user
-                (find-first people {:username user-id}))
-               (into {}
-                     (for [person people]
-                       [(:username person) (process-user person)])))))]
+           (process-user (first (->clj people))))]
      (query-hooks/use-query
       (conj ["people"] user-id)
-      #(-> (query-hooks/fetch people-url)
+      #(-> (query-hooks/fetch (str people-url user-id))
            (.then received-people))
       opts))))
 
