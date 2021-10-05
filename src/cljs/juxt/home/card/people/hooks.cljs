@@ -1,7 +1,9 @@
 (ns juxt.home.card.people.hooks
   (:require [cljs-bean.core :refer [->clj ->js]]
+            [potpuri.core :refer [deep-merge find-first]]
             [juxt.home.card.query-hooks :as query-hooks]
-            [juxt.home.card.config :as config]))
+            [juxt.home.card.config :as config]
+            [clojure.string :as str]))
 
 (defn process-user
   [{:keys [user slack]}]
@@ -28,19 +30,40 @@
               :Salary "$145,000",
               :Birthday "June 8, 1990"}}))
 
+(def people-url (str config/site-api-origin "/card/users/"))
+
 (defn use-people
-  ([] (use-people nil))
-  ([opts]
+  ([] (use-people {}))
+  ([{:keys [user-id] :as opts}]
    (let [received-people
          (fn process-people [people]
-           (into {}
-                 (for [person (->clj people)]
-                   [(:username person) (process-user person)])))]
+           (let [people (->clj people)]
+             (if user-id
+               (process-user
+                (find-first people {:username user-id}))
+               (into {}
+                     (for [person people]
+                       [(:username person) (process-user person)])))))]
      (query-hooks/use-query
-      ["people"]
-      #(-> (query-hooks/fetch (str config/site-api-origin "/card/users/"))
+      (conj ["people"] user-id)
+      #(-> (query-hooks/fetch people-url)
            (.then received-people))
-      (merge
-       {:query-opts {:placeholderData []
-                     :staleTime (* 1000 60 10)}}
-       opts)))))
+      opts))))
+
+(defn use-directory
+  ([] (use-directory {}))
+  ([opts]
+   (let [people->directory
+         (fn [people]
+           (let [people (->clj people)]
+             (group-by
+              (fn last-initial [{full-name :name}]
+                (first (last (str/split full-name " "))))
+              (map process-user people))))
+         directory
+         (query-hooks/use-query
+          ["people"]
+          #(-> (query-hooks/fetch people-url)
+               (.then people->directory))
+          opts)]
+     directory)))
