@@ -17,10 +17,8 @@
      {:class "page-section"}
      ($ common/hook-info {:hook events})
      ($ EventCalendar {:isCurrentUser true
-                       :onDeleteEvent #(do
-                                         (prn "del" %)
-                                         (.mutate delete-mutation %))
+                       :onDeleteEvent #(.mutate delete-mutation %)
                        :onUpdateEvent #(do
-                                         (prn "up" %)
+                                         (js/console.log "up" %)
                                          (.mutate update-mutation %))
                        :events (->js data)}))))

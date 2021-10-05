@@ -56,7 +56,6 @@ export function EventCalendar({
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
   };
-  console.log(events);
 
   function convertEvent(event: EventApi) {
     const id = event.id;
@@ -72,7 +71,7 @@ export function EventCalendar({
 
   const handleEventChange = (dropProps: EventClickArg) => {
     const { event } = dropProps;
-    onUpdateEvent(event);
+    onUpdateEvent(event.toPlainObject());
   };
 
   const handleSelect = ({ startStr, endStr, allDay }: DateSelectArg) => {
