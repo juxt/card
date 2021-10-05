@@ -1,2 +1,5 @@
 {:config-paths ["lilactown/helix"]
- :lint-as {juxt.lib.helix/defnc clojure.core/defn}}
+ :lint-as {juxt.lib.helix/defnc clojure.core/defn
+           kitchen-async.promise/let clojure.core/let
+           kitchen-async.promise/try clojure.core/try
+           kitchen-async.promise/catch clojure.core/catch}}
