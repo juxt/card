@@ -1,7 +1,7 @@
 (ns juxt.home.card.events.hooks
   (:require
    [potpuri.core :refer [deep-merge]]
-   [cljs-bean.core :refer [->clj]]
+   [cljs-bean.core :refer [->clj ->js]]
    [juxt.home.card.config :as config]
    [juxt.home.card.graphql :as graphql]
    [juxt.home.card.query-hooks :as query-hooks]))
@@ -72,6 +72,40 @@
         key #js ["holidays" user-id]]
     (query-hooks/use-delete-mutation
      {:key key
+      :mutation-fn-props
+      {:toast
+       {:pending "Deleting event..."
+        :success "Event deleted! 💥"
+        :error "Error deleting event..."}}})))
+
+(defn use-update-event
+  []
+  (let [{:keys [data]} (query-hooks/use-self)
+        user-id (:id data)
+        ;; TODO don't hardcode key, could be holidays/timesheets but need to
+        ;; make some js changes so we store type in the event data
+        key #js ["holidays" user-id]]
+    (query-hooks/use-create-mutation
+     {:key key
+      :url-fn (fn [event]
+                (let [{:keys [allDay start end id title]} (->clj event)
+                      id (if (empty? id)
+                           (str
+                            config/site-api-origin
+                            "/card/holidays/"
+                            (random-uuid))
+                           id)
+                      holiday {:crux.db/id id
+                               :start start
+                               :end end
+                               :description title
+                               :all-day? (or allDay false)
+                               :juxt.site.alpha/type "Holiday"
+                               :juxt.pass.alpha/user user-id}]
+                  (prn holiday)
+                  (when (every? some? (vals holiday))
+                    (query-hooks/create-req! id {:body (query-hooks/prepare-body
+                                                        holiday)}))))
       :mutation-fn-props
       {:toast
        {:pending "Deleting event..."
