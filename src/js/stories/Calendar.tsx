@@ -32,6 +32,7 @@ export type CalendarProps = {
   events: CalendarFormData[];
   projectOptions: Option[];
   isCurrentUser: boolean;
+  isLoading?: boolean;
   onUpdateEvent: TonUpdateEvent;
   onDeleteEvent: TonDeleteEvent;
 };
@@ -40,6 +41,7 @@ export type CalendarModalProps = CalendarFormData | null | undefined;
 
 export function EventCalendar({
   events,
+  isLoading,
   isCurrentUser,
   projectOptions,
   onUpdateEvent,
@@ -139,6 +141,7 @@ export function EventCalendar({
           </label>
         </div>
         <div className="demo-app-sidebar-section">
+          {isLoading && <div>Loading...</div>}
           <h2>All Events ({currentEvents.length})</h2>
           <ul>{currentEvents.map(renderSidebarEvent)}</ul>
         </div>
