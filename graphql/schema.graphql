@@ -10,36 +10,48 @@ type Query {
 Holidays are fun.
   """
   allUsers: [User]
-@xtdb(q: """
-{:find [e] :where [[e :juxt.site.alpha/type "User"]]}
-""")
+@site(q: {find: [e] where: [[e {keyword: "juxt.site.alpha/type"} "User"]]})
   allHolidays: [Holiday]
-@xtdb(q: """
-{:find [e] :where [[e :juxt.site.alpha/type "Holiday"]]}
-""")
+@site(q: {find: [e] where: [[e {keyword: "juxt.site.alpha/type"} "Holiday"]]})
 }
 
 """
 An object representing a Site user. Anyone who needs to log in to the system must have a user record.
 """
 type User {
-  id: ID @xtdb(a: "crux.db/id")
-  username: String @xtdb(a: "juxt.pass.alpha/username")
-  name: String @xtdb(a: "name")
-  email: String @xtdb(a: "email")
-  holidays: [Holiday] @xtdb(q: """
-{:find [e] :where [[e :juxt.site.alpha/type "Holiday"]
-                   [e :juxt.pass.alpha/user object]]}
-""")
+  id: ID @site(a: "crux.db/id")
+  username: String @site(a: "juxt.pass.alpha/username")
+  name: String
+  email: String
+  slackUserDetails: [SlackProfile]
+    @site(q:
+    {find: [e]
+     where:
+      [[e {keyword: "juxt.site.alpha/type"} "SlackUserDetails"]
+       [e {keyword: "juxt.pass.alpha/user"} object]]})
+  holidays: [Holiday]
+    @site(q: { find: [hol]
+               where: [[hol {keyword: "juxt.site.alpha/type"} "Holiday"]
+                       [hol {keyword: "juxt.pass.alpha/user"} object]]})
+}
+
+
+"""
+A users Slack profile ingested from slacks API
+"""
+type SlackProfile {
+  id: ID @site(a: "crux.db/id")
+  profilePic: String @site(a: "juxt.home/slack-profile-pic")
+  user: User @site(a: "juxt.pass.alpha/user")
 }
 
 """
 The holiday object
 """
 type Holiday {
-  id: ID @xtdb(a: "crux.db/id")
-  user: User @xtdb(a: "juxt.pass.alpha/user")
-  startDate: String @xtdb(a: "start-date")
-  endDate: String @xtdb(a: "end-date")
-  description: String @xtdb(a: "description")
+  id: ID @site(a: "crux.db/id")
+  user: User @site(a: "juxt.pass.alpha/user")
+  startDate: String @site(a: "start-date")
+  endDate: String @site(a: "end-date")
+  description: String
 }
