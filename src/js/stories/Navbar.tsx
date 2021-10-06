@@ -19,7 +19,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { SearchIcon } from "@heroicons/react/solid";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { NavigationItem, User } from "../types";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export type NavBarProps = {
   isFetching?: boolean;
@@ -39,15 +39,22 @@ const Nav = ({
 }) => {
   return (
     <>
-      {items.map(({ path, current, name }) => (
-        <Link
-          key={name}
-          to={path}
-          className={current ? currentStyle : defaultStyle}
-        >
-          {name}
-        </Link>
-      ))}
+      {items.map(({ path, name }) => {
+        // Shouldn't really have to do this because navlink does it automatically,
+        // but wasn't having a lot of luck getting it to work with the Disclosure thing so 🤷
+        const currentPath = window.location.pathname.split("/")[1] || "/";
+        const isActive = currentPath === path;
+        return (
+          <Disclosure.Button
+            as={NavLink}
+            key={name}
+            to={path}
+            className={isActive ? currentStyle : defaultStyle}
+          >
+            {name}
+          </Disclosure.Button>
+        );
+      })}
     </>
   );
 };
@@ -166,12 +173,12 @@ function NavBar({ navigation, logo, user, isFetching }: NavBarProps) {
                           >
                             {secondaryNav.map(({ id, path: href, name }) => (
                               <Menu.Item key={id}>
-                                <a
-                                  href={href}
+                                <Link
+                                  to={href}
                                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 >
                                   {name}
-                                </a>
+                                </Link>
                               </Menu.Item>
                             ))}
                           </Menu.Items>

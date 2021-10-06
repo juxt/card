@@ -32,9 +32,9 @@ export function DescriptionList({
     <div className="mt-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
         {fields &&
-          Object.keys(fields).map((field) =>
-            renderField(field, profile?.fields![field] || "")
-          )}
+          Object.keys(fields).map((field) => {
+            return renderField(field, fields[field] || "");
+          })}
         {profile?.about && (
           <div className="sm:col-span-2">
             <dt className="text-sm font-medium text-gray-500">About</dt>

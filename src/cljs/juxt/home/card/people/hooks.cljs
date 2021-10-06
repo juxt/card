@@ -36,12 +36,15 @@
 (defn use-people
   ([] (use-people {}))
   ([{:keys [user-id] :as opts}]
-   (let [received-people
+   (let [self (query-hooks/use-self)
+         received-people
          (fn process-people [people]
            (process-user (first (->clj people))))]
      (query-hooks/use-query
       (conj ["people"] user-id)
-      #(-> (query-hooks/fetch (str people-url user-id))
+      #(-> (query-hooks/fetch (str people-url user-id)
+                              {:query-opts
+                               {:placeholderData self}})
            (.then received-people))
       opts))))
 
