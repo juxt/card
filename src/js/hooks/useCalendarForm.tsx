@@ -28,6 +28,7 @@ export function useCalendarForm(
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<CalendarFormData>({
     //disable typescript for this yup stuff until I can figure it out
@@ -52,7 +53,7 @@ export function useCalendarForm(
 
   return {
     register,
-    reset,
+    setValue,
     errors,
     onSubmit: handleSubmit(onSubmit, onError),
   };

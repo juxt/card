@@ -32,8 +32,11 @@ export const CreateEventForm: FC<Props> = (props) => {
 
   const { dateRange, setDateRange } = props;
 
-  const formatDate = (dateStr: string | undefined) => {
+  const formatDate = (dateStr: string | undefined, isHoliday: boolean) => {
     if (!dateStr) return "";
+    if (isHoliday && dateStr.length > 10) {
+      return dateStr.slice(0, 10);
+    }
     if (dateRange?.allDay && dateStr.length === 10) {
       return dateStr;
     }
@@ -41,23 +44,24 @@ export const CreateEventForm: FC<Props> = (props) => {
   };
 
   const Form: FC<Props> = ({ setDateRange, projectOptions }) => {
-    const { register, onSubmit, errors, reset } = useCalendarForm(
+    const { register, onSubmit, errors, setValue } = useCalendarForm(
       props.onSubmit,
       dateRange,
       setDateRange
     );
 
+    const [isHoliday, setIsHoliday] = useState(false);
+
     useEffect(() => {
-      reset({
-        ...dateRange,
-        start: formatDate(dateRange?.start),
-        end: formatDate(dateRange?.end),
-      });
-    }, [reset, dateRange]);
+      setValue("start", formatDate(dateRange?.start, isHoliday));
+      setValue("end", formatDate(dateRange?.end, isHoliday));
+    }, [setValue, dateRange, isHoliday]);
 
     const checkboxClass =
       "mt-2.5 rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0";
     const noDivider = "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1";
+
+    console.log(dateRange);
 
     const holidayInputs: Inputs = [
       {
@@ -126,7 +130,6 @@ export const CreateEventForm: FC<Props> = (props) => {
         required: true,
       },
     ];
-    const [isHoliday, setIsHoliday] = useState(false);
     const inputs = isHoliday ? holidayInputs : timesheetInputs;
     const formWrapperClass =
       "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5";
