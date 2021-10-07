@@ -1,8 +1,10 @@
-import { FilterIcon, SearchIcon } from "@heroicons/react/solid";
+import { FilterIcon, SearchIcon, XIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 import { Directory as TDirectory } from "../types";
 import { Link } from "react-router-dom";
 import { MOCK_USER } from "../utils";
+import { Disclosure } from "@headlessui/react";
+import { useWindowSize } from "../hooks/useWindowSize";
 export type DirectoryListProps = {
   directory?: TDirectory;
   isLoading: boolean;
@@ -31,8 +33,10 @@ const Directory = (props: DirectoryProps) => {
   const { letter } = props;
   const directoryItemClass =
     "relative px-6 py-5 flex items-center space-x-3 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-pink-500";
+  const size = useWindowSize();
+  const isMobile = size?.width && size.width < 768;
   return (
-    <div key={letter} className="relative">
+    <div key={letter} className="relative bg-white">
       <div className="z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 px-6 py-1 text-sm font-medium text-gray-500">
         <h3>{letter}</h3>
       </div>
@@ -63,8 +67,16 @@ const Directory = (props: DirectoryProps) => {
                     to={`/people?selected=${person.id}`}
                     className="focus:outline-none"
                   >
-                    {/* Extend touch target to entire panel */}
-                    <span className="absolute inset-0" aria-hidden="true" />
+                    {/* Extend touch target to entire panel and close on click if mobile */}
+                    {isMobile ? (
+                      <Disclosure.Button
+                        as="span"
+                        aria-hidden="true"
+                        className="absolute inset-0"
+                      />
+                    ) : (
+                      <span className="absolute inset-0" aria-hidden="true" />
+                    )}
                     <p className="text-sm font-medium text-gray-900">
                       {person.name}
                     </p>
@@ -87,8 +99,12 @@ const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 export function DirectoryList({ directory, isLoading }: DirectoryListProps) {
   const [searchText, setSearchText] = useState("");
   return (
-    <aside className="hidden xl:order-first xl:flex xl:flex-col flex-shrink-0 w-96 border-r border-gray-200">
-      <div className="px-6 pt-6 pb-4">
+    <aside className="absolute z-10 bg-white h-screen md:relative lg:order-first lg:flex lg:flex-col flex-shrink-0 w-96 border-r border-gray-200">
+      <div className="relative px-6 pt-6 pb-4 bg-white">
+        <Disclosure.Button
+          as={XIcon}
+          className="lg:hidden absolute top-0 right-0 h-6 w-6 m-4 text-gray-500"
+        />
         <h2 className="text-lg font-medium text-gray-900">Directory</h2>
         <p className="mt-1 text-sm text-gray-600">
           {isLoading
