@@ -79,8 +79,8 @@ export function EventCalendar({
   const handleSelect = ({ startStr, endStr, allDay }: DateSelectArg) => {
     !menuVisible &&
       setModalProps({
-        start: startStr,
-        end: endStr,
+        start: startStr + "T00:00",
+        end: endStr + "T00:00",
         id: "",
         allDay,
         title: "",
