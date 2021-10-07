@@ -192,6 +192,7 @@ export function EventCalendar({
             center: "title",
             right: isMobile ? "" : "dayGridMonth,timeGridWeek,timeGridDay",
           }}
+          eventClassNames={["chromatic-ignore"]}
           initialView="dayGridMonth"
           contentHeight="auto"
           editable={isCurrentUser}

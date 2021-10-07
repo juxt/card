@@ -7,7 +7,10 @@ import { NavBar } from "./Navbar";
 export default {
   title: "People/dashboard",
   component: People,
-  parameters: { actions: { argTypesRegex: "^on.*" } },
+  parameters: {
+    actions: { argTypesRegex: "^on.*" },
+    chromatic: { viewports: [320, 480, 1200, 1790] },
+  },
 } as Meta;
 
 const Template: Story<PeopleProps> = (args) => (
