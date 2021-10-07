@@ -99,7 +99,7 @@ const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 export function DirectoryList({ directory, isLoading }: DirectoryListProps) {
   const [searchText, setSearchText] = useState("");
   return (
-    <aside className="absolute z-10 bg-white h-screen md:relative lg:order-first lg:flex lg:flex-col flex-shrink-0 w-96 border-r border-gray-200">
+    <aside className="absolute z-10 bg-white h-screen md:relative lg:order-first lg:flex lg:flex-col flex-shrink-0  border-r border-gray-200">
       <div className="relative px-6 pt-6 pb-4 bg-white">
         <Disclosure.Button
           as={XIcon}
@@ -110,7 +110,7 @@ export function DirectoryList({ directory, isLoading }: DirectoryListProps) {
           {isLoading
             ? "Loading..."
             : `Search directory of ${
-                Object.values(directory!).length
+                Object.values(directory!).length + 1
               } employees`}
         </p>
         <form className="mt-6 flex space-x-4">
