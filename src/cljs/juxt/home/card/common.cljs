@@ -36,3 +36,11 @@
    (when (:isError hook)
      (js/console.log (:error hook))
      (d/p "Error fetching"))))
+
+(defn format-holiday
+  [{:keys [start-date end-date start end crux.db/id all-day? description]}]
+  {:id id
+   :start (or start start-date)
+   :end (or end end-date)
+   :allDay (not (false? all-day?))
+   :title description})
