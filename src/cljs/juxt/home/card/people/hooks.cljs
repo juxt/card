@@ -1,6 +1,7 @@
 (ns juxt.home.card.people.hooks
   (:require [cljs-bean.core :refer [->clj ->js]]
-            [potpuri.core :refer [find-first]]
+            [juxt.home.card.common :as common]
+            [potpuri.core :refer [find-first deep-merge]]
             [react-query :refer [useQueryClient]]
             [juxt.home.card.query-hooks :as query-hooks]
             [juxt.home.card.config :as config]
@@ -33,20 +34,36 @@
 
 (def people-url (str config/site-api-origin "/card/users/"))
 
+(defn use-holidays-by-user-id
+  [user-id]
+  (let [received-holidays (fn process-hols [hols]
+                            (->> (->clj hols)
+                                 flatten
+                                 (filter #(= user-id (:juxt.pass.alpha/user %)))
+                                 (map common/format-holiday)))]
+    (query-hooks/use-query
+     ["holidays" user-id]
+     #(-> (query-hooks/fetch (str config/site-api-origin "/card/holidays"))
+          (.then received-holidays)))))
+
 (defn use-people
   ([] (use-people {}))
   ([{:keys [user-id] :as opts}]
    (let [self (query-hooks/use-self)
+         holidays (:data
+                   (use-holidays-by-user-id (str "https://home.juxt.site/_site/users/" user-id)))
          received-people
-         (fn process-people [people]
-           (process-user (first (->clj people))))]
+         (fn process-people [holidays people]
+           (let [user (first (->clj people))]
+             (process-user user)))]
      (query-hooks/use-query
       (conj ["people"] user-id)
       #(-> (query-hooks/fetch (str people-url user-id)
                               {:query-opts
                                {:placeholderData self}})
-           (.then received-people))
-      opts))))
+           (.then (partial received-people holidays)))
+      (deep-merge opts
+                  {:query-opts {:select #(assoc % :holidays holidays)}})))))
 
 (defn use-directory
   ([] (use-directory {}))

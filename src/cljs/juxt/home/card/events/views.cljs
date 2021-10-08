@@ -19,7 +19,5 @@
      ($ EventCalendar {:isCurrentUser true
                        :isLoading (or isLoading isPlaceholderData)
                        :onDeleteEvent #(.mutate delete-mutation %)
-                       :onUpdateEvent #(do
-                                         (js/console.log "up" %)
-                                         (.mutate update-mutation %))
+                       :onUpdateEvent #(.mutate update-mutation %)
                        :events (->js data)}))))

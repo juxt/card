@@ -4,6 +4,7 @@
    [cljs-bean.core :refer [->clj ->js]]
    [juxt.home.card.config :as config]
    [juxt.home.card.graphql :as graphql]
+   [juxt.home.card.common :as common]
    [juxt.home.card.query-hooks :as query-hooks]))
 
 (defn use-events
@@ -39,14 +40,6 @@
                      :staleTime (* 1000 60 60 24)}}
        opts)))))
 
-(defn format-holiday
-  [{:keys [start-date end-date start end crux.db/id all-day? description]}]
-  {:id id
-   :start (or start start-date)
-   :end (or end end-date)
-   :allDay (not (false? all-day?))
-   :title description})
-
 (defn use-my-holidays
   []
   (let [{:keys [data]} (query-hooks/use-self)
@@ -56,7 +49,7 @@
                    ;; doing the processing in this select opt means
                    ;; this hook won't cause a rerender when other
                    ;; holiday items are changed
-                   {:select #(map format-holiday %)
+                   {:select #(map common/format-holiday %)
                     ;; my holidays will only be modified by me, so
                     ;; no need to refetch (we invalidate manually
                     ;; when a mutation happens)
