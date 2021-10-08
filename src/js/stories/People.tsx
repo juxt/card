@@ -19,7 +19,7 @@ export function People({
   isProfileLoading,
   directory,
   isDirectoryLoading,
-  user,
+  isCurrentUser,
   onUpdateEvent,
   onDeleteEvent,
 }: PeopleProps) {
@@ -90,7 +90,7 @@ export function People({
                   <EventCalendar
                     events={profile?.holidays || []}
                     projectOptions={profile?.projects || []}
-                    isCurrentUser={user?.id === profile?.id}
+                    isCurrentUser={isCurrentUser}
                     onDeleteEvent={onDeleteEvent}
                     onUpdateEvent={onUpdateEvent}
                   />

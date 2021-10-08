@@ -22,6 +22,7 @@
                 :directory (->js (:data directory))
                 :isDirectoryLoading (:isLoading directory)
                 :isProfileLoading (:isLoading profile)
-                :user {:id username}
+                :isCurrentUser (or (nil? selected)
+                                   (= selected username))
                 :onDeleteEvent #(.mutate delete-mutation %)
                 :onUpdateEvent #(.mutate update-mutation %)}))))
