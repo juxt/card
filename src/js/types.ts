@@ -39,7 +39,6 @@ export type TonDeleteEvent = (id: string) => void;
 export type TonUpdateEvent = (props: unknown) => void;
 
 export type PeopleProps = {
-  user?: User;
   profile?: User;
   isProfileLoading: boolean;
   directory?: Directory;
