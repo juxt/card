@@ -38,9 +38,39 @@
      (d/p "Error fetching"))))
 
 (defn format-holiday
-  [{:keys [start-date end-date start end crux.db/id all-day? description]}]
-  {:id id
+  [{:keys [start-date
+           end-date
+           start
+           end
+           half-start
+           half-end
+           id
+           title
+           description]
+    :as hol}]
+  {:id (or id (:crux.db/id hol))
    :start (or start start-date)
    :end (or end end-date)
-   :allDay (not (false? all-day?))
-   :title description})
+   :isStartHalfDay half-start
+   :isEndHalfDay half-end
+   :allDay true
+   :type "Holiday"
+   :title (or title description)})
+
+(defn format-timesheet
+  [{:keys [start-date
+           end-date
+           start
+           end
+           project
+           id
+           title
+           description]
+    :as timesheet}]
+  {:id (or id (:crux.db/id timesheet))
+   :start (or start start-date)
+   :end (or end end-date)
+   :project project
+   :allDay true
+   :type "Timesheet"
+   :title (or title description)})

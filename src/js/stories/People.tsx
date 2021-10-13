@@ -11,7 +11,7 @@ import { useWindowSize } from "../hooks/useWindowSize";
 
 const tabs = [
   { name: "Profile", path: "#", current: true },
-  { name: "Calendar", path: "#", current: false },
+  { name: "Holidays", path: "#", current: false },
 ];
 
 export function People({
@@ -86,9 +86,10 @@ export function People({
                     isLoading={isProfileLoading}
                   />
                 )}
-                {selectedTab === "Calendar" && (
+                {selectedTab === "Holidays" && (
                   <EventCalendar
                     events={profile?.holidays || []}
+                    eventType="Holiday"
                     projectOptions={profile?.projects || []}
                     isCurrentUser={isCurrentUser}
                     onDeleteEvent={onDeleteEvent}

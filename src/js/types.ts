@@ -1,3 +1,5 @@
+import { Path } from "react-hook-form";
+
 export type SidebarProps = {
   user?: User;
   navigation: NavigationItem[];
@@ -48,10 +50,13 @@ export type PeopleProps = {
   onDeleteEvent: TonDeleteEvent;
 };
 
+export type EventType = "Holiday" | "Timesheet";
+
 export type CalendarFormData = {
   id?: string;
   title: string;
   project?: string;
+  type: EventType;
   start: string;
   isStartHalfDay?: boolean;
   end: string;
@@ -62,4 +67,15 @@ export type CalendarFormData = {
 export type Option = {
   label?: string;
   value: string;
+};
+
+export type FormInput = {
+  inputName: Path<CalendarFormData>;
+  label?: string;
+  type: string;
+  options?: Option[];
+  placeholder?: string;
+  wrapperClass?: string;
+  inputClass?: string;
+  required?: boolean;
 };

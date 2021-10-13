@@ -51,6 +51,31 @@ The project has two main parts. The CLJS files contain the entry point, routing 
 
 If you plan to edit the .tsx files, please ensure you have https://prettier.io/[prettier] setup.
 
+== Common Issues
+
+ Please have a good read through the helix docs if you are having difficulties, there are some differences in how elements are created compared to reagent.
+
+The most common is probably that you should not merge anything into a props map.
+
+This is wrong:
+```
+($ EventCalendar
+       (merge
+        {:isCurrentUser true
+         :onDeleteEvent #(.mutate delete-mutation %)
+         :onUpdateEvent #(.mutate update-mutation %)}
+        props))
+```
+And this is correct:
+```
+($ EventCalendar
+       {:isCurrentUser true
+        :onDeleteEvent #(.mutate delete-mutation %)
+        :onUpdateEvent #(.mutate update-mutation %)
+        & props})
+```
+
+
 == Release
 
 To release to production run:

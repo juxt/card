@@ -8,16 +8,36 @@
             ["/juxt/card/stories/Calendar" :refer [EventCalendar]]
             [helix.dom :as d]))
 
-(defnc view
-  []
-  (let [{:keys [data isLoading isPlaceholderData] :as events} (hooks/use-my-holidays)
-        delete-mutation (hooks/use-delete-event)
+(defnc calendar
+  [props]
+  (let [delete-mutation (hooks/use-delete-event)
         update-mutation (hooks/use-update-event)]
+    ($ EventCalendar
+       {:isCurrentUser true
+        :onDeleteEvent #(.mutate delete-mutation %)
+        :onUpdateEvent #(.mutate update-mutation %)
+        & props})))
+
+(defnc timesheets
+  []
+  (let [{:keys [data isLoading isPlaceholderData] :as events}
+        (hooks/use-my-timesheets)]
     (d/section
      {:class "page-section"}
      ($ common/hook-info {:hook events})
-     ($ EventCalendar {:isCurrentUser true
-                       :isLoading (or isLoading isPlaceholderData)
-                       :onDeleteEvent #(.mutate delete-mutation %)
-                       :onUpdateEvent #(.mutate update-mutation %)
-                       :events (->js data)}))))
+     ($ calendar
+        {:isLoading (or isLoading isPlaceholderData)
+         :events (->js data)
+         :eventType "Timesheet"}))))
+
+(defnc holidays
+  []
+  (let [{:keys [data isLoading isPlaceholderData] :as events}
+        (hooks/use-my-holidays)]
+    (d/section
+     {:class "page-section"}
+     ($ common/hook-info {:hook events})
+     ($ calendar
+        {:isLoading (or isLoading isPlaceholderData)
+         :events (->js data)
+         :eventType "Holiday"}))))

@@ -30,9 +30,12 @@
   [{:path "/"
     :name "Home"
     :element ($ home)}
-   {:path "events"
-    :name "Events"
-    :element ($ events/view)}
+   {:path "holidays"
+    :name "Holidays"
+    :element ($ events/holidays)}
+   {:path "timesheets"
+    :name "Timesheets"
+    :element ($ events/timesheets)}
    {:path "people"
     :name "People"
     :element ($ people/view)}])

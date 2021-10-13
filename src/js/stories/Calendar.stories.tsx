@@ -9,11 +9,25 @@ export default {
 } as Meta;
 
 const Template: Story<CalendarProps> = (args) => <EventCalendar {...args} />;
-export const Calendar = Template.bind({});
-Calendar.args = {
-  isCurrentUser: true,
+const defaultArgs = {
   events: MOCK_EVENTS,
+  isCurrentUser: true,
   projectOptions: MOCK_PROJECTS,
+};
+
+export const Calendar = Template.bind({});
+Calendar.args = defaultArgs;
+
+export const CalendarAlwaysTimeSheet = Template.bind({});
+CalendarAlwaysTimeSheet.args = {
+  ...defaultArgs,
+  eventType: "Timesheet",
+};
+
+export const CalendarAlwaysHoliday = Template.bind({});
+CalendarAlwaysHoliday.args = {
+  ...defaultArgs,
+  eventType: "Holiday",
 };
 
 export const CalendarNoEvents = Template.bind({});

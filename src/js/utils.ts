@@ -93,12 +93,14 @@ export const MOCK_EVENTS: CalendarFormData[] = [
     start: dateStr(today),
     allDay: true,
     end: dateStr(daysPlus(1)),
+    type: "Holiday",
   },
   {
     id: createEventId(),
     title: "Really long name timed event to test truncation",
     start: dateStr(today) + "T10:00:00",
     end: dateStr(today) + "T11:30:00",
+    type: "Timesheet",
   },
   {
     id: createEventId(),
@@ -108,12 +110,14 @@ export const MOCK_EVENTS: CalendarFormData[] = [
     isStartHalfDay: true,
     end: dateStr(daysPlus(4)),
     isEndHalfDay: true,
+    type: "Holiday",
   },
   {
     id: createEventId(),
     title: "Timed event",
     start: dateStr(today) + "T12:00:00",
     end: dateStr(today) + "T14:30:00",
+    type: "Timesheet",
   },
 ];
 
