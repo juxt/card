@@ -16,6 +16,8 @@ import {
   TonDeleteEvent,
   TonUpdateEvent,
   Option,
+  FormInput,
+  EventType,
 } from "../types";
 import {
   Menu,
@@ -30,7 +32,8 @@ const MENU_ID = "event-menu-id";
 
 export type CalendarProps = {
   events: CalendarFormData[];
-  projectOptions: Option[];
+  eventType?: EventType;
+  projectOptions?: Option[];
   isCurrentUser: boolean;
   isLoading?: boolean;
   onUpdateEvent: TonUpdateEvent;
@@ -41,6 +44,7 @@ export type CalendarModalProps = CalendarFormData | null | undefined;
 
 export function EventCalendar({
   events,
+  eventType,
   isLoading,
   isCurrentUser,
   projectOptions,
@@ -58,6 +62,11 @@ export function EventCalendar({
   const handleWeekendsToggle = () => {
     setWeekendsVisible(!weekendsVisible);
   };
+
+  const filteredEvents = React.useMemo(() => {
+    if (!eventType) return events;
+    return events.filter((event) => event.type === eventType);
+  }, [events, eventType]);
 
   function convertEvent(event: EventApi) {
     const id = event.id;
@@ -81,6 +90,7 @@ export function EventCalendar({
       setModalProps({
         start: startStr + "T00:00",
         end: endStr + "T00:00",
+        type: eventType || (allDay ? "Holiday" : "Timesheet"),
         id: "",
         allDay,
         title: "",
@@ -99,6 +109,7 @@ export function EventCalendar({
         setModalProps({
           ...selectedEvent,
           title,
+          type: calEvent.extendedProps.type,
           start: startStr,
           end: endStr,
         });
@@ -120,14 +131,89 @@ export function EventCalendar({
       <i>{event.title}</i>
     </li>
   );
+  const checkboxClass =
+    "mt-2.5 rounded-md focus:ring-indigo-500 focus:border-indigo-500 min-w-0";
+  const noDivider = "sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-1";
 
+  const holidayInputs: FormInput[] = [
+    {
+      inputName: "title",
+      label: "Description",
+      type: "text",
+      placeholder: "Going anywhere nice?",
+    },
+    {
+      inputName: "start",
+      label: "Start Date",
+      type: "date",
+      required: true,
+    },
+    {
+      inputName: "isStartHalfDay",
+      label: "Half Day?",
+      type: "checkbox",
+      inputClass: checkboxClass,
+      wrapperClass: noDivider,
+    },
+    {
+      inputName: "end",
+      label: "End Date",
+      type: "date",
+      required: true,
+    },
+    {
+      inputName: "isEndHalfDay",
+      label: "Half Day?",
+      type: "checkbox",
+      inputClass: checkboxClass,
+      wrapperClass: noDivider,
+    },
+    {
+      inputName: "allDay",
+      type: "hidden",
+      required: false,
+      wrapperClass: noDivider,
+    },
+  ];
+  const timesheetInputs: FormInput[] = [
+    {
+      inputName: "project",
+      label: "Project",
+      type: "dropdown",
+      options: projectOptions,
+      placeholder: "Project",
+    },
+    {
+      inputName: "title",
+      label: "Short description of the work",
+      type: "text",
+      placeholder: "",
+    },
+    {
+      inputName: "start",
+      label: "Start Date",
+      type: "datetime-local",
+      required: true,
+    },
+    {
+      inputName: "end",
+      label: "End Date",
+      type: "datetime-local",
+      required: true,
+    },
+  ];
+  const isHoliday = modalProps?.type === "Holiday";
+  // for now assume timesheets if not holiday
+  const inputs = isHoliday ? holidayInputs : timesheetInputs;
+  const modalTitle = isHoliday ? "Add Holiday" : "Add Timesheet";
   return (
     <div className="demo-app">
       <CreateEventForm
         dateRange={modalProps}
-        projectOptions={projectOptions}
         setDateRange={setModalProps}
         onSubmit={onUpdateEvent}
+        inputs={inputs}
+        title={modalTitle}
       />
       <div className="demo-app-sidebar">
         <div className="demo-app-sidebar-section">
@@ -190,7 +276,10 @@ export function EventCalendar({
           headerToolbar={{
             left: "prev,next today",
             center: "title",
-            right: isMobile ? "" : "dayGridMonth,timeGridWeek,timeGridDay",
+            right:
+              isMobile || eventType === "Holiday"
+                ? ""
+                : "dayGridMonth,timeGridWeek,timeGridDay",
           }}
           eventClassNames={["chromatic-ignore"]}
           initialView="dayGridMonth"
@@ -201,7 +290,7 @@ export function EventCalendar({
           selectMirror={isCurrentUser}
           dayMaxEvents={true}
           weekends={weekendsVisible}
-          events={events}
+          events={filteredEvents}
           select={handleSelect}
           eventClick={handleEventClick}
           eventsSet={setCurrentEvents}
