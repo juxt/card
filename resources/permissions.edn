@@ -1,6 +1,0 @@
-{:crux.db/id
- "{{base-uri}}/_site/users/mal/permissions/card/view-cards"
- :juxt.site.alpha/type "Grant"
- :juxt.pass.alpha/user "{{base-uri}}/_site/users/mal"
- :juxt.pass.alpha/permission
- "{{base-uri}}/_card/permissions/view-cards"}

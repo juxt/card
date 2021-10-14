@@ -5,6 +5,8 @@ node_modules/
 .shadow-cljs/
 gen/
 
+/build/js
+/build/css
 /public/js
 /public/css
 

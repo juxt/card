@@ -18,19 +18,18 @@
     :closure-defines
     {goog.DEBUG true
      juxt.home.card.config/dev? true
-     juxt.home.card.config/site-api-origin "https://home.juxt.site" #_"http://localhost:2021"
-     juxt.home.card.config/application-context "/"}}
+     juxt.home.card.config/site-api-origin "https://home.juxt.site" #_"http://localhost:2021"}
+}
 
    :release
    {:compiler-options {:optimizations :advanced}
-    :output-dir "target/js"
+    :output-dir "build/js"
     :asset-path "/js"
     :closure-defines
-    {juxt.home.card.config/dev? true
+    {juxt.home.card.config/dev? false
      ;; We need the full origin because we currently use it to construct card
      ;; ids
-     juxt.home.card.config/site-api-origin "https://home.juxt.site"
-     juxt.home.card.config/application-context "/card/"}
+     juxt.home.card.config/site-api-origin "https://home.juxt.site"}
     :build-hooks
     [(shadow.cljs.build-report/hook
       {:output-to "tmp/report.html"})]}}}}
