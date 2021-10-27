@@ -35,8 +35,8 @@ A GraphQL schema is written in GraphQL's Schema Definition Language. See
 A `schema.graphql` file is provided as a demonstration. This queries for
 holidays and their users.
 
-Site defines a special directive, `@xtdb`, which is used to _bind_ the GraphQL
-types and object fields to the database. The directive is alpha status and may change based on dev feedback. It's a good idea to check the current code implementation at <<site-graphql>.
+Site defines a special directive, `@site`, which is used to _bind_ the GraphQL
+types and object fields to the database. The directive is alpha status and may change based on dev feedback. It's a good idea to check the current code implementation at `graphql/schema.graphql`.
 
 ----
 site put-asset --file schema.graphql --type application/graphql --path /graphql
