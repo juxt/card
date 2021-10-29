@@ -28,7 +28,7 @@
 (def navbar-pages
   "Top level pages that will appear in the navbar. Other pages are defined
   directly in the 'pages' component"
-  [{:path "/"
+  [{:path ""
     :name "Home"
     :element ($ home)}
    {:path "holidays"
@@ -61,15 +61,19 @@
       (d/p {:class "text-red-500"} "Error loading user... Are you logged into site?")
       :else
       ($ BrowserRouter
-         (d/main
-          {:class "app-container"}
-          ($ NavBar {:navigation (->js navbar-pages)
-                     :isFetching isFetching
-                     :logo "https://home.juxt.site/x-on-dark.svg"
-                     :user (->js data)})
-          ($ pages)
-          (d/div {:class "p-4 lg:p-10"}
-                 ($ ReactQueryDevtools {:initialIsOpen true})))))))
+         ($ Routes
+            ($ Route
+               {:path "/_card/*"
+                :element
+                (d/main
+                 {:class "app-container"}
+                 ($ NavBar {:navigation (->js navbar-pages)
+                            :isFetching isFetching
+                            :logo "https://home.juxt.site/x-on-dark.svg"
+                            :user (->js data)})
+                 ($ pages)
+                 (d/div {:class "p-4 lg:p-10"}
+                        ($ ReactQueryDevtools {:initialIsOpen true})))}))))))
 
 (rdom/render
  ($ QueryClientProvider
