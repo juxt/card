@@ -6,6 +6,7 @@
    [juxt.lib.helix :refer [defnc]]
    [juxt.home.card.events.views :as events]
    [juxt.home.card.people.views :as people]
+   [juxt.home.card.hiring.views :as hiring]
    [helix.dom :as d]
    [cljs-bean.core :refer [->js]]
    [react-toastify :refer [ToastContainer]]
@@ -36,6 +37,9 @@
    {:path "timesheets"
     :name "Timesheets"
     :element ($ events/timesheets)}
+   {:path "hiring"
+    :name "Hiring"
+    :element ($ hiring/view)}
    {:path "people"
     :name "People"
     :element ($ people/view)}])
